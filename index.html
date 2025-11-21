@@ -3,122 +3,333 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRACKS Ad Ops Wizard</title>
+    <title>TRACKS Ad Ops Suite</title>
     <style>
+        /* =========================================
+           1. GLOBAL VARIABLES & RESET
+           ========================================= */
         :root {
-            /* BRAND COLOR */
-            --primary: #ff0249; 
+            /* Brand Colors */
+            --primary: #ff0249; /* Main TRACKS Pink */
             
-            /* UI Colors */
+            /* UI Neutral Colors */
             --light: #f8f9fa;
             --grey: #eef2f5;
+            --dark: #2c3e50;
+            --border: #eee;
         }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 20px; background: var(--grey); color: #333; }
-        .container { max-width: 95%; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); min-height: 80vh; display: flex; flex-direction: column; }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: var(--grey); 
+            color: #333; 
+        }
+
+        .container { 
+            max-width: 1400px; /* Wide layout to accommodate large tables */
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            min-height: 80vh; 
+            display: flex; 
+            flex-direction: column; 
+        }
         
-        /* WIZARD HEADER */
-        .wizard-header { display: flex; border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 20px; justify-content: space-between; align-items: center; }
+        /* =========================================
+           2. HEADER & NAVIGATION
+           ========================================= */
+        .app-header { 
+            display: flex; 
+            border-bottom: 2px solid var(--border); 
+            padding-bottom: 20px; 
+            margin-bottom: 30px; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
         
         .header-branding { display: flex; align-items: center; gap: 15px; }
+        
+        /* Logo acts as a "Home" button via JS */
+        .logo-link { text-decoration: none; display: block; transition: opacity 0.2s; cursor: pointer; }
+        .logo-link:hover { opacity: 0.8; }
         .header-logo { height: 32px; width: auto; display: block; }
+        
+        h1 { margin: 0; font-size: 1.5rem; color: var(--primary); border: none; padding: 0; line-height: 1; }
+        
+        .nav-home { 
+            cursor: pointer; 
+            color: #555; 
+            font-weight: bold; 
+            display: none; /* Hidden by default, shown via JS when inside a tool */
+            align-items: center; 
+            gap: 5px; 
+            transition: 0.2s; 
+        }
+        .nav-home:hover { color: var(--primary); }
 
-        h1 { margin: 0; font-size: 1.5rem; color: var(--primary); border: none; padding: 0; line-height: 1;}
-
-        /* Steps */
-        .step-indicator { display: flex; gap: 10px; }
-        .step-dot { width: 30px; height: 30px; border-radius: 50%; background: #ddd; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        .step-dot.active { background: var(--primary); box-shadow: 0 2px 5px rgba(255, 2, 73, 0.4); }
-        .step-dot.completed { background: #27ae60; }
-
-        h2 { color: var(--primary); margin-top: 0; margin-bottom: 10px; }
-        p.instructions { color: #555; font-size: 0.95rem; line-height: 1.5; margin-top: 0; margin-bottom: 20px; max-width: 900px; }
-
-        /* STEPS visibility */
-        .step-section { display: none; animation: fadeIn 0.3s ease-in-out; }
-        .step-section.active { display: block; }
+        /* =========================================
+           3. VIEW MANAGEMENT (SPA Logic)
+           ========================================= */
+        /* All main views are hidden by default */
+        .view-section { display: none; animation: fadeIn 0.3s ease-in-out; }
+        
+        /* Active view is shown */
+        .view-section.active { display: block; }
+        
+        /* Animation for smooth transition */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Config & Globals */
-        .top-bar { display: flex; gap: 20px; margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #ddd; }
-        .input-group { display: flex; flex-direction: column; min-width: 150px; }
-        .input-group label { font-weight: bold; font-size: 0.8rem; margin-bottom: 5px; color: #555; }
-        input, select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-
-        /* Tables */
-        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-        th { text-align: left; font-size: 0.85rem; color: white; padding: 12px 10px; position: relative; }
-        td { padding: 8px; vertical-align: top; border-bottom: 1px solid #eee; }
+        /* =========================================
+           4. DASHBOARD (Landing Page)
+           ========================================= */
+        .dashboard-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 30px; 
+            margin-top: 40px; 
+        }
         
-        /* TABLE HEADERS USE BRAND COLOR */
-        .header-camp th, 
-        .header-adgroup th, 
-        .header-creative th { background: var(--primary); }
+        .tool-card {
+            background: white; 
+            border: 1px solid var(--border); 
+            border-radius: 10px; 
+            padding: 40px 30px; 
+            text-align: center;
+            transition: all 0.3s ease; 
+            cursor: pointer; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .tool-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            border-color: var(--primary); 
+        }
+        
+        .card-icon { font-size: 3rem; margin-bottom: 20px; color: var(--primary); }
+        .card-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; color: var(--dark); }
+        .card-desc { color: #777; line-height: 1.5; }
 
-        input[type="text"] { width: 100%; box-sizing: border-box; }
-        select { width: 100%; }
+        /* =========================================
+           5. COMMON UI COMPONENTS (Inputs, Buttons)
+           ========================================= */
+        /* Wizard Step Dots */
+        .step-indicator { display: flex; gap: 10px; }
+        .step-dot { 
+            width: 30px; height: 30px; 
+            border-radius: 50%; 
+            background: #ddd; color: white; 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: bold; 
+        }
+        .step-dot.active { background: var(--primary); box-shadow: 0 2px 5px rgba(255, 2, 73, 0.4); }
+        .step-dot.completed { background: #27ae60; }
+        
+        /* Headings & Text */
+        h2 { color: var(--primary); margin-top: 0; margin-bottom: 15px; }
+        p.instructions { color: #555; font-size: 0.95rem; line-height: 1.5; margin-top: 0; margin-bottom: 20px; max-width: 900px; }
+        
+        /* Config Bar (Top of tools) */
+        .top-bar { 
+            display: flex; gap: 20px; margin-bottom: 20px; 
+            background: var(--light); padding: 15px; 
+            border-radius: 6px; border: 1px solid #ddd; 
+            flex-wrap: wrap; 
+        }
+        
+        .input-group { display: flex; flex-direction: column; min-width: 150px; flex-grow: 1; }
+        .input-group label { font-weight: bold; font-size: 0.8rem; margin-bottom: 5px; color: #555; }
+        
+        /* Custom Adder Wrapper */
+        .custom-adder-wrapper { 
+            margin-left:auto; 
+            border-left:1px solid #ddd; 
+            padding-left:20px; 
+            min-width: 350px; 
+            display: flex; 
+            flex-direction: column; 
+        }
 
+        /* Form Elements */
+        input, select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        input[type="text"], input[type="date"] { width: 100%; box-sizing: border-box; }
+        
+        /* Data Tables */
+        .table-wrapper { overflow-x: auto; padding-bottom: 10px; } /* Enables horizontal scroll on small screens */
+        
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-bottom: 10px; 
+            min-width: 1200px; /* Force width to prevent squashing */
+            table-layout: fixed; /* Enforce column widths */
+        }
+        
+        th { 
+            text-align: left; 
+            font-size: 0.85rem; 
+            color: white; 
+            padding: 12px 10px; 
+            background: var(--primary); 
+            white-space: nowrap; 
+        }
+        
+        td { 
+            padding: 8px; 
+            vertical-align: top; 
+            border-bottom: 1px solid #eee; 
+            word-wrap: break-word; /* Prevent long text from breaking layout */
+        }
+        
         /* Buttons */
         .btn { cursor: pointer; padding: 10px 20px; border: none; border-radius: 4px; font-weight: bold; transition: 0.2s; }
         
         .btn-nav { background: var(--primary); color: white; font-size: 1rem; }
         .btn-nav:hover { background: #d6003b; } 
+        
         .btn-nav.secondary { background: #95a5a6; }
         .btn-nav.secondary:hover { background: #7f8c8d; }
+        
         .btn-add { background: #f1f1f1; color: #333; width: 100%; border: 1px dashed #ccc; margin-top: 5px; }
         .btn-add:hover { background: #e2e2e2; }
+        
         .btn-remove { background: transparent; color: #e74c3c; border: 1px solid #e74c3c; padding: 4px 8px; font-size: 0.8rem; }
         .btn-remove:hover { background: #e74c3c; color: white; }
         
-        /* DOWNLOAD BUTTON */
-        .btn-download { background: #27ae60; color: white; font-size: 0.9rem; margin-top: 10px; display: inline-block; text-decoration: none; }
+        .btn-download { 
+            background: #27ae60; color: white; 
+            font-size: 0.9rem; margin-top: 10px; 
+            display: inline-block; text-decoration: none; 
+            padding: 8px 15px; border-radius: 4px; 
+            cursor: pointer; border: none;
+        }
         .btn-download:hover { background: #219150; }
 
-        .footer-nav { margin-top: auto; padding-top: 20px; border-top: 1px solid #eee; display: flex; justify-content: space-between; }
+        /* API Buttons */
+        .btn-shorten { 
+            background: var(--dark); color: white; 
+            border: none; padding: 5px 10px; 
+            font-size: 0.75rem; border-radius: 3px; 
+            cursor: pointer; margin-top: 5px; width: 100%; 
+        }
+        .btn-shorten:hover { background: #1a252f; }
+        .btn-shorten:disabled { background: #ccc; cursor: not-allowed; }
 
-        /* Output Textareas */
-        textarea { width: 100%; height: 150px; font-family: monospace; padding: 10px; border: 1px solid #ccc; background: #fafafa; white-space: pre; overflow-x: auto; }
-        .output-label { font-weight: bold; display: block; margin-bottom: 5px; color: #2c3e50; display: flex; justify-content: space-between; align-items: center;}
+        /* Footer Navigation */
+        .footer-nav { 
+            margin-top: auto; padding-top: 20px; 
+            border-top: 1px solid #eee; 
+            display: flex; justify-content: space-between; 
+        }
+
+        /* =========================================
+           6. UTILITY STYLES (Tooltips, Alerts)
+           ========================================= */
+        /* Output Areas */
+        textarea { 
+            width: 100%; height: 150px; 
+            font-family: monospace; padding: 10px; 
+            border: 1px solid #ccc; background: #fafafa; 
+            white-space: pre; overflow-x: auto; 
+        }
+        .output-label { 
+            font-weight: bold; display: block; margin-bottom: 5px; 
+            color: var(--dark); display: flex; 
+            justify-content: space-between; align-items: center;
+        }
         
-        /* TOOLTIP CSS */
-        .tooltip-container { cursor: help; border-bottom: 1px dotted rgba(255,255,255,0.5); }
-        .tooltip-text {
-            visibility: hidden;
-            width: 280px;
-            background-color: #333;
-            color: #fff;
-            text-align: left;
-            border-radius: 6px;
-            padding: 10px;
-            position: absolute;
-            z-index: 10;
-            right: 0; /* Align to right edge of header */
-            top: 100%; /* Show below */
-            margin-top: 5px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-weight: normal;
-            font-size: 0.75rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            line-height: 1.4;
-            white-space: normal; /* Allow wrapping */
+        /* Tooltips */
+        .tooltip-container { cursor: help; display: flex; align-items: center; gap: 5px; position: relative; }
+        .info-icon { 
+            display: inline-block; width: 16px; height: 16px; 
+            background: rgba(255,255,255,0.3); border-radius: 50%; 
+            text-align: center; line-height: 16px; 
+            font-size: 11px; font-weight: bold; 
+        }
+        .tooltip-text { 
+            visibility: hidden; width: 280px; 
+            background-color: #333; color: #fff; 
+            text-align: left; border-radius: 6px; padding: 10px; 
+            position: absolute; z-index: 100; right: 0; top: 100%; margin-top: 5px; 
+            opacity: 0; transition: opacity 0.3s; 
+            font-weight: normal; font-size: 0.75rem; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2); line-height: 1.4; white-space: normal; 
         }
         .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
-
-        /* Auto-fill highlight effect */
+        
+        /* Warning Box */
+        .warning-box { 
+            background-color: #fff3cd; color: #856404; 
+            border: 1px solid #ffeeba; padding: 15px; 
+            border-radius: 6px; margin-bottom: 20px; 
+            font-size: 0.95rem; display: flex; align-items: flex-start; gap: 10px; 
+        }
+        
+        /* Animations */
         .flash-bg { animation: flash 1s; }
         @keyframes flash { 0% { background-color: #ffe6ed; } 100% { background-color: transparent; } }
+
+        /* =========================================
+           7. TOOL SPECIFIC STYLES (UTM / Influencer)
+           ========================================= */
+        .base-input-box { 
+            background: #fff2cc; padding: 20px; 
+            border-radius: 8px; border: 1px solid #e2c068; 
+            margin-bottom: 30px; 
+        }
+        .base-url-input { 
+            width: 100%; padding: 12px; font-size: 1rem; 
+            border: 2px solid var(--primary); border-radius: 6px; 
+        }
+        
+        .utm-link-box { 
+            background: #f4f4f4; padding: 8px; 
+            border-radius: 4px; font-family: monospace; 
+            font-size: 0.75rem; color: #555; 
+            border: 1px solid #ddd;
+            word-break: break-all; /* Ensure long links wrap */
+            white-space: normal;
+            max-width: 100%;
+        }
+        
+        .utm-link-box a { color: var(--primary); text-decoration: none; }
+        .utm-link-box a:hover { text-decoration: underline; }
+
+        .btn-copy { 
+            background: #333; color: white; border: none; 
+            padding: 6px 12px; border-radius: 4px; 
+            font-size: 0.8rem; cursor: pointer; white-space: nowrap;
+        }
+        .btn-copy:hover { background: black; }
+        
+        .plat-icon { margin-right: 8px; font-size: 1.1rem; vertical-align: middle; }
+        
+        .i-short { 
+            background: #f9f9f9; border: 1px solid #ddd; 
+            color: var(--dark); font-weight: bold; font-size: 0.8rem; 
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     
-    <div class="wizard-header">
+    <div class="app-header">
         <div class="header-branding">
-            <img src="https://tracks.secondstage.io/vite/assets/tracks-signup-logo-J-NQw5DE.png" alt="TRACKS Logo" class="header-logo">
-            <h1>Ad Ops Wizard</h1>
+            <a href="#" class="logo-link" onclick="switchView('dashboard'); return false;">
+                <img src="https://tracks.secondstage.io/vite/assets/tracks-signup-logo-J-NQw5DE.png" alt="TRACKS Logo" class="header-logo">
+            </a>
+            <h1>Ad Ops Suite</h1>
         </div>
-        <div class="step-indicator">
+        <div class="nav-home" id="nav-home" onclick="switchView('dashboard')">
+            <span>&larr; Back to Home</span>
+        </div>
+        
+        <div class="step-indicator" id="wizard-steps" style="display:none;">
             <div class="step-dot active" id="dot-1">1</div>
             <div class="step-dot" id="dot-2">2</div>
             <div class="step-dot" id="dot-3">3</div>
@@ -126,143 +337,281 @@
         </div>
     </div>
 
-    <div id="step-1" class="step-section active">
-        <h2>Step 1: Create Campaigns</h2>
-        
-        <p class="instructions">
-            Please begin by completing the Campaign Helper table using your media plan. Each row can be filled out by selecting options from the dropdown menus. If none of the available choices fit your needs, you can add new ones using the “Quick Add Custom Options” button in the top-right corner.
-        </p>
+    <div id="view-dashboard" class="view-section active">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="color:#333; font-size: 2rem;">Welcome to Ad Ops Helper</h2>
+            <p style="color:#666;">Select a tool to get started.</p>
+        </div>
 
+        <div class="dashboard-grid">
+            <div class="tool-card" onclick="switchView('wizard')">
+                <div class="card-icon">⚡</div>
+                <div class="card-title">Ad Ops Wizard</div>
+                <div class="card-desc">Naming conventions for Campaigns, Ad Groups, and Creatives.</div>
+            </div>
+            <div class="tool-card" onclick="switchView('utm')">
+                <div class="card-icon">🔗</div>
+                <div class="card-title">UTM Link Builder</div>
+                <div class="card-desc">Generate tracking links for paid media channels.</div>
+            </div>
+            <div class="tool-card" onclick="switchView('influencer')">
+                <div class="card-icon">🤳</div>
+                <div class="card-title">Influencer Builder</div>
+                <div class="card-desc">Generate specific tracking links for Influencers and Creators.</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-wizard" class="view-section">
+        
+        <div id="step-1" class="wizard-step-container active">
+            <h2>Step 1: Create Campaigns</h2>
+            <p class="instructions">
+                Please begin by completing the Campaign Helper table using your media plan. Each row can be filled out by selecting options from the dropdown menus. If none of the available choices fit your needs, you can add new ones using the “Quick Add Custom Options” button in the top-right corner.
+            </p>
+            
+            <div class="top-bar">
+                <div class="input-group">
+                    <label>Project Code</label>
+                    <input type="text" id="g_project" value="2s">
+                </div>
+                <div class="input-group">
+                    <label>Beat / Phase</label>
+                    <input type="text" id="g_phase" value="Update_251125">
+                </div>
+                <div class="custom-adder-wrapper">
+                     <label>Quick Add Custom Option</label>
+                     <div style="display:flex; gap:5px;">
+                         <select id="custom_cat" style="width: 40%;">
+                             <option value="platforms">Platform</option>
+                             <option value="strategies">Strategy</option>
+                             <option value="objectives">Objective</option>
+                             <option value="audiences">Audience</option>
+                             <option value="audTypes">Audience Type</option>
+                         </select>
+                         <input type="text" id="custom_val" placeholder="New Value..." style="width: 40%;">
+                         <button onclick="addCustom('custom_cat', 'custom_val')" style="background:#27ae60; color:white; border:none; border-radius:3px; width: 20%; font-weight: bold;">Add +</button>
+                     </div>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+            <table id="table-camp">
+                <thead>
+                    <tr>
+                        <th style="width:12%">Platform</th>
+                        <th style="width:8%">Tier</th>
+                        <th style="width:12%">Geos (Comma Sep)</th>
+                        <th style="width:12%">Strategy</th>
+                        <th style="width:12%">Objective</th>
+                        <th style="width:12%">Start Date</th>
+                        <th style="width:20%" class="tooltip-container">
+                            Custom Naming Placeholder <span class="info-icon">i</span>
+                            <span class="tooltip-text">
+                                If you like to add additional information you can use "Custom Naming Placeholder" fields. You can add as many values as you'd like by separating each with a underscore ( _ ).<br><br>Example: Call of Duty: Warzone_Desktop_Video
+                            </span>
+                        </th>
+                        <th style="width:5%"></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            </div>
+            <button class="btn btn-add" onclick="addCampRow()">+ Add Campaign Row</button>
+        </div>
+
+        <div id="step-2" class="wizard-step-container" style="display:none;">
+            <h2>Step 2: Create Ad Groups</h2>
+            <p class="instructions">Select a campaign. The <b>Geo</b> field will fill automatically.</p>
+            <div class="table-wrapper">
+            <table id="table-adgroup">
+                <thead>
+                    <tr>
+                        <th style="width:30%">Select Parent Campaign</th>
+                        <th style="width:10%">Geos (Auto)</th>
+                        <th style="width:20%">Audience</th>
+                        <th style="width:20%">Audience Type</th>
+                        <th>Custom</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            </div>
+            <button class="btn btn-add" onclick="addAdGroupRow()">+ Add Ad Group Row</button>
+        </div>
+
+        <div id="step-3" class="wizard-step-container" style="display:none;">
+            <h2>Step 3: Creatives</h2>
+            <div class="table-wrapper">
+            <table id="table-creative">
+                <thead>
+                    <tr>
+                        <th style="width:20%">Campaign Context (Ref)</th>
+                        <th style="width:10%">Geos (Auto)</th>
+                        <th style="width:10%">Format</th>
+                        <th style="width:10%">Dims</th>
+                        <th style="width:10%">LP</th>
+                        <th style="width:8%">Ver</th>
+                        <th style="width:8%">Len</th>
+                        <th>Custom</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            </div>
+            <button class="btn btn-add" onclick="addCreativeRow()">+ Add Creative Row</button>
+        </div>
+
+        <div id="step-4" class="wizard-step-container" style="display:none;">
+            <h2 style="color:#27ae60;">Step 4: Final Export</h2>
+            <div class="warning-box">
+                <div class="warning-icon">⚠️</div>
+                <div><strong>Important:</strong> Results are NOT saved. Download the CSV files below to use in Excel/Sheets.</div>
+            </div>
+            
+            <div class="output-label"><span>1. Campaigns</span><button class="btn btn-download" onclick="downloadCSV('out-camp', 'Campaigns.csv')">Download CSV</button></div>
+            <textarea id="out-camp"></textarea>
+            
+            <br><br>
+            <div class="output-label"><span>2. Ad Groups</span><button class="btn btn-download" onclick="downloadCSV('out-adgroup', 'AdGroups.csv')">Download CSV</button></div>
+            <textarea id="out-adgroup"></textarea>
+            
+            <br><br>
+            <div class="output-label"><span>3. Creatives</span><button class="btn btn-download" onclick="downloadCSV('out-creative', 'Creatives.csv')">Download CSV</button></div>
+            <textarea id="out-creative"></textarea>
+        </div>
+
+        <div class="footer-nav">
+            <button class="btn btn-nav secondary" id="btn-back" onclick="changeStep(-1)" style="visibility:hidden;">Back</button>
+            <button class="btn btn-nav" id="btn-next" onclick="changeStep(1)">Next Step &rarr;</button>
+        </div>
+    </div>
+
+    <div id="view-utm" class="view-section">
+        <h2>UTM Link Builder</h2>
+        <p class="instructions">Enter your Landing Page URL below. The tool will generate tracking links for all supported platforms automatically.</p>
+        <div class="base-input-box">
+            <label style="font-weight:bold; display:block; margin-bottom:10px;">Paste Destination URL (Landing Page):</label>
+            <input type="text" id="utm-base-url" class="base-url-input" value="https://secondstage.io" oninput="generateUTMs()">
+        </div>
+        <div class="table-wrapper">
+        <table class="utm-table">
+            <thead><tr><th style="width: 20%;">Platform</th><th>Generated Tracking Link</th><th style="width: 8%;">Action</th></tr></thead>
+            <tbody id="utm-tbody"></tbody>
+        </table>
+        </div>
+    </div>
+
+    <div id="view-influencer" class="view-section">
+        <h2>Influencer Link Builder</h2>
+        <p class="instructions">
+            Fill in the details below to generate trackable links for Creators and Influencers. 
+            Ensure you enter a unique <b>Short Key</b> (e.g. creator name) for the tracking to work.
+        </p>
+        
         <div class="top-bar">
-            <div class="input-group">
-                <label>Project Code</label>
-                <input type="text" id="g_project" value="2s">
-            </div>
-            <div class="input-group">
-                <label>Beat / Phase</label>
-                <input type="text" id="g_phase" value="Update_251125">
-            </div>
-            <div class="input-group" style="margin-left:auto; border-left:1px solid #ddd; padding-left:20px; min-width: 350px;">
+            <div class="input-group"><label>Game</label><input type="text" id="inf_project" value="" placeholder="Enter Game Name" oninput="updateInfTable()"></div>
+            <div class="input-group"><label>Beat / Phase</label><input type="text" id="inf_phase" value="Update" oninput="updateInfTable()"></div>
+            <div class="input-group" style="flex-grow: 2;"><label>Destination URL</label><input type="text" id="inf_dest" value="https://secondstage.io" oninput="updateInfTable()"></div>
+            
+            <div class="custom-adder-wrapper">
                  <label>Quick Add Custom Option</label>
                  <div style="display:flex; gap:5px;">
-                     <select id="custom_cat" style="width: 40%;">
-                         <option value="platforms">Platform</option>
-                         <option value="strategies">Strategy (Step 1)</option>
-                         <option value="objectives">Objective (Step 1)</option>
-                         <option value="audiences">Audience (Step 2)</option>
-                         <option value="audTypes">Audience Type (Step 2)</option>
+                     <select id="inf_custom_cat" style="width: 40%;">
+                         <option value="inf_langs">Language</option>
+                         <option value="inf_plats">Platform</option>
+                         <option value="inf_types">Content Type</option>
+                         <option value="inf_personas">Persona</option>
                      </select>
-                     <input type="text" id="custom_val" placeholder="New Value..." style="width: 40%;">
-                     <button onclick="addCustom()" style="background:#27ae60; color:white; border:none; border-radius:3px; width: 20%; font-weight: bold;">Add +</button>
+                     <input type="text" id="inf_custom_val" placeholder="New Value..." style="width: 40%;">
+                     <button onclick="addCustom('inf_custom_cat', 'inf_custom_val')" style="background:#27ae60; color:white; border:none; border-radius:3px; width: 20%; font-weight: bold;">Add +</button>
                  </div>
-                 <small style="color:#888; font-size:0.7rem; margin-top:3px;">Adds directly to dropdowns below.</small>
             </div>
         </div>
 
-        <table class="header-camp" id="table-camp">
+        <div class="table-wrapper">
+        <table id="table-inf">
             <thead>
                 <tr>
-                    <th style="width:15%">Platform</th>
-                    <th style="width:10%">Tier</th>
-                    <th style="width:15%">Geos (Comma Sep)</th>
-                    <th style="width:15%">Strategy</th>
-                    <th style="width:15%">Objective</th>
-                    <th style="width:15%">Start Date</th>
-                    <th class="tooltip-container">Custom Naming Placeholder
-                        <span class="tooltip-text">
-                            If you like to add additional information you can use "Custom Naming Placeholder" fields. You can add as many values as you'd like by separating each with a underscore ( _ ).<br><br>
-                            Example: Call of Duty: Warzone_Desktop_Video
-                        </span>
-                    </th>
-                    <th></th>
+                    <th style="width:10%">Creator</th>
+                    <th style="width:6%">Language</th>
+                    <th style="width:8%">Platform</th>
+                    <th style="width:7%">Type</th>
+                    <th style="width:8%">Persona</th>
+                    <th style="width:10%">Date</th>
+                    <th style="width:10%">Short Key (Name Your URL)</th>
+                    <th>Generated Long Link</th>
+                    <th style="width:10%">Short Link</th>
+                    <th style="width:5%"></th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
-        <button class="btn btn-add" onclick="addCampRow()">+ Add Campaign Row</button>
-    </div>
-
-    <div id="step-2" class="step-section">
-        <h2>Step 2: Create Ad Groups</h2>
-        <p style="color:#666; font-style:italic;">Select a campaign. The <b>Geo</b> field will fill automatically based on the campaign name.</p>
-        
-        <table class="header-adgroup" id="table-adgroup">
-            <thead>
-                <tr>
-                    <th style="width:30%">Select Parent Campaign</th>
-                    <th style="width:10%">Geos (Auto)</th>
-                    <th style="width:20%">Audience</th>
-                    <th style="width:20%">Audience Type</th>
-                    <th>Custom</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-        <button class="btn btn-add" onclick="addAdGroupRow()">+ Add Ad Group Row</button>
-    </div>
-
-    <div id="step-3" class="step-section">
-        <h2>Step 3: Creatives</h2>
-        <p style="color:#666; font-style:italic;">Select a campaign. The <b>Geo</b> field will fill automatically.</p>
-
-        <table class="header-creative" id="table-creative">
-            <thead>
-                <tr>
-                    <th style="width:20%">Campaign Context (Ref)</th>
-                    <th style="width:10%">Geos (Auto)</th>
-                    <th style="width:10%">Format</th>
-                    <th style="width:10%">Dims</th>
-                    <th style="width:10%">LP</th>
-                    <th style="width:8%">Ver</th>
-                    <th style="width:8%">Len</th>
-                    <th>Custom</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-        <button class="btn btn-add" onclick="addCreativeRow()">+ Add Creative Row</button>
-    </div>
-
-    <div id="step-4" class="step-section">
-        <h2 style="color:#27ae60;">Step 4: Final Export</h2>
-        <p>Copy table content or Download CSV files below.</p>
-        
-        <div class="output-label">
-            <span>1. Campaigns</span>
-            <button class="btn btn-download" onclick="downloadCSV('out-camp', 'Campaigns.csv')">Download CSV</button>
         </div>
-        <textarea id="out-camp"></textarea>
-        
-        <br><br>
-        <div class="output-label">
-            <span>2. Ad Groups</span>
-            <button class="btn btn-download" onclick="downloadCSV('out-adgroup', 'AdGroups.csv')">Download CSV</button>
-        </div>
-        <textarea id="out-adgroup"></textarea>
-        
-        <br><br>
-        <div class="output-label">
-            <span>3. Creatives</span>
-            <button class="btn btn-download" onclick="downloadCSV('out-creative', 'Creatives.csv')">Download CSV</button>
-        </div>
-        <textarea id="out-creative"></textarea>
-    </div>
-
-    <div class="footer-nav">
-        <button class="btn btn-nav secondary" id="btn-back" onclick="changeStep(-1)" style="visibility:hidden;">Back</button>
-        <button class="btn btn-nav" id="btn-next" onclick="changeStep(1)">Next Step &rarr;</button>
+        <button class="btn btn-add" onclick="addInfRow()">+ Add Creator Row</button>
     </div>
 
 </div>
 
 <script>
-    // --- 1. DATA & STORAGE ---
+    // --- 1. GLOBAL NAVIGATION & STATE ---
+    function switchView(viewName) {
+        // Hide all views
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        const navHome = document.getElementById('nav-home');
+        const wizardSteps = document.getElementById('wizard-steps');
+
+        if (viewName === 'dashboard') {
+            document.getElementById('view-dashboard').classList.add('active');
+            navHome.style.display = 'none';
+            wizardSteps.style.display = 'none';
+        } 
+        else if (viewName === 'wizard') {
+            document.getElementById('view-wizard').classList.add('active');
+            resetWizard(); // Force Reset
+            navHome.style.display = 'flex';
+            wizardSteps.style.display = 'flex';
+        } 
+        else if (viewName === 'utm') {
+            document.getElementById('view-utm').classList.add('active');
+            navHome.style.display = 'flex';
+            wizardSteps.style.display = 'none';
+            generateUTMs(); 
+        }
+        else if (viewName === 'influencer') {
+            document.getElementById('view-influencer').classList.add('active');
+            navHome.style.display = 'flex';
+            wizardSteps.style.display = 'none';
+            if(document.querySelector('#table-inf tbody').children.length === 0) addInfRow();
+        }
+    }
+
+    function resetWizard() {
+        currentStep = 1;
+        // Hard Reset Visibility using style attribute to override any stuck CSS classes
+        document.querySelectorAll('.wizard-step-container').forEach(el => el.style.display = 'none');
+        document.getElementById('step-1').style.display = 'block';
+        
+        // Reset Indicators
+        document.querySelectorAll('.step-dot').forEach(d => d.classList.remove('active', 'completed'));
+        document.getElementById('dot-1').classList.add('active');
+        
+        // Reset Nav Buttons
+        document.getElementById('btn-back').style.visibility = 'hidden';
+        const btnNext = document.getElementById('btn-next');
+        btnNext.style.display = 'block'; 
+        btnNext.innerText = 'Next Step \u2192';
+    }
+
+    // --- 2. DATA MANAGEMENT & INITIALIZATION ---
     let currentStep = 1;
     let generatedCampaignList = []; 
-
+    
+    // Default Dropdown Options
     const DEFAULTS = {
+        // Ad Ops Wizard Options
         platforms: ["GoogleSearch", "YouTube", "Meta", "Reddit", "TikTok", "DisplayVideo360", "X"],
         tiers: ["T1", "T2", "T3", "Global", "RoW"],
         strategies: ["Awareness", "Consideration", "Conversion", "Retention"],
@@ -270,60 +619,99 @@
         audiences: ["Core", "Secondary", "Aspirational", "Broad", "Mainstream", "Lookalike", "Retargeting"],
         audTypes: ["Prospecting", "Retargeting", "Retention"],
         formats: ["Video", "Static", "Carousel", "Collection", "HTML5"],
-        lps: ["Website", "Steam", "Epic", "PS_Store"]
+        lps: ["Website", "Steam", "Epic", "PS_Store"],
+        
+        // Influencer Builder Options
+        inf_langs: ["EN","DE","FR","ES","IT","PT","PL"],
+        inf_plats: ["YouTube","Twitch","TikTok","Instagram","X","Kick"],
+        inf_types: ["VOD","Stream","Short","Post","Story"],
+        inf_personas: ["Creator","Influencer","Ambassador","Partner"]
     };
     let lists = JSON.parse(JSON.stringify(DEFAULTS));
 
-    // --- 2. INIT ---
     window.onload = function() {
+        // Restore custom options from browser storage
         const saved = localStorage.getItem('adOpsWizardLists');
         if(saved) lists = JSON.parse(saved);
-
-        addCampRow();
-        addAdGroupRow();
-        addCreativeRow();
+        
+        // Initialize Wizard Rows
+        addCampRow(); addAdGroupRow(); addCreativeRow();
+        
+        // Start on Dashboard
+        switchView('dashboard'); 
     };
 
-    // --- 3. NAVIGATION & AUTO-FILL LOGIC ---
+    // --- 3. WIZARD STEP LOGIC ---
     function changeStep(dir) {
-        if (currentStep === 1 && dir === 1) {
-            processStep1(); 
-            updateAdGroupDropdowns();
-        }
-        if (currentStep === 3 && dir === 1) {
-            generateFinalOutput();
-        }
+        // Processing Logic before moving
+        if (currentStep === 1 && dir === 1) { processStep1(); updateAdGroupDropdowns(); }
+        if (currentStep === 3 && dir === 1) { generateFinalOutput(); }
 
+        // UI: Update dots
         document.getElementById(`step-${currentStep}`).classList.remove('active');
         document.getElementById(`dot-${currentStep}`).classList.remove('active');
         if(dir === 1) document.getElementById(`dot-${currentStep}`).classList.add('completed');
 
         currentStep += dir;
+        if(currentStep > 4) currentStep = 4;
         
+        // UI: Show new step
         document.getElementById(`step-${currentStep}`).classList.add('active');
         document.getElementById(`dot-${currentStep}`).classList.add('active');
         document.getElementById(`dot-${currentStep}`).classList.remove('completed');
 
+        // FORCE DISPLAY STYLE TOGGLE (Bulletproof)
+        document.querySelectorAll('.wizard-step-container').forEach(el => el.style.display = 'none');
+        document.getElementById(`step-${currentStep}`).style.display = 'block';
+
+        // UI: Buttons
         document.getElementById('btn-back').style.visibility = currentStep > 1 ? 'visible' : 'hidden';
-        document.getElementById('btn-next').innerText = currentStep === 4 ? 'Finish' : 'Next Step \u2192';
-        if(currentStep > 4) currentStep = 4;
+        const btnNext = document.getElementById('btn-next');
+        if (currentStep === 4) { btnNext.style.display = 'none'; } 
+        else { btnNext.style.display = 'block'; btnNext.innerText = 'Next Step \u2192'; }
     }
 
-    function autoInheritGeo(selectEl) {
-        const val = selectEl.value;
-        if(!val) return;
+    // --- 4. ROW BUILDERS (HTML Generation) ---
+    function createSelect(opts, cls="", cat) {
+        let h = `<select class="${cls}" data-cat="${cat}"><option value="" disabled selected>Select...</option>`;
+        opts.forEach(o => h += `<option value="${o}">${o}</option>`);
+        h += `</select>`;
+        return h;
+    }
+    
+    function addCampRow() {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${createSelect(lists.platforms,"","platforms")}</td><td>${createSelect(lists.tiers,"","tiers")}</td><td><input type="text" placeholder="UK, DE"></td><td>${createSelect(lists.strategies,"","strategies")}</td><td>${createSelect(lists.objectives,"","objectives")}</td><td><input type="date" value="${new Date().toISOString().split('T')[0]}"></td><td><input type="text"></td><td><button class="btn-remove" onclick="this.closest('tr').remove()">X</button></td>`;
+        document.querySelector('#table-camp tbody').appendChild(tr);
+    }
+    
+    function addAdGroupRow() {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td><select class="camp-select" onchange="autoInheritGeo(this)"><option disabled>Complete Step 1 first...</option></select></td><td><input type="text" class="geo-input" placeholder="Auto-fills"></td><td>${createSelect(lists.audiences,"","audiences")}</td><td>${createSelect(lists.audTypes,"","audTypes")}</td><td><input type="text"></td><td><button class="btn-remove" onclick="this.closest('tr').remove()">X</button></td>`;
+        document.querySelector('#table-adgroup tbody').appendChild(tr);
+        updateAdGroupDropdowns(); 
+    }
+    
+    function addCreativeRow() {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td><select class="camp-select" onchange="autoInheritGeo(this)"><option disabled>Complete Step 1...</option></select></td><td><input type="text" class="geo-input" placeholder="Auto-fills"></td><td>${createSelect(lists.formats,"","formats")}</td><td><input type="text" placeholder="1920x1080"></td><td>${createSelect(lists.lps,"","lps")}</td><td><input type="text" value="v1"></td><td><input type="text" placeholder="15s"></td><td><input type="text"></td><td><button class="btn-remove" onclick="this.closest('tr').remove()">X</button></td>`;
+        document.querySelector('#table-creative tbody').appendChild(tr);
+        updateAdGroupDropdowns();
+    }
 
+    // --- 5. WIZARD BUSINESS LOGIC ---
+    function autoInheritGeo(selectEl) {
+        const val = selectEl.value; if(!val) return;
         const parts = val.split('-');
-        // Naming: Project-Platform-Geo-...
+        // Inherit Geo from Campaign Name (Index 2)
         if (parts.length > 2) {
             const geo = parts[2];
             const row = selectEl.closest('tr');
             const geoInput = row.querySelector('.geo-input');
-            
-            if(geoInput) {
-                geoInput.value = geo;
-                geoInput.classList.add('flash-bg');
-                setTimeout(() => geoInput.classList.remove('flash-bg'), 1000);
+            if(geoInput) { 
+                geoInput.value = geo; 
+                geoInput.classList.add('flash-bg'); 
+                setTimeout(() => geoInput.classList.remove('flash-bg'), 1000); 
             }
         }
     }
@@ -332,150 +720,48 @@
         generatedCampaignList = [];
         const proj = document.getElementById('g_project').value.trim();
         const phase = document.getElementById('g_phase').value.trim();
-
         document.querySelectorAll('#table-camp tbody tr').forEach(row => {
             const inps = row.querySelectorAll('input, select');
-            const plat = inps[0].value;
-            const geoRaw = inps[2].value;
-            const strat = inps[3].value;
-            const obj = inps[4].value;
-            const date = inps[5].value;
-            const cust = inps[6].value;
-
-            if(!plat || !geoRaw) return;
-
-            geoRaw.split(',').map(s=>s.trim()).filter(s=>s).forEach(geo => {
-                let name = `${proj}-${plat}-${geo}-${phase}`;
-                const d = formatAdOpsDate(date);
-                if(d) name += `_${d}`;
-                name += `-${strat}_${obj}`;
-                if(cust) name += `_${cust}`;
-                
+            if(!inps[0].value || !inps[2].value) return;
+            inps[2].value.split(',').map(s=>s.trim()).filter(s=>s).forEach(geo => {
+                let name = `${proj}-${inps[0].value}-${geo}-${phase}`;
+                if(inps[5].value) name += `_${formatAdOpsDate(inps[5].value)}`;
+                name += `-${inps[3].value}_${inps[4].value}`;
+                if(inps[6].value) name += `_${inps[6].value}`;
                 generatedCampaignList.push(name);
             });
         });
     }
 
     function updateAdGroupDropdowns() {
-        const dropdowns = document.querySelectorAll('.camp-select');
-        dropdowns.forEach(sel => {
+        document.querySelectorAll('.camp-select').forEach(sel => {
             const currentVal = sel.value; 
             sel.innerHTML = '<option value="" disabled selected>Select generated campaign...</option>';
-            generatedCampaignList.forEach(name => {
-                const opt = document.createElement('option');
-                opt.value = name;
-                opt.text = name;
-                sel.appendChild(opt);
-            });
+            generatedCampaignList.forEach(name => { const opt = document.createElement('option'); opt.value = name; opt.text = name; sel.appendChild(opt); });
             if(generatedCampaignList.includes(currentVal)) sel.value = currentVal;
         });
     }
 
-    // --- 4. ROW BUILDERS ---
-    function createSelect(opts, cls="", categoryName) {
-        // Add data-cat attribute to identifying dropdown category
-        let h = `<select class="${cls}" data-cat="${categoryName}"><option value="" disabled selected>Select...</option>`;
-        opts.forEach(o => h += `<option value="${o}">${o}</option>`);
-        h += `</select>`;
-        return h;
-    }
-
-    function addCampRow() {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${createSelect(lists.platforms, "", "platforms")}</td>
-            <td>${createSelect(lists.tiers, "", "tiers")}</td>
-            <td><input type="text" placeholder="UK, DE"></td>
-            <td>${createSelect(lists.strategies, "", "strategies")}</td>
-            <td>${createSelect(lists.objectives, "", "objectives")}</td>
-            <td><input type="date" value="${new Date().toISOString().split('T')[0]}"></td>
-            <td><input type="text"></td>
-            <td><button class="btn-remove" onclick="this.closest('tr').remove()">X</button></td>`;
-        document.querySelector('#table-camp tbody').appendChild(tr);
-    }
-
-    function addAdGroupRow() {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td><select class="camp-select" onchange="autoInheritGeo(this)"><option disabled>Complete Step 1 first...</option></select></td>
-            <td><input type="text" class="geo-input" placeholder="Auto-fills"></td>
-            <td>${createSelect(lists.audiences, "", "audiences")}</td>
-            <td>${createSelect(lists.audTypes, "", "audTypes")}</td>
-            <td><input type="text"></td>
-            <td><button class="btn-remove" onclick="this.closest('tr').remove()">X</button></td>`;
-        document.querySelector('#table-adgroup tbody').appendChild(tr);
-        
-        if(generatedCampaignList.length > 0) {
-            const sel = tr.querySelector('.camp-select');
-            sel.innerHTML = '<option value="" disabled selected>Select generated campaign...</option>';
-            generatedCampaignList.forEach(name => {
-                sel.innerHTML += `<option value="${name}">${name}</option>`;
+    // Generic Function to Add Custom Options
+    function addCustom(catId, valId) {
+        const cat = document.getElementById(catId).value;
+        const val = document.getElementById(valId).value.trim();
+        if(val && !lists[cat].includes(val)) {
+            lists[cat].push(val);
+            localStorage.setItem('adOpsWizardLists', JSON.stringify(lists));
+            // Update all relevant dropdowns currently on page
+            document.querySelectorAll(`select[data-cat="${cat}"]`).forEach(sel => { 
+                sel.innerHTML += `<option value="${val}">${val}</option>`; 
             });
+            document.getElementById(valId).value = ''; 
         }
-    }
-
-    function addCreativeRow() {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td><select class="camp-select" onchange="autoInheritGeo(this)"><option disabled>Complete Step 1...</option></select></td>
-            <td><input type="text" class="geo-input" placeholder="Auto-fills"></td>
-            <td>${createSelect(lists.formats, "", "formats")}</td>
-            <td><input type="text" placeholder="1920x1080"></td>
-            <td>${createSelect(lists.lps, "Website", "lps")}</td>
-            <td><input type="text" value="v1"></td>
-            <td><input type="text" placeholder="15s"></td>
-            <td><input type="text"></td>
-            <td><button class="btn-remove" onclick="this.closest('tr').remove()">X</button></td>`;
-        document.querySelector('#table-creative tbody').appendChild(tr);
-        
-        if(generatedCampaignList.length > 0) {
-            const sel = tr.querySelector('.camp-select');
-            sel.innerHTML = '<option value="" disabled selected>Select generated campaign...</option>';
-            generatedCampaignList.forEach(name => {
-                sel.innerHTML += `<option value="${name}">${name}</option>`;
-            });
-        }
-    }
-
-    // --- 5. UTILS & EXPORT ---
-    function formatAdOpsDate(ds) {
-        if(!ds) return "";
-        const d = new Date(ds);
-        return `${d.getFullYear().toString().substr(-2)}${(d.getMonth()+1).toString().padStart(2,'0')}${d.getDate().toString().padStart(2,'0')}`;
-    }
-
-    function addCustom() {
-        const cat = document.getElementById('custom_cat').value;
-        const val = document.getElementById('custom_val').value.trim();
-        if(val) {
-            if(!lists[cat].includes(val)){
-                lists[cat].push(val);
-                localStorage.setItem('adOpsWizardLists', JSON.stringify(lists));
-                refreshDropdowns(cat); 
-                document.getElementById('custom_val').value = ''; 
-            } else {
-                alert("Already exists!");
-            }
-        }
-    }
-
-    function refreshDropdowns(cat) {
-        const selects = document.querySelectorAll(`select[data-cat="${cat}"]`);
-        selects.forEach(sel => {
-            const currentVal = sel.value;
-            let html = `<option value="" disabled ${currentVal===""?"selected":""}>Select...</option>`;
-            lists[cat].forEach(o => {
-                html += `<option value="${o}" ${currentVal===o?"selected":""}>${o}</option>`;
-            });
-            sel.innerHTML = html;
-        });
     }
 
     function generateFinalOutput() {
-        const proj = document.getElementById('g_project').value;
-        const phase = document.getElementById('g_phase').value;
-
-        // Campaigns
+        processStep1(); 
+        const proj = document.getElementById('g_project').value; const phase = document.getElementById('g_phase').value;
+        
+        // 1. Campaigns
         let outCamp = "Project\tPhase\tPlatform\tTier\tGeo\tStrat\tObj\tDate\tCustom\tCampaign Name\n";
         document.querySelectorAll('#table-camp tbody tr').forEach(row => {
             const i = row.querySelectorAll('input, select');
@@ -490,15 +776,11 @@
         });
         document.getElementById('out-camp').value = outCamp;
 
-        // Ad Groups
+        // 2. Ad Groups
         let outAG = "Campaign Name\tGeo\tAudience\tType\tCustom\tAd Group Name\n";
         document.querySelectorAll('#table-adgroup tbody tr').forEach(row => {
             const i = row.querySelectorAll('input, select');
-            const cmp = i[0].value; 
-            const geoRaw = i[1].value; 
-            const aud = i[2].value;
-            const type = i[3].value;
-            const cust = i[4].value;
+            const cmp = i[0].value; const geoRaw = i[1].value; const aud = i[2].value; const type = i[3].value; const cust = i[4].value;
             if(!cmp || !aud) return;
             const geos = geoRaw ? geoRaw.split(',').map(s=>s.trim()) : [""];
             geos.forEach(geo => {
@@ -509,7 +791,7 @@
         });
         document.getElementById('out-adgroup').value = outAG;
 
-        // Creatives
+        // 3. Creatives
         let outCr = "Camp Ref\tGeo\tFormat\tDims\tPhase\tLP\tVer\tLen\tCustom\tCreative Name\n";
         document.querySelectorAll('#table-creative tbody tr').forEach(row => {
             const i = row.querySelectorAll('input, select');
@@ -525,23 +807,161 @@
         document.getElementById('out-creative').value = outCr;
     }
 
-    // --- 6. DOWNLOAD CSV ---
+    // --- 6. UTILS ---
     function downloadCSV(elId, filename) {
-        let content = document.getElementById(elId).value;
-        // Convert Tabs to Commas
-        content = content.replaceAll('\t', ',');
-        
+        let content = document.getElementById(elId).value.replaceAll('\t', ',');
         const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
-        if (link.download !== undefined) {
-            const url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", filename);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        link.href = URL.createObjectURL(blob); link.download = filename;
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+    function formatAdOpsDate(ds) {
+        if(!ds) return ""; const d = new Date(ds);
+        return `${d.getFullYear().toString().substr(-2)}${(d.getMonth()+1).toString().padStart(2,'0')}${d.getDate().toString().padStart(2,'0')}`;
+    }
+
+    // ==================== 7. UTM BUILDER LOGIC ====================
+    const PLATFORM_ICONS = {
+        "Google Search": "🔍", "YouTube": "▶️", "Performance Max": "🚀", "Meta": "♾️", "Reddit": "🤖", "TikTok": "🎵", "Google DemandGen": "📉", "DisplayVideo360": "📊", "YouTube VTA (DV360)": "📺"
+    };
+    const UTM_TEMPLATES = [
+        { name: "Google Search", tpl: "?channel=GoogleSearch&campaign={campaignid}&ad_group={adgroupid}&ad={creative}&utm_source=search&utm_medium=cpc&utm_campaign={campaignid}&utm_content={adgroupid}&utm_term={creative}&placement={placement}&keyword={keyword}&utm_id={campaignid}" },
+        { name: "YouTube", tpl: "?channel=YouTube&campaign={campaignid}&ad_group={adgroupid}&ad={creative}&utm_source=youtube&utm_medium=social&utm_campaign={campaignid}&utm_content={adgroupid}&utm_term={creative}&placement={placement}&keyword={keyword}&utm_id={campaignid}" },
+        { name: "Performance Max", tpl: "?channel=PMax&campaign={campaignid}&ad_group={adgroupid}&ad={creative}&utm_source=pmax&utm_medium=cpc&utm_campaign={campaignid}&utm_content={adgroupid}&utm_term={creative}&placement={placement}&keyword={keyword}&utm_id={campaignid}" },
+        { name: "Meta", tpl: "?channel=Meta&campaign={{campaign.id}}&campaign_name={{campaign.name}}&ad_group={{adset.id}}&ad_group_name={{adset.name}}&ad={{ad.id}}&ad_name={{ad.name}}&utm_source=meta&utm_medium=social&utm_campaign={{campaign.name}}&utm_content={{adset.name}}&utm_term={{ad.name}}&utm_id={{campaign.id}}&placement={{placement}}&utm_source_platform={{site_source_name}}" },
+        { name: "Reddit", tpl: "?channel=Reddit&campaign={{CAMPAIGN_ID}}&ad_group={{ADGROUP_ID}}&ad_group_name={{ADGROUP_NAME}}&ad={{AD_ID}}&ad_name={{AD_NAME}}&reddit_clickid={{CLICK_ID}}&utm_source=reddit&utm_medium=social&utm_campaign={{CAMPAIGN_ID}}&utm_content={{ADGROUP_NAME}}&utm_term={{AD_NAME}}&utm_id={{CAMPAIGN_ID}}&placement=reddit&keyword={{POST_ID}}" },
+        { name: "TikTok", tpl: "?channel=TikTok&campaign=__CAMPAIGN_ID__&campaign_name=__CAMPAIGN_NAME__&ad_group=__AID__&ad_group_name=__AID_NAME__&ad=__CID__&ad_name=__CID_NAME__&utm_source=tiktok&utm_medium=social&utm_campaign=__CAMPAIGN_NAME__&utm_content=__AID_NAME__&utm_term=__CID_NAME__&utm_id=__CAMPAIGN_ID__&placement=__PLACEMENT__" },
+        { name: "Google DemandGen", tpl: "?channel=GoogleDemandGen&campaign={campaignid}&ad_group={adgroupid}&ad={creative}&utm_source=googledemandgen&utm_medium=cpc&utm_campaign={campaignid}&utm_content={adgroupid}&utm_term={creative}&placement={placement}&keyword={keyword}&utm_id={campaignid}" },
+        { name: "DisplayVideo360", tpl: "?channel=DisplayVideo&campaign=${INSERTION_ORDER_ID}&ad_group=${CAMPAIGN_ID}&ad=${CREATIVE_ID}&utm_source=displayvideo&utm_medium=cpm&utm_campaign=${INSERTION_ORDER_ID}&utm_content=${CAMPAIGN_ID}&utm_term=${CREATIVE_ID}&utm_id=${INSERTION_ORDER_ID}&placement=${UNIVERSAL_SITE_ID}" },
+        { name: "YouTube VTA (DV360)", tpl: "?channel=YouTubeVTA&campaign={campaignid}&ad_group={adgroupid}&ad={creative}&utm_source=youtubevta&utm_medium=social&utm_campaign={campaignid}&utm_content={adgroupid}&utm_term={creative}&placement={placement}&keyword={keyword}&utm_id={campaignid}" }
+    ];
+    function generateUTMs() {
+        const baseUrl = document.getElementById('utm-base-url').value.trim().replace(/\/$/, ""); 
+        const tbody = document.getElementById('utm-tbody');
+        tbody.innerHTML = "";
+        UTM_TEMPLATES.forEach(item => {
+            let connector = baseUrl.includes("?") ? "&" : "?";
+            const finalLink = `${baseUrl}${connector}${item.tpl.replace("?", "")}`;
+            const icon = PLATFORM_ICONS[item.name] || "🌐";
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td style="font-weight:bold;"><span class="plat-icon">${icon}</span>${item.name}</td><td><div class="utm-link-box">${finalLink}</div></td><td style="text-align:center;"><button class="btn-copy" onclick="copyToClip(this, '${finalLink}')">Copy</button></td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // ==================== 8. INFLUENCER LOGIC ====================
+    function addInfRow() {
+        const tr = document.createElement('tr');
+        // Dropdowns populated from Global 'lists' object
+        tr.innerHTML = `
+            <td><input type="text" class="i-creator" placeholder="Name" oninput="updateInfTable()"></td>
+            <td>${createSelect(lists.inf_langs,"i-lang","inf_langs")}</td>
+            <td>${createSelect(lists.inf_plats,"i-plat","inf_plats")}</td>
+            <td>${createSelect(lists.inf_types,"i-type","inf_types")}</td>
+            <td>${createSelect(lists.inf_personas,"i-persona","inf_personas")}</td>
+            <td><input type="date" class="i-date" value="${new Date().toISOString().split('T')[0]}" oninput="updateInfTable()"></td>
+            <td><input type="text" class="i-key" placeholder="Required" oninput="updateInfTable()"></td>
+            <td><div class="utm-link-box generated-link-box">...</div></td>
+            <td>
+                <input type="text" class="i-short" placeholder="Result..." readonly>
+                <button class="btn-shorten" onclick="fetchShortLink(this)">Get Short Link</button>
+            </td>
+            <td><button class="btn-remove" onclick="this.closest('tr').remove()">X</button></td>
+        `;
+        tr.querySelectorAll('select').forEach(s => s.addEventListener('change', updateInfTable));
+        document.querySelector('#table-inf tbody').appendChild(tr);
+    }
+
+    function updateInfTable() {
+        const proj = document.getElementById('inf_project').value.trim();
+        const phase = document.getElementById('inf_phase').value.trim();
+        const dest = document.getElementById('inf_dest').value.trim().replace(/\/$/, "");
+
+        document.querySelectorAll('#table-inf tbody tr').forEach(row => {
+            const creator = row.querySelector('.i-creator').value.trim();
+            const lang = row.querySelector('.i-lang').value;
+            const plat = row.querySelector('.i-plat').value;
+            const type = row.querySelector('.i-type').value;
+            const persona = row.querySelector('.i-persona').value;
+            const dateRaw = row.querySelector('.i-date').value;
+            const shortKey = row.querySelector('.i-key').value.trim();
+            const outBox = row.querySelector('.generated-link-box');
+            const shortenBtn = row.querySelector('.btn-shorten');
+
+            if(!creator || !lang || !plat || !type || !persona || !shortKey) {
+                outBox.innerText = "Fill all fields...";
+                shortenBtn.disabled = true;
+                return;
+            }
+
+            const date = formatAdOpsDate(dateRaw);
+            const parentCamp = `${proj}-${persona}-${lang}-${phase}_${date}-${plat}_${type}`;
+            const campName = `${parentCamp}-${creator}`;
+            
+            let connector = dest.includes("?") ? "&" : "?";
+            const params = new URLSearchParams();
+            params.set("campaign_name", campName);
+            params.set("ad_group_name", creator);
+            params.set("utm_source", creator);
+            params.set("utm_medium", "creator");
+            params.set("utm_campaign", parentCamp);
+            params.set("utm_content", shortKey);
+
+            const fullLink = `${dest}${connector}${params.toString()}`;
+            
+            outBox.innerHTML = `<a href="${fullLink}" target="_blank">${fullLink}</a>`;
+            outBox.setAttribute('data-long-url', fullLink);
+            outBox.setAttribute('data-short-key', shortKey);
+            shortenBtn.disabled = false;
+        });
+    }
+
+    // --- API SHORTENER ---
+    async function fetchShortLink(btn) {
+        const row = btn.closest('tr');
+        const linkBox = row.querySelector('.generated-link-box');
+        const shortInput = row.querySelector('.i-short');
+        
+        const longUrl = linkBox.getAttribute('data-long-url');
+        const shortKey = linkBox.getAttribute('data-short-key');
+        
+        const destVal = document.getElementById('inf_dest').value;
+        let hostname = new URL(destVal).hostname.replace(/^www\./, '');
+        const apiUrl = `https://connect.${hostname}/shorten`;
+
+        btn.innerText = "Shortening...";
+        btn.disabled = true;
+        shortInput.value = "";
+
+        try {
+            const requestUrl = `${apiUrl}?url=${encodeURIComponent(longUrl)}&short_key=${encodeURIComponent(shortKey)}`;
+            const response = await fetch(requestUrl, { method: 'GET' });
+            if (!response.ok) throw new Error("Network Error");
+            const data = await response.json();
+            if (data.short_url) {
+                shortInput.value = data.short_url;
+                btn.innerText = "Done!";
+            } else {
+                shortInput.value = "Error";
+                btn.innerText = "Retry";
+                btn.disabled = false;
+            }
+        } catch (error) {
+            console.error(error);
+            shortInput.value = "API Error";
+            btn.innerText = "Retry";
+            btn.disabled = false;
+            alert(`Failed to shorten link. Ensure the domain 'connect.${hostname}' allows CORS requests.`);
         }
+    }
+
+    function copyToClip(btn, text) {
+        navigator.clipboard.writeText(text).then(() => {
+            const original = btn.innerText;
+            btn.innerText = "Copied!";
+            btn.style.background = "#27ae60";
+            setTimeout(() => { btn.innerText = original; btn.style.background = "#333"; }, 1500);
+        });
     }
 </script>
 
