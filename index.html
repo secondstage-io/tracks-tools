@@ -21,6 +21,10 @@
             --adg-bg: #e9f7ef;
             --cr-border: #ff0249;
             --cr-bg: #fff0f5;
+            
+            /* Platform Colors */
+            --meta-blue: #0668E1;
+            --reddit-orange: #FF4500;
         }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 20px; background: var(--grey); color: #333; padding-bottom: 100px; }
         .container { max-width: 1400px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); min-height: 80vh; display: flex; flex-direction: column; }
@@ -143,7 +147,7 @@
         .btn-text-copy-data { color: #f39c12; border-color: #fcd596; }
         .btn-text-copy-data:hover { background: #fef9e7; border-color: #f39c12; }
 
-        /* PASTE BUTTONS (Aligned with Text Actions) */
+        /* PASTE BUTTONS */
         .btn-paste { 
             background: white; border: 1px solid #f39c12; color: #f39c12; 
             margin-left: 10px; opacity: 0.5; cursor: not-allowed; font-size: 0.75rem;
@@ -156,8 +160,14 @@
         .btn-download:hover { background: #219150; }
         .btn-download-master { background: var(--dark); color: white; font-size: 1rem; padding: 12px 20px; width: 100%; margin-bottom: 15px; }
         .btn-download-master:hover { background: #1a252f; }
+        
+        /* PLATFORM EXPORT BUTTONS */
+        .btn-download-meta { background: var(--meta-blue); color: white; font-size: 0.9rem; padding: 10px 20px; border-radius: 4px; cursor: pointer; border: none; display: inline-block; text-decoration: none; margin-right: 10px; }
+        .btn-download-meta:hover { background: #0456be; }
+        .btn-download-reddit { background: #FF4500; color: white; font-size: 0.9rem; padding: 10px 20px; border-radius: 4px; cursor: pointer; border: none; display: inline-block; text-decoration: none; margin-right: 10px; }
+        .btn-download-reddit:hover { background: #cc3700; }
 
-        .warning-box { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 15px; border-radius: 6px; margin-top: 20px; display: flex; align-items: flex-start; gap: 10px; }
+        .warning-box { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 15px; border-radius: 6px; margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
 
         /* Influencer / UTM Styles */
         .table-wrapper { overflow-x: auto; padding-bottom: 10px; }
@@ -262,14 +272,21 @@
         <div class="warning-box">
             <div style="font-size: 1.5rem;">⚠️</div>
             <div style="width:100%;">
-                <strong>Export Data:</strong><br>
+                <strong>Export Data:</strong>
                 <div style="margin-top:15px;">
                     <button class="btn btn-download-master" onclick="exportTree('master')">📥 Download Master Flat File (All Levels)</button>
-                    <div style="border-top: 1px solid #e6cd96; padding-top: 10px; font-size: 0.9rem;">
-                        <span style="margin-right: 10px;">Or download separate levels:</span>
-                        <button class="btn-download" onclick="exportTree('camp')">Campaigns Only</button>
-                        <button class="btn-download" onclick="exportTree('adg')">Ad Groups Only</button>
-                        <button class="btn-download" onclick="exportTree('cr')">Creatives Only</button>
+                    
+                    <div style="border-top: 1px solid #e6cd96; padding-top: 10px; margin-top: 10px; font-size: 0.9rem;">
+                        <span style="margin-right: 10px; font-weight:bold;">Separate Levels:</span>
+                        <button class="btn-download" onclick="exportTree('camp')">Campaigns</button>
+                        <button class="btn-download" onclick="exportTree('adg')">Ad Groups</button>
+                        <button class="btn-download" onclick="exportTree('cr')">Creatives</button>
+                    </div>
+
+                    <div style="border-top: 1px solid #e6cd96; padding-top: 10px; margin-top: 10px; font-size: 0.9rem;">
+                        <span style="margin-right: 10px; font-weight:bold;">Platform Imports:</span>
+                        <button class="btn-download-meta" onclick="exportMeta()">Meta</button>
+                        <button class="btn-download-reddit" onclick="exportReddit()">Reddit</button>
                     </div>
                 </div>
             </div>
@@ -366,7 +383,7 @@
     };
 
     // ============================================================
-    //  TREE BUILDER LOGIC (V44 Core)
+    //  TREE BUILDER LOGIC (V47 Core)
     // ============================================================
     
     function addCampaignBlock() {
@@ -380,7 +397,7 @@
                 </div>
                 <div onclick="event.stopPropagation()">
                     <button class="btn-text-action" onclick="duplicateBlock(this, 'camp')">Duplicate Campaign</button>
-                    <button class="btn-text-action btn-text-delete" onclick="removeBlock(this)">Delete</button>
+                    <button class="btn-text-action btn-text-delete" onclick="removeBlock(this, 'camp')">Delete</button>
                 </div>
             </div>
             <div class="block-body">
@@ -426,7 +443,7 @@
                 <div onclick="event.stopPropagation()">
                     <button class="btn-text-action btn-text-copy-data" onclick="copyStructure(this, 'adg')">Copy Ad Group</button>
                     <button class="btn-text-action" onclick="duplicateBlock(this, 'adg')">Duplicate Ad Group</button>
-                    <button class="btn-text-action btn-text-delete" onclick="removeBlock(this)">Delete</button>
+                    <button class="btn-text-action btn-text-delete" onclick="removeBlock(this, 'adg')">Delete</button>
                 </div>
             </div>
             <div class="block-body">
@@ -470,7 +487,7 @@
                 <div onclick="event.stopPropagation()">
                     <button class="btn-text-action btn-text-copy-data" onclick="copyStructure(this, 'cr')">Copy Creative</button>
                     <button class="btn-text-action" onclick="duplicateBlock(this, 'cr')">Duplicate Creative</button>
-                    <button class="btn-text-action btn-text-delete" onclick="removeBlock(this)">Delete</button>
+                    <button class="btn-text-action btn-text-delete" onclick="removeBlock(this, 'cr')">Delete</button>
                 </div>
             </div>
             <div class="block-body">
@@ -506,17 +523,19 @@
         if(parent) parent.classList.toggle('collapsed');
     }
 
-    // FIX: STRICT DELETE LOGIC
-    function removeBlock(btn) {
-        if(confirm("Delete this item?")) {
-            // Only check the direct parentage order to prevent accidental top-level delete
-            if(btn.closest('.block-creative')) {
-                btn.closest('.block-creative').remove();
-            } else if(btn.closest('.block-adgroup')) {
-                btn.closest('.block-adgroup').remove();
-            } else if(btn.closest('.block-campaign')) {
-                btn.closest('.block-campaign').remove();
-            }
+    // FIX: STRICT DELETE LOGIC (V47)
+    function removeBlock(btn, type) {
+        if(!confirm("Delete this item?")) return;
+        
+        // Strict check based on type passed from button
+        let selector = "";
+        if(type === 'camp') selector = '.block-campaign';
+        else if(type === 'adg') selector = '.block-adgroup';
+        else if(type === 'cr') selector = '.block-creative';
+        
+        if(selector) {
+            const block = btn.closest(selector);
+            if(block) block.remove();
         }
     }
 
@@ -792,10 +811,141 @@
         updateInfTable();
     }
 
+    // META EXPORT
+    function exportMeta() {
+        const gProj = document.getElementById('g_project').value.trim();
+        const gPhase = document.getElementById('g_phase').value.trim();
+        const headers = ['Campaign ID', 'Campaign Name', 'Campaign Status', 'Special Ad Categories', 'Special Ad Category Country', 'Campaign Objective', 'Buying Type', 'Campaign Spend Limit', 'Campaign Daily Budget', 'Campaign Lifetime Budget', 'Campaign Bid Strategy', 'Tags', 'Campaign Is Using L3 Schedule', 'Campaign Start Time', 'Campaign Stop Time', 'Ad Set ID', 'Ad Set Run Status', 'Ad Set Name', 'Ad Set Time Start', 'Ad Set Time Stop', 'Ad Set Daily Budget', 'Ad Set Lifetime Budget', 'Link Object ID', 'Link', 'Application ID', 'Countries', 'Global Regions', 'Excluded Global Regions', 'Cities', 'Regions', 'Zip', 'Gender', 'Age Min', 'Age Max', 'Education Status', 'College Start Year', 'College End Year', 'Interested In', 'Relationship', 'Connections', 'Excluded Connections', 'Friends of Connections', 'Locales', 'Broad Category Clusters', 'Custom Audiences', 'Excluded Custom Audiences', 'Location Cluster IDs', 'Excluded Location Cluster IDs', 'Publisher Platforms', 'Device Platforms', 'Facebook Positions', 'Instagram Positions', 'Oculus Positions', 'Audience Network Positions', 'Optimization Goal', 'Billing Event', 'Bid Amount', 'Ad Set Bid Strategy', 'Beneficiary (financial ads in Taiwan)', 'Payer (financial ads in Taiwan)', 'Beneficiary (Taiwan)', 'Payer (Taiwan)', 'Beneficiary (financial ads in Australia)', 'Payer (financial ads in Australia)', 'Beneficiary (Singapore)', 'Payer (Singapore)', 'Minimum ROAS', 'Ad Set Minimum Spend Limit', 'Ad Set Maximum Spend Limit', 'Beneficiary (securities ads in India)', 'Payer (securities ads in India)', 'Beneficiary (selected locations)', 'Payer (selected locations)', 'Large Geo Areas', 'Excluded Large Geo Areas', 'Medium Geo Areas', 'Excluded Medium Geo Areas', 'Small Geo Areas', 'Excluded Small Geo Areas', 'Metro Areas', 'Excluded Metro Areas', 'Subcities', 'Excluded Subcities', 'Neighborhoods', 'Excluded Neighborhoods', 'Subneighborhoods', 'Excluded Subneighborhoods', 'Ad ID', 'Ad Status', 'Ad Name', 'Title', 'Body', 'Link Description', 'Display Link', 'Image Hash', 'Creative Type', 'URL Tags', 'Image File Name', 'Creative Optimization', 'Product 1 - Link', 'Product 1 - Name', 'Product 1 - Description', 'Product 1 - Image Hash', 'Product 2 - Link', 'Product 2 - Name', 'Product 2 - Description', 'Product 2 - Image Hash', 'Product 3 - Link', 'Product 3 - Name', 'Product 3 - Description', 'Product 3 - Image Hash', 'Call to Action', 'Story ID'];
+        
+        let csv = headers.join(";") + "\n"; // Meta uses Semicolon
+
+        document.querySelectorAll('.block-campaign').forEach(camp => {
+            const c = getCampValues(camp);
+            if(c.plat !== 'Meta') return;
+
+            const campNameBase = `${gProj}-${c.plat}-{{GEO}}-${gPhase}_${c.dateStr}-${c.strat}_${c.obj}${c.cust ? '_'+c.cust : ''}`;
+            
+            c.geos.forEach(geo => {
+                const finalCampName = campNameBase.replace('{{GEO}}', geo);
+                const adGroups = camp.querySelectorAll('.block-adgroup');
+                
+                if(adGroups.length === 0) {
+                    // Camp Row
+                    let row = Array(headers.length).fill("");
+                    row[1] = finalCampName; row[2] = "Active"; row[5] = c.obj; row[6] = "Auction";
+                    csv += row.join(";") + "\n";
+                } else {
+                    adGroups.forEach(adg => {
+                        const a = getAdgValues(adg);
+                        const adgName = `${geo}-${a.aud}_${a.type}${a.cust ? '_'+a.cust : ''}`;
+                        const creatives = adg.querySelectorAll('.block-creative');
+
+                        if(creatives.length === 0) {
+                            // Ad Set Row
+                            let row = Array(headers.length).fill("");
+                            row[1] = finalCampName; row[2] = "Active"; row[5] = c.obj; row[6] = "Auction";
+                            row[16] = "Active"; row[17] = adgName; row[53] = "Offsite Conversions";
+                            csv += row.join(";") + "\n";
+                        } else {
+                            // Ad Row
+                            creatives.forEach(cr => {
+                                const r = getCrValues(cr);
+                                const parts = [geo, r.fmt, r.dim, gPhase, r.lp, r.ver, r.len];
+                                if(r.cust) parts.push(r.cust);
+                                const crName = parts.join('-');
+
+                                let row = Array(headers.length).fill("");
+                                row[1] = finalCampName; row[2] = "Active"; row[5] = c.obj; row[6] = "Auction";
+                                row[16] = "Active"; row[17] = adgName; row[53] = "Offsite Conversions";
+                                row[87] = "Active"; row[88] = crName; row[94] = r.fmt;
+                                csv += row.join(";") + "\n";
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `Meta_Import_AdOps.csv`;
+        link.click();
+    }
+
+    // REDDIT EXPORT
+    function exportReddit() {
+        const gProj = document.getElementById('g_project').value.trim();
+        const gPhase = document.getElementById('g_phase').value.trim();
+        const headers = ["Results", "Campaign ID", "Campaign name", "Special ad category", "Campaign objective", "Campaign budget", "Funding instrument", "Campaign status", "Campaign App ID", "Ad group ID", "Ad group name", "Start time", "End time", "Bid strategy", "Bid", "Budget type", "Budget", "Conversion goal", "Conversion optimization window", "Frequency caps", "Ad group status", "Locations", "Exclude locations", "Gender", "Exclude keywords", "Keywords", "Interests", "Communities", "Exclude communities", "Auto app exclusions", "Device type", "Minimum OS version", "Carriers", "Placements", "Platforms", "Custom audiences", "Exclude custom audiences", "Third-party audiences", "Exclude third-party audiences", "Expand audience automatically", "Delivery type", "Ad Group App ID", "Shopping Ad Type", "Product Catalog ID", "Ad ID", "Ad name", "Impression trackers", "Click trackers", "Ad status", "Second Line CTA", "Ad product IDs", "Post ID", "Profile name or ID", "Post type", "Call to action", "Headline", "Destination URL", "Display URL", "Media file name", "Thumbnail file name", "Body", "Allow comments", "Additional Text", "Carousel card 1 - Media file name", "Carousel card 1 - Destination URL", "Carousel card 1 - Display URL", "Carousel card 1 - Caption", "Carousel card 1 - Call to action", "Carousel card 2 - Media file name", "Carousel card 2 - Destination URL", "Carousel card 2 - Display URL", "Carousel card 2 - Caption", "Carousel card 2 - Call to action", "Carousel card 3 - Media file name", "Carousel card 3 - Destination URL", "Carousel card 3 - Display URL", "Carousel card 3 - Caption", "Carousel card 3 - Call to action", "Carousel card 4 - Media file name", "Carousel card 4 - Destination URL", "Carousel card 4 - Display URL", "Carousel card 4 - Caption", "Carousel card 4 - Call to action", "Carousel card 5 - Media file name", "Carousel card 5 - Destination URL", "Carousel card 5 - Display URL", "Carousel card 5 - Caption", "Carousel card 5 - Call to action", "Carousel card 6 - Media file name", "Carousel card 6 - Destination URL", "Carousel card 6 - Display URL", "Carousel card 6 - Caption", "Carousel card 6 - Call to action"];
+        
+        let csv = headers.join(",") + "\n";
+
+        document.querySelectorAll('.block-campaign').forEach(camp => {
+            const c = getCampValues(camp);
+            // Filter: Only Reddit
+            if(c.plat !== 'Reddit') return;
+
+            const campNameBase = `${gProj}-${c.plat}-{{GEO}}-${gPhase}_${c.dateStr}-${c.strat}_${c.obj}${c.cust ? '_'+c.cust : ''}`;
+
+            c.geos.forEach(geo => {
+                const finalCampName = campNameBase.replace('{{GEO}}', geo);
+                const adGroups = camp.querySelectorAll('.block-adgroup');
+                
+                if(adGroups.length === 0) {
+                    let row = Array(headers.length).fill("");
+                    row[2] = finalCampName; // Campaign name
+                    row[4] = c.obj; // Objective
+                    row[7] = "ACTIVE"; // Campaign status
+                    csv += row.join(",") + "\n";
+                } else {
+                    adGroups.forEach(adg => {
+                        const a = getAdgValues(adg);
+                        const adgName = `${geo}-${a.aud}_${a.type}${a.cust ? '_'+a.cust : ''}`;
+                        const creatives = adg.querySelectorAll('.block-creative');
+
+                        if(creatives.length === 0) {
+                            let row = Array(headers.length).fill("");
+                            row[2] = finalCampName;
+                            row[4] = c.obj;
+                            row[7] = "ACTIVE";
+                            row[10] = adgName; // Ad group name
+                            row[20] = "ACTIVE"; // Ad group status
+                            csv += row.join(",") + "\n";
+                        } else {
+                            creatives.forEach(cr => {
+                                const r = getCrValues(cr);
+                                const parts = [geo, r.fmt, r.dim, gPhase, r.lp, r.ver, r.len];
+                                if(r.cust) parts.push(r.cust);
+                                const crName = parts.join('-');
+
+                                let row = Array(headers.length).fill("");
+                                row[2] = finalCampName;
+                                row[4] = c.obj;
+                                row[7] = "ACTIVE";
+                                row[10] = adgName;
+                                row[20] = "ACTIVE";
+                                row[45] = crName; // Ad name
+                                row[48] = "ACTIVE"; // Ad status
+                                csv += row.join(",") + "\n";
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `Reddit_Import_AdOps.csv`;
+        link.click();
+    }
+
     // [UTM/INFLUENCER LOGIC PRESERVED FROM V26]
     const UTM_TEMPLATES = [{ name: "Google Search", tpl: "?channel=GoogleSearch&campaign={campaignid}&ad_group={adgroupid}&ad={creative}&utm_source=search&utm_medium=cpc&utm_campaign={campaignid}&utm_content={adgroupid}&utm_term={creative}&placement={placement}&keyword={keyword}&utm_id={campaignid}" },{ name: "YouTube", tpl: "?channel=YouTube&campaign={campaignid}&ad_group={adgroupid}&ad={creative}&utm_source=youtube&utm_medium=social&utm_campaign={campaignid}&utm_content={adgroupid}&utm_term={creative}&placement={placement}&keyword={keyword}&utm_id={campaignid}" },{ name: "Performance Max", tpl: "?channel=PMax&campaign={campaignid}&ad_group={adgroupid}&ad={creative}&utm_source=pmax&utm_medium=cpc&utm_campaign={campaignid}&utm_content={adgroupid}&utm_term={creative}&placement={placement}&keyword={keyword}&utm_id={campaignid}" },{ name: "Meta", tpl: "?channel=Meta&campaign={{campaign.id}}&campaign_name={{campaign.name}}&ad_group={{adset.id}}&ad_group_name={{adset.name}}&ad={{ad.id}}&ad_name={{ad.name}}&utm_source=meta&utm_medium=social&utm_campaign={{campaign.name}}&utm_content={{adset.name}}&utm_term={{ad.name}}&utm_id={{campaign.id}}&placement={{placement}}&utm_source_platform={{site_source_name}}" },{ name: "Reddit", tpl: "?channel=Reddit&campaign={{CAMPAIGN_ID}}&ad_group={{ADGROUP_ID}}&ad_group_name={{ADGROUP_NAME}}&ad={{AD_ID}}&ad_name={{AD_NAME}}&reddit_clickid={{CLICK_ID}}&utm_source=reddit&utm_medium=social&utm_campaign={{CAMPAIGN_ID}}&utm_content={{ADGROUP_NAME}}&utm_term={{AD_NAME}}&utm_id={{CAMPAIGN_ID}}&placement=reddit&keyword={{POST_ID}}" },{ name: "TikTok", tpl: "?channel=TikTok&campaign=__CAMPAIGN_ID__&campaign_name=__CAMPAIGN_NAME__&ad_group=__AID__&ad_group_name=__AID_NAME__&ad=__CID__&ad_name=__CID_NAME__&utm_source=tiktok&utm_medium=social&utm_campaign=__CAMPAIGN_NAME__&utm_content=__AID_NAME__&utm_term=__CID_NAME__&utm_id=__CAMPAIGN_ID__&placement=__PLACEMENT__" },{ name: "Google DemandGen", tpl: "?channel=GoogleDemandGen&campaign={campaignid}&ad_group={adgroupid}&ad={creative}&utm_source=googledemandgen&utm_medium=cpc&utm_campaign={campaignid}&utm_content={adgroupid}&utm_term={creative}&placement={placement}&keyword={keyword}&utm_id={campaignid}" },{ name: "DisplayVideo360", tpl: "?channel=DisplayVideo&campaign=${INSERTION_ORDER_ID}&ad_group=${CAMPAIGN_ID}&ad=${CREATIVE_ID}&utm_source=displayvideo&utm_medium=cpm&utm_campaign=${INSERTION_ORDER_ID}&utm_content=${CAMPAIGN_ID}&utm_term=${CREATIVE_ID}&utm_id=${INSERTION_ORDER_ID}&placement=${UNIVERSAL_SITE_ID}" },{ name: "YouTube VTA (DV360)", tpl: "?channel=YouTubeVTA&campaign={campaignid}&ad_group={adgroupid}&ad={creative}&utm_source=youtubevta&utm_medium=social&utm_campaign={campaignid}&utm_content={adgroupid}&utm_term={creative}&placement={placement}&keyword={keyword}&utm_id={campaignid}" }];
     function generateUTMs() { const baseUrl = document.getElementById('utm-base-url').value.trim().replace(/\/$/, ""); const tbody = document.getElementById('utm-tbody'); tbody.innerHTML = ""; UTM_TEMPLATES.forEach(item => { let connector = baseUrl.includes("?") ? "&" : "?"; const finalLink = `${baseUrl}${connector}${item.tpl.replace("?", "")}`; const tr = document.createElement('tr'); tr.innerHTML = `<td style="font-weight:bold;">${item.name}</td><td><div class="utm-link-box">${finalLink}</div></td><td style="text-align:center;"><button class="btn-copy" onclick="copyToClip(this, '${finalLink}')">Copy</button></td>`; tbody.appendChild(tr); }); }
-    function addInfRow() { const tr = document.createElement('tr'); tr.innerHTML = `<td><input type="text" class="i-creator" placeholder="Name" oninput="updateInfTable()"></td><td>${createSelectHTML(lists.inf_langs,"i-lang","inf_langs")}</td><td>${createSelectHTML(lists.inf_plats,"i-plat","inf_plats")}</td><td>${createSelectHTML(lists.inf_types,"i-type","inf_types")}</td><td>${createSelectHTML(lists.inf_personas,"i-persona","inf_personas")}</td><td><input type="date" class="i-date" value="${new Date().toISOString().split('T')[0]}" oninput="updateInfTable()"></td><td><input type="text" class="i-key" placeholder="Required" oninput="updateInfTable()"></td><td><div class="utm-link-box generated-link-box">...</div></td><td><input type="text" class="i-short" placeholder="Result..." readonly> <button class="btn-shorten" onclick="fetchShortLink(this)">Get Short Link</button></td><td><button class="btn-remove" onclick="this.closest('tr').remove()">X</button></td>`; tr.querySelectorAll('select').forEach(s => s.addEventListener('change', updateInfTable)); document.querySelector('#table-inf tbody').appendChild(tr); }
+    function addInfRow() { const tr = document.createElement('tr'); tr.innerHTML = `<td><input type="text" class="i-creator" placeholder="Name" oninput="updateInfTable()"></td><td>${createSelectHTML(lists.inf_langs,"i-lang","inf_langs")}</td><td>${createSelectHTML(lists.inf_plats,"i-plat","inf_plats")}</td><td>${createSelectHTML(lists.inf_types,"i-type","inf_types")}</td><td>${createSelectHTML(lists.inf_personas,"i-persona","inf_personas")}</td><td><input type="date" class="i-date" value="${new Date().toISOString().split('T')[0]}" oninput="updateInfTable()"></td><td><input type="text" class="i-key" placeholder="Required" oninput="updateInfTable()"></td><td><div class="utm-link-box generated-link-box">...</div></td><td><input type="text" class="i-short" placeholder="Result..." readonly> <button class="btn-shorten" onclick="fetchShortLink(this)">Get Short Link</button></td><td>${generateActionButtons()}</td>`; tr.querySelectorAll('select').forEach(s => s.addEventListener('change', updateInfTable)); document.querySelector('#table-inf tbody').appendChild(tr); }
     function updateInfTable() { const proj = document.getElementById('inf_project').value.trim(); const phase = document.getElementById('inf_phase').value.trim(); const dest = document.getElementById('inf_dest').value.trim().replace(/\/$/, ""); document.querySelectorAll('#table-inf tbody tr').forEach(row => { const creator = row.querySelector('.i-creator').value.trim(); const lang = row.querySelector('.i-lang').value; const plat = row.querySelector('.i-plat').value; const type = row.querySelector('.i-type').value; const persona = row.querySelector('.i-persona').value; const dateRaw = row.querySelector('.i-date').value; const shortKey = row.querySelector('.i-key').value.trim(); const outBox = row.querySelector('.generated-link-box'); const shortenBtn = row.querySelector('.btn-shorten'); if(!creator || !lang || !plat || !type || !persona || !shortKey) { outBox.innerText = "Fill all fields..."; shortenBtn.disabled = true; return; } const date = formatAdOpsDate(dateRaw); const prefix = proj ? `${proj}-` : ""; const parentCamp = `${prefix}${persona}-${lang}-${phase}_${date}-${plat}_${type}`; const campName = `${parentCamp}-${creator}`; let connector = dest.includes("?") ? "&" : "?"; const params = new URLSearchParams(); params.set("campaign_name", campName); params.set("ad_group_name", creator); params.set("utm_source", creator); params.set("utm_medium", "creator"); params.set("utm_campaign", parentCamp); params.set("utm_content", shortKey); const fullLink = `${dest}${connector}${params.toString()}`; outBox.innerHTML = `<a href="${fullLink}" target="_blank">${fullLink}</a>`; outBox.setAttribute('data-long-url', fullLink); outBox.setAttribute('data-short-key', shortKey); shortenBtn.disabled = false; }); }
     async function fetchShortLink(btn) { const row = btn.closest('tr'); const linkBox = row.querySelector('.generated-link-box'); const shortInput = row.querySelector('.i-short'); const longUrl = linkBox.getAttribute('data-long-url'); const shortKey = linkBox.getAttribute('data-short-key'); const destVal = document.getElementById('inf_dest').value; let hostname = new URL(destVal).hostname.replace(/^www\./, ''); const apiUrl = `https://connect.${hostname}/shorten`; btn.innerText = "Shortening..."; btn.disabled = true; shortInput.value = ""; try { const requestUrl = `${apiUrl}?url=${encodeURIComponent(longUrl)}&short_key=${encodeURIComponent(shortKey)}`; const response = await fetch(requestUrl, { method: 'GET' }); if (!response.ok) throw new Error("Network Error"); const data = await response.json(); if (data.short_url) { shortInput.value = data.short_url; btn.innerText = "Done!"; } else { shortInput.value = "Error"; btn.innerText = "Retry"; btn.disabled = false; } } catch (error) { console.error(error); shortInput.value = "API Error"; btn.innerText = "Retry"; btn.disabled = false; alert(`Failed to shorten link. Ensure the domain 'connect.${hostname}' allows CORS requests.`); } }
     function copyToClip(btn, text) { navigator.clipboard.writeText(text).then(() => { const original = btn.innerText; btn.innerText = "Copied!"; btn.style.background = "#27ae60"; setTimeout(() => { btn.innerText = original; btn.style.background = "#333"; }, 1500); }); }
