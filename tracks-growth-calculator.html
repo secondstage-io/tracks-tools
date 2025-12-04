@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS Growth Calculator</title>
+    
+    <!-- 1. Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. Load React & ReactDOM (Specific Versions for Stability) -->
+    <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+    
+    <!-- 3. Load Prop-types (Required dependency for some Recharts UMD builds) -->
+    <script src="https://unpkg.com/prop-types/prop-types.min.js"></script>
+
+    <!-- 4. Load Recharts (Pinned version to ensure compatibility) -->
+    <script crossorigin src="https://unpkg.com/recharts@2.12.0/umd/Recharts.js"></script>
+    
+    <!-- 5. Babel to compile JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        /* Custom range slider styling */
+        input[type=range] {
+            height: 6px;
+            border-radius: 5px;
+            background: #e2e8f0;
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #ff0249;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, ComposedChart, Bar } = window.Recharts;
+
+        // Brand Color Constants
+        const BRAND_COLOR = '#ff0249';
+        const BRAND_COLOR_LIGHT = '#ffe6ed'; 
+
+        // Icons
+        const CopyIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+        );
+        const DollarIcon = () => (
+             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        );
+        const TrendIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        );
+        const UsersIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        );
+        const InfoIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>
+        );
+
+        const SaasCalculator = () => {
+            // --- State / Inputs ---
+            
+            // Standard Pricing
+            const [setupFeeStandard, setSetupFeeStandard] = useState(5000);
+            const [gracePeriodStandard, setGracePeriodStandard] = useState(2);
+            
+            // Subsequent Pricing
+            const [setupFeeSubsequent, setSetupFeeSubsequent] = useState(2000);
+            const [gracePeriodSubsequent, setGracePeriodSubsequent] = useState(0); // Assumed 0 based on "no further included month"
+            
+            // Mix
+            const [subsequentMix, setSubsequentMix] = useState(20); // % of sales that are subsequent
+            
+            // General
+            const [recurringFee, setRecurringFee] = useState(3000); 
+            const [avgRetentionMonths, setAvgRetentionMonths] = useState(4);
+            const [startingGames, setStartingGames] = useState(8);
+            const [newGamesPerMonth, setNewGamesPerMonth] = useState(1);
+            const [growthRate, setGrowthRate] = useState(0); 
+
+            const [data, setData] = useState([]);
+            const [metrics, setMetrics] = useState({
+                ltv: 0,
+                mrrYear1: 0,
+                mrrYear2: 0,
+                totalRevYear1: 0,
+                blendedSetup: 0
+            });
+
+            // --- Calculations ---
+            useEffect(() => {
+                const calculatedData = [];
+                let currentActive = startingGames;
+                let cumulativeRevenue = 0;
+                
+                const churnRate = avgRetentionMonths > 0 ? 1 / avgRetentionMonths : 1; 
+
+                // Calculate Blended Values
+                const mixRate = subsequentMix / 100;
+                const blendedSetupFee = (setupFeeStandard * (1 - mixRate)) + (setupFeeSubsequent * mixRate);
+                const blendedGracePeriod = (gracePeriodStandard * (1 - mixRate)) + (gracePeriodSubsequent * mixRate);
+
+                for (let month = 1; month <= 24; month++) {
+                    const activeNewGames = newGamesPerMonth * Math.pow(1 + (growthRate / 100), month - 1);
+                    
+                    // 1. Setup Revenue (Blended)
+                    const revenueFromSetup = activeNewGames * blendedSetupFee;
+
+                    // 2. Recurring Revenue
+                    // We need to calculate how many games are currently in their "Free/Included" period.
+                    // Because 'blendedGracePeriod' might be a decimal (e.g. 1.5 months), we handle it proportionally.
+                    
+                    // Games added this month (Age 0)
+                    // If blendedGrace is 1.5, then 100% of this month's games are free.
+                    const graceFactorM0 = Math.min(1, Math.max(0, blendedGracePeriod));
+                    const gamesInGraceM0 = activeNewGames * graceFactorM0;
+
+                    // Games added last month (Age 1) - need to account for churn
+                    const gamesAddedLastMonth = month > 1 ? (newGamesPerMonth * Math.pow(1 + (growthRate / 100), month - 2)) : 0;
+                    const gamesSurvivingM1 = gamesAddedLastMonth * (1 - churnRate);
+                    // If blendedGrace is 1.5, then 50% (1.5 - 1.0) of last month's games are still free.
+                    const graceFactorM1 = Math.min(1, Math.max(0, blendedGracePeriod - 1));
+                    const gamesInGraceM1 = gamesSurvivingM1 * graceFactorM1;
+
+                    // Games added 2 months ago (Age 2)
+                    const gamesAdded2MonthsAgo = month > 2 ? (newGamesPerMonth * Math.pow(1 + (growthRate / 100), month - 3)) : 0;
+                    const gamesSurvivingM2 = gamesAdded2MonthsAgo * Math.pow((1 - churnRate), 2);
+                    // If blendedGrace is 2.5, then 50% of these are free. If 1.5, 0% are free.
+                    const graceFactorM2 = Math.min(1, Math.max(0, blendedGracePeriod - 2));
+                    const gamesInGraceM2 = gamesSurvivingM2 * graceFactorM2;
+
+                    const totalGamesInGrace = gamesInGraceM0 + gamesInGraceM1 + gamesInGraceM2;
+                    
+                    // Total Paying = Total Active - Total In Grace
+                    // Note: currentActive (at start of loop) doesn't include activeNewGames yet.
+                    // So Total Active Pool = currentActive + activeNewGames - Churn(calculated later). 
+                    // Let's use the pre-churn active count for revenue calc.
+                    const totalActivePool = currentActive + activeNewGames;
+                    
+                    // We need to be careful not to subtract churned users from the grace pool double count.
+                    // Simplified: We take Total Pool and subtract the Calculated Grace Pool.
+                    let payingRecurringGames = totalActivePool - totalGamesInGrace;
+                    
+                    // Safety: We assume 'startingGames' are mature and always pay.
+                    // But if calculated Paying < starting, we clamp.
+                    if (payingRecurringGames < 0) payingRecurringGames = 0;
+
+                    const revenueFromRecurring = payingRecurringGames * recurringFee;
+                    const totalMonthlyRevenue = revenueFromSetup + revenueFromRecurring;
+
+                    // 3. Update Active Counts
+                    const churnedGames = currentActive * churnRate;
+                    const previousActive = currentActive;
+                    currentActive = previousActive + activeNewGames - churnedGames;
+                    if (currentActive < 0) currentActive = 0;
+
+                    cumulativeRevenue += totalMonthlyRevenue;
+
+                    calculatedData.push({
+                        month,
+                        newGames: parseFloat(activeNewGames.toFixed(1)),
+                        churnedGames: parseFloat(churnedGames.toFixed(1)),
+                        activeGames: parseFloat(currentActive.toFixed(1)),
+                        revenue: Math.round(totalMonthlyRevenue),
+                        splitSetup: Math.round(revenueFromSetup),
+                        splitRecurring: Math.round(revenueFromRecurring),
+                        cumulativeRevenue: Math.round(cumulativeRevenue)
+                    });
+                }
+
+                setData(calculatedData);
+
+                // LTV Estimate (Blended)
+                const effectiveRecurringMonths = Math.max(0, avgRetentionMonths - blendedGracePeriod);
+                const ltv = blendedSetupFee + (recurringFee * effectiveRecurringMonths);
+
+                setMetrics({
+                    ltv: ltv,
+                    mrrYear1: calculatedData[11]?.revenue || 0,
+                    mrrYear2: calculatedData[23]?.revenue || 0,
+                    totalRevYear1: calculatedData[11]?.cumulativeRevenue || 0,
+                    blendedSetup: blendedSetupFee
+                });
+
+            }, [setupFeeStandard, setupFeeSubsequent, gracePeriodStandard, gracePeriodSubsequent, subsequentMix, recurringFee, avgRetentionMonths, startingGames, newGamesPerMonth, growthRate]);
+
+            const formatCurrency = (val) => {
+                return new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(val);
+            };
+
+            const copyToClipboard = () => {
+                const header = "Month,New Games,Churned Games,Total Active Games,Setup Revenue,Recurring Revenue,Total Monthly Revenue,Cumulative Revenue\n";
+                const rows = data.map(row => 
+                    `${row.month},${row.newGames},${row.churnedGames},${row.activeGames},${row.splitSetup},${row.splitRecurring},${row.revenue},${row.cumulativeRevenue}`
+                ).join("\n");
+                
+                const csvContent = header + rows;
+                const textArea = document.createElement("textarea");
+                textArea.value = csvContent;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert("Data copied! You can paste this directly into Google Sheets.");
+            };
+
+            return (
+                <div className="flex flex-col h-screen bg-slate-50 overflow-hidden text-slate-900">
+                    {/* Header */}
+                    <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shrink-0">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-white p-1 rounded-lg border border-slate-200">
+                                <img src="https://tracks.secondstage.io/vite/assets/tracks-signup-logo-J-NQw5DE.png" className="h-8 w-auto" alt="Tracks Logo" />
+                            </div>
+                            <div>
+                                <h1 className="text-xl font-bold text-slate-800">Growth Modeler</h1>
+                                <p className="text-xs text-slate-500">Forecasting for Game Platform Sales</p>
+                            </div>
+                        </div>
+                        <button 
+                            onClick={copyToClipboard}
+                            className="flex items-center gap-2 bg-[#ff0249] hover:bg-[#cc023a] text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                        >
+                            <CopyIcon />
+                            Copy Data for Excel/Sheets
+                        </button>
+                    </header>
+
+                    <div className="flex flex-1 overflow-hidden">
+                        {/* Sidebar */}
+                        <aside className="w-80 bg-white border-r border-slate-200 overflow-y-auto p-6 flex flex-col gap-8 shrink-0">
+                            
+                            {/* Logic Explanation Box */}
+                            <div className="bg-slate-50 border border-slate-200 p-3 rounded-md text-xs text-slate-600 flex flex-col gap-2">
+                                <div className="flex gap-2">
+                                    <div className="shrink-0 mt-0.5 text-[#ff0249]"><InfoIcon /></div>
+                                    <p className="font-semibold text-slate-800">Blended Logic Active</p>
+                                </div>
+                                <p>
+                                    Based on your sales mix, the model uses an <strong>Effective Setup Fee of {formatCurrency(metrics.blendedSetup)}</strong>.
+                                </p>
+                            </div>
+
+                            <div className="space-y-6">
+                                
+                                {/* Sales Mix Section */}
+                                <div className="space-y-4 pt-2">
+                                    <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+                                        <div className="text-[#ff0249]"><UsersIcon /></div> Sales Mix
+                                    </h3>
+                                    
+                                    <div>
+                                        <div className="flex justify-between text-sm mb-1">
+                                            <span className="text-slate-600">Subsequent Games</span>
+                                            <span className="font-bold text-[#ff0249]">{subsequentMix}%</span>
+                                        </div>
+                                        <input 
+                                            type="range" 
+                                            min="0" 
+                                            max="100" 
+                                            value={subsequentMix} 
+                                            onChange={(e) => setSubsequentMix(Number(e.target.value))}
+                                            className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                                        />
+                                        <div className="flex justify-between text-xs text-slate-400 mt-1">
+                                            <span>All New Clients</span>
+                                            <span>All Repeat</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Unit Economics Section */}
+                                <div className="space-y-3 border-t border-slate-100 pt-4">
+                                    <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+                                        <div className="text-[#ff0249]"><DollarIcon /></div> Pricing Config
+                                    </h3>
+                                    
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-xs font-medium text-slate-500 mb-1">Standard Setup</label>
+                                            <input type="number" value={setupFeeStandard} onChange={(e) => setSetupFeeStandard(Number(e.target.value))} className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-[#ff0249] outline-none" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-slate-500 mb-1">Subsq. Setup</label>
+                                            <input type="number" value={setupFeeSubsequent} onChange={(e) => setSetupFeeSubsequent(Number(e.target.value))} className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-[#ff0249] outline-none" />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-600 mb-1">Avg. Recurring Fee (€/mo)</label>
+                                        <input type="number" value={recurringFee} onChange={(e) => setRecurringFee(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#ff0249] outline-none" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-600 mb-1">Avg. Retention (Months)</label>
+                                        <input type="number" value={avgRetentionMonths} onChange={(e) => setAvgRetentionMonths(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#ff0249] outline-none" />
+                                    </div>
+                                </div>
+
+                                {/* Growth Engine Section */}
+                                <div className="space-y-3 border-t border-slate-100 pt-4">
+                                    <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+                                        <div className="text-[#ff0249]"><TrendIcon /></div> Growth Engine
+                                    </h3>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-600 mb-1">Starting Active Games</label>
+                                        <input type="number" value={startingGames} onChange={(e) => setStartingGames(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#ff0249] outline-none" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-600 mb-1">New Games Sold / Month</label>
+                                        <input type="number" value={newGamesPerMonth} onChange={(e) => setNewGamesPerMonth(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#ff0249] outline-none" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-600 mb-1">Sales Pipeline Growth (%)</label>
+                                        <input type="number" value={growthRate} onChange={(e) => setGrowthRate(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#ff0249] outline-none" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className={`bg-[${BRAND_COLOR_LIGHT}] p-4 rounded-lg border border-[#ff0249]/20 mt-auto`}>
+                                <h4 className="text-[#ff0249] font-bold mb-2 text-sm">Summary</h4>
+                                <div className="space-y-2 text-sm">
+                                    <div className="flex justify-between"><span className="text-[#ff0249]">Blended LTV:</span><span className="font-bold text-slate-900">{formatCurrency(metrics.ltv)}</span></div>
+                                    <div className="flex justify-between"><span className="text-[#ff0249]">Month 12 Rev:</span><span className="font-bold text-slate-900">{formatCurrency(metrics.mrrYear1)}</span></div>
+                                </div>
+                            </div>
+                        </aside>
+
+                        {/* Main Content */}
+                        <main className="flex-1 overflow-y-auto p-6 bg-slate-50">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm h-80 flex flex-col">
+                                    <h3 className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">Total Revenue Forecast (Setup + Recurring)</h3>
+                                    <div className="flex-1">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <AreaChart data={data}>
+                                                <defs><linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={BRAND_COLOR} stopOpacity={0.1}/><stop offset="95%" stopColor={BRAND_COLOR} stopOpacity={0}/></linearGradient></defs>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                                <XAxis dataKey="month" tick={{fontSize: 12, fill: '#64748b'}} axisLine={false} tickLine={false} />
+                                                <YAxis tick={{fontSize: 12, fill: '#64748b'}} axisLine={false} tickLine={false} tickFormatter={(value) => `€${value/1000}k`} />
+                                                <Tooltip formatter={(value) => formatCurrency(value)} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
+                                                <Area type="monotone" dataKey="revenue" stroke={BRAND_COLOR} strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm h-80 flex flex-col">
+                                    <h3 className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">Revenue Composition</h3>
+                                    <div className="flex-1">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <ComposedChart data={data}>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                                <XAxis dataKey="month" tick={{fontSize: 12, fill: '#64748b'}} axisLine={false} tickLine={false}/>
+                                                <YAxis tick={{fontSize: 12, fill: '#64748b'}} axisLine={false} tickLine={false} tickFormatter={(value) => `€${value/1000}k`}/>
+                                                <Tooltip formatter={(value) => formatCurrency(value)} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}/>
+                                                <Legend />
+                                                <Bar dataKey="splitSetup" name="Setup Fees" fill="#10b981" barSize={20} stackId="a" />
+                                                {/* Using Brand Color for Recurring as it's the main driver */}
+                                                <Bar dataKey="splitRecurring" name="Recurring Fees" fill={BRAND_COLOR} barSize={20} stackId="a" />
+                                            </ComposedChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                                <div className="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                                    <h3 className="font-semibold text-slate-700">Detailed Monthly Breakdown</h3>
+                                </div>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm text-left">
+                                        <thead className="text-xs text-slate-500 uppercase bg-slate-50">
+                                            <tr><th className="px-6 py-3">Month</th><th className="px-6 py-3">New Games</th><th className="px-6 py-3 text-red-500">Churned</th><th className="px-6 py-3 font-bold text-slate-700">Total Active</th><th className="px-6 py-3 bg-[${BRAND_COLOR_LIGHT}] text-[#ff0249]">Total Rev.</th><th className="px-6 py-3">Cum. Revenue</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            {data.map((row) => (
+                                                <tr key={row.month} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                                    <td className="px-6 py-3 font-medium text-slate-900">{row.month}</td>
+                                                    <td className="px-6 py-3 text-emerald-600">+{row.newGames}</td>
+                                                    <td className="px-6 py-3 text-red-500">-{row.churnedGames}</td>
+                                                    <td className="px-6 py-3 font-bold text-slate-800">{row.activeGames}</td>
+                                                    <td className={`px-6 py-3 bg-[${BRAND_COLOR_LIGHT}] font-medium text-[#ff0249]`}>{formatCurrency(row.revenue)}</td>
+                                                    <td className="px-6 py-3 text-slate-500">{formatCurrency(row.cumulativeRevenue)}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<SaasCalculator />);
+    </script>
+</body>
+</html>
