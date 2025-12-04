@@ -86,9 +86,12 @@
             // General
             const [recurringFee, setRecurringFee] = useState(3000); 
             const [avgRetentionMonths, setAvgRetentionMonths] = useState(4);
+            const [churnLockMonths, setChurnLockMonths] = useState(2); // New State for Hard Lock
             const [startingGames, setStartingGames] = useState(8);
-            const [newGamesPerMonth, setNewGamesPerMonth] = useState(1);
-            const [growthRate, setGrowthRate] = useState(5); 
+            
+            // Discrete Yearly Inputs
+            const [newGamesYear1, setNewGamesYear1] = useState(12);
+            const [newGamesYear2, setNewGamesYear2] = useState(20);
 
             const [data, setData] = useState([]);
             const [metrics, setMetrics] = useState({
@@ -98,6 +101,35 @@
                 totalRevYear1: 0,
                 blendedSetup: 0
             });
+
+            // Helper: Distribute total integer games across 12 months with volatility
+            const distributeGames = (total) => {
+                // Weights represent a "volatility curve" rather than flat distribution
+                // Some months are naturally busier (e.g. 1.5) than others (e.g. 0.5)
+                const weights = [0.6, 1.2, 0.8, 1.5, 0.5, 1.3, 1.0, 1.4, 0.7, 1.2, 1.4, 0.4];
+                const totalWeight = weights.reduce((a, b) => a + b, 0); // Should be 12, but we calculate to be safe
+
+                // 1. Calculate ideal float amount for each month
+                // 2. Floor it to get guaranteed integer games
+                let distributed = weights.map(w => Math.floor(total * (w / totalWeight)));
+                
+                // 3. Calculate remaining games to distribute to make sum match total exactly
+                let currentSum = distributed.reduce((a, b) => a + b, 0);
+                let remainder = total - currentSum;
+
+                // 4. Distribute remainder to months that were closest to rounding up
+                const decimalParts = weights.map(w => (total * (w / totalWeight)) % 1);
+                
+                // Sort indices by largest decimal part first
+                const indices = Array.from(decimalParts.keys()).sort((a, b) => decimalParts[b] - decimalParts[a]);
+
+                // Add 1 game to top candidates until remainder is 0
+                for (let i = 0; i < remainder; i++) {
+                    distributed[indices[i]]++;
+                }
+
+                return distributed;
+            };
 
             // --- Calculations ---
             useEffect(() => {
@@ -112,53 +144,63 @@
                 const blendedSetupFee = (setupFeeStandard * (1 - mixRate)) + (setupFeeSubsequent * mixRate);
                 const blendedGracePeriod = (gracePeriodStandard * (1 - mixRate)) + (gracePeriodSubsequent * mixRate);
 
+                // Distribution Logic
+                const totalYear1 = Math.max(0, Math.round(newGamesYear1));
+                const gamesArrayY1 = distributeGames(totalYear1);
+                const totalYear2 = Math.max(0, Math.round(newGamesYear2));
+                const gamesArrayY2 = distributeGames(totalYear2);
+                const monthlyNewGames = [...gamesArrayY1, ...gamesArrayY2];
+
                 for (let month = 1; month <= 24; month++) {
-                    // New Games (Rounded to Integer for realistic figures)
-                    const rawNewGames = newGamesPerMonth * Math.pow(1 + (growthRate / 100), month - 1);
-                    const activeNewGames = Math.round(rawNewGames);
+                    const activeNewGames = monthlyNewGames[month - 1] || 0;
                     
-                    // 1. Setup Revenue (Based on Integer New Games)
+                    // 1. Setup Revenue
                     const revenueFromSetup = activeNewGames * blendedSetupFee;
 
-                    // 2. Recurring Revenue Logic
-                    // We must estimate how many games are in the grace period using rounded inputs to match the table
-                    
-                    // Games added this month (Age 0)
+                    // 2. Recurring Revenue Logic (Grace Period)
                     const graceFactorM0 = Math.min(1, Math.max(0, blendedGracePeriod));
                     const gamesInGraceM0 = activeNewGames * graceFactorM0;
 
-                    // Games added last month (Age 1)
-                    // We re-calculate the rounded previous months to keep consistency
-                    const rawPrev = month > 1 ? (newGamesPerMonth * Math.pow(1 + (growthRate / 100), month - 2)) : 0;
-                    const activePrev = Math.round(rawPrev);
+                    const activePrev = month > 1 ? monthlyNewGames[month - 2] : 0;
                     const gamesSurvivingM1 = activePrev * (1 - churnRate); 
                     const graceFactorM1 = Math.min(1, Math.max(0, blendedGracePeriod - 1));
                     const gamesInGraceM1 = gamesSurvivingM1 * graceFactorM1;
 
-                    // Games added 2 months ago (Age 2)
-                    const rawPrev2 = month > 2 ? (newGamesPerMonth * Math.pow(1 + (growthRate / 100), month - 3)) : 0;
-                    const activePrev2 = Math.round(rawPrev2);
+                    const activePrev2 = month > 2 ? monthlyNewGames[month - 3] : 0;
                     const gamesSurvivingM2 = activePrev2 * Math.pow((1 - churnRate), 2);
                     const graceFactorM2 = Math.min(1, Math.max(0, blendedGracePeriod - 2));
                     const gamesInGraceM2 = gamesSurvivingM2 * graceFactorM2;
 
                     const totalGamesInGrace = gamesInGraceM0 + gamesInGraceM1 + gamesInGraceM2;
-                    
-                    // Total Active Pool (Pre-Churn)
                     const totalActivePool = currentActive + activeNewGames;
-                    
-                    // Paying Games (Rounded to Integer)
-                    // We assume 'Starting Games' are mature and paying. 
-                    // We subtract the Calculated Grace Pool from the Total Pool.
                     let payingRecurringGames = Math.round(totalActivePool - totalGamesInGrace);
-                    
                     if (payingRecurringGames < 0) payingRecurringGames = 0;
 
                     const revenueFromRecurring = payingRecurringGames * recurringFee;
                     const totalMonthlyRevenue = revenueFromSetup + revenueFromRecurring;
 
-                    // 3. Churn (Rounded to Integer)
-                    const rawChurn = currentActive * churnRate;
+                    // 3. Churn Logic with Hard Lock
+                    // Logic: We identify how many "New" games from recent months are currently inside the Lock Period.
+                    // These games are REMOVED from the churnable pool.
+                    // Starting Games (currentActive at start) are assumed mature and not protected.
+                    
+                    let protectedGamesCount = 0;
+                    // Look back 'churnLockMonths' to find new additions that are safe
+                    for (let i = 1; i <= churnLockMonths; i++) {
+                        const lookbackIndex = month - 1 - i; // Index of new games added i months ago
+                        if (lookbackIndex >= 0) {
+                             // Note: In a perfect simulation we'd track exactly who survived, but 
+                             // since they are protected, 100% survive. So we just sum the original adds.
+                            protectedGamesCount += monthlyNewGames[lookbackIndex];
+                        }
+                    }
+
+                    // Churn Calculation
+                    // currentActive includes everyone from start of month.
+                    // We protect the recent cohorts.
+                    const churnablePool = Math.max(0, currentActive - protectedGamesCount);
+                    
+                    const rawChurn = churnablePool * churnRate;
                     const churnedGames = Math.round(rawChurn);
                     
                     // Update Active for next month
@@ -170,9 +212,9 @@
 
                     calculatedData.push({
                         month,
-                        newGames: activeNewGames,     // Now an Integer
-                        churnedGames: churnedGames,   // Now an Integer
-                        activeGames: currentActive,   // Now an Integer
+                        newGames: activeNewGames,     
+                        churnedGames: churnedGames,   
+                        activeGames: currentActive,   
                         revenue: Math.round(totalMonthlyRevenue),
                         splitSetup: Math.round(revenueFromSetup),
                         splitRecurring: Math.round(revenueFromRecurring),
@@ -182,7 +224,6 @@
 
                 setData(calculatedData);
 
-                // LTV Estimate (Blended)
                 const effectiveRecurringMonths = Math.max(0, avgRetentionMonths - blendedGracePeriod);
                 const ltv = blendedSetupFee + (recurringFee * effectiveRecurringMonths);
 
@@ -194,7 +235,7 @@
                     blendedSetup: blendedSetupFee
                 });
 
-            }, [setupFeeStandard, setupFeeSubsequent, gracePeriodStandard, gracePeriodSubsequent, subsequentMix, recurringFee, avgRetentionMonths, startingGames, newGamesPerMonth, growthRate]);
+            }, [setupFeeStandard, setupFeeSubsequent, gracePeriodStandard, gracePeriodSubsequent, subsequentMix, recurringFee, avgRetentionMonths, startingGames, newGamesYear1, newGamesYear2, churnLockMonths]);
 
             const formatCurrency = (val) => {
                 return new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(val);
@@ -216,7 +257,6 @@
                 alert("Data copied! You can paste this directly into Google Sheets.");
             };
 
-            // Totals Calculation for Footer
             const totalNewGames = data.reduce((sum, item) => sum + item.newGames, 0);
             const totalChurned = data.reduce((sum, item) => sum + item.churnedGames, 0);
 
@@ -253,7 +293,8 @@
                                     <p className="font-semibold text-slate-800">Blended Logic Active</p>
                                 </div>
                                 <p>
-                                    Based on your sales mix, the model uses an <strong>Effective Setup Fee of {formatCurrency(metrics.blendedSetup)}</strong>.
+                                    <strong>Revenue:</strong> {formatCurrency(metrics.blendedSetup)} setup fee.<br/>
+                                    <strong>Churn:</strong> New games locked for {churnLockMonths} months.
                                 </p>
                             </div>
 
@@ -310,6 +351,10 @@
                                         <label className="block text-sm font-medium text-slate-600 mb-1">Avg. Retention (Months)</label>
                                         <input type="number" value={avgRetentionMonths} onChange={(e) => setAvgRetentionMonths(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#ff0249] outline-none" />
                                     </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-600 mb-1">Minimum Contract Duration (Churn Lock)</label>
+                                        <input type="number" value={churnLockMonths} onChange={(e) => setChurnLockMonths(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#ff0249] outline-none" />
+                                    </div>
                                 </div>
 
                                 {/* Growth Engine Section */}
@@ -321,14 +366,17 @@
                                         <label className="block text-sm font-medium text-slate-600 mb-1">Starting Active Games</label>
                                         <input type="number" value={startingGames} onChange={(e) => setStartingGames(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#ff0249] outline-none" />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-600 mb-1">New Games Sold / Month</label>
-                                        <input type="number" value={newGamesPerMonth} onChange={(e) => setNewGamesPerMonth(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#ff0249] outline-none" />
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-xs font-medium text-slate-500 mb-1">Year 1 Sales</label>
+                                            <input type="number" value={newGamesYear1} onChange={(e) => setNewGamesYear1(Number(e.target.value))} className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-[#ff0249] outline-none" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-slate-500 mb-1">Year 2 Sales</label>
+                                            <input type="number" value={newGamesYear2} onChange={(e) => setNewGamesYear2(Number(e.target.value))} className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-[#ff0249] outline-none" />
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-600 mb-1">Sales Pipeline Growth (%)</label>
-                                        <input type="number" value={growthRate} onChange={(e) => setGrowthRate(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#ff0249] outline-none" />
-                                    </div>
+                                    <p className="text-xs text-slate-400 italic">Total games distributed unevenly across 12 months.</p>
                                 </div>
                             </div>
 
