@@ -8,17 +8,17 @@
     <!-- 1. Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- 2. Load React & ReactDOM (Switched to jsDelivr for reliable UMD builds) -->
+    <!-- 2. Load React & ReactDOM -->
     <script crossorigin src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
     <script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
     
     <!-- 3. Load Prop-types -->
     <script src="https://cdn.jsdelivr.net/npm/prop-types/prop-types.min.js"></script>
 
-    <!-- 4. Load Recharts (Critical Fix: using jsDelivr /umd/ path) -->
+    <!-- 4. Load Recharts -->
     <script crossorigin src="https://cdn.jsdelivr.net/npm/recharts@2.12.0/umd/Recharts.js"></script>
     
-    <!-- 5. Babel to compile JSX -->
+    <!-- 5. Babel -->
     <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
 
     <style>
@@ -39,6 +39,9 @@
             background: #ff0249;
             cursor: pointer;
         }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -56,6 +59,7 @@
         // Brand Color Constants
         const BRAND_COLOR = '#ff0249';
         const BRAND_COLOR_LIGHT = '#ffe6ed'; 
+        const BRAND_COLOR_FLAT = '#8b5cf6'; // Violet for Flat clients to differentiate
 
         // Icons
         const CopyIcon = () => (
@@ -77,179 +81,211 @@
         const SaasCalculator = () => {
             // --- State / Inputs ---
             
-            // Standard Pricing
+            // --- TRACKS FLEX Config ---
             const [setupFeeStandard, setSetupFeeStandard] = useState(5000);
             const [gracePeriodStandard, setGracePeriodStandard] = useState(2);
-            
-            // Subsequent Pricing
             const [setupFeeSubsequent, setSetupFeeSubsequent] = useState(2000);
             const [gracePeriodSubsequent, setGracePeriodSubsequent] = useState(0); 
-            
-            // Mix
             const [subsequentMix, setSubsequentMix] = useState(20); 
+            const [recurringFeeFlex, setRecurringFeeFlex] = useState(3000); 
+            const [retentionFlex, setRetentionFlex] = useState(4);
+            const [churnLockFlex, setChurnLockFlex] = useState(2);
             
-            // General
-            const [recurringFee, setRecurringFee] = useState(3000); 
-            const [avgRetentionMonths, setAvgRetentionMonths] = useState(4);
-            const [churnLockMonths, setChurnLockMonths] = useState(2); // New State for Hard Lock
-            const [startingGames, setStartingGames] = useState(8);
+            // --- TRACKS FLAT Config ---
+            const [recurringFeeFlat, setRecurringFeeFlat] = useState(3500);
+            const [retentionFlat, setRetentionFlat] = useState(12); // "Avg Contract Duration"
             
-            // Discrete Yearly Inputs
-            const [newGamesYear1, setNewGamesYear1] = useState(12);
-            const [newGamesYear2, setNewGamesYear2] = useState(20);
+            // --- GROWTH / SALES ---
+            const [startingGamesFlex, setStartingGamesFlex] = useState(8);
+            const [startingGamesFlat, setStartingGamesFlat] = useState(2);
+            
+            // Year 1 (Direct Inputs)
+            const [flexY1, setFlexY1] = useState(10);
+            const [flatY1, setFlatY1] = useState(4);
+            
+            // Year 2 (Direct Inputs)
+            const [flexY2, setFlexY2] = useState(14);
+            const [flatY2, setFlatY2] = useState(6);
 
             const [data, setData] = useState([]);
             const [metrics, setMetrics] = useState({
-                ltv: 0,
-                mrrYear1: 0,
-                mrrYear2: 0,
-                totalRevYear1: 0,
-                blendedSetup: 0
+                ltvFlex: 0,
+                ltvFlat: 0,
+                totalRevenue: 0,
+                setupRevenue: 0,
+                recurringRevenue: 0
             });
 
             // Helper: Distribute total integer games across 12 months with volatility
             const distributeGames = (total) => {
-                // Weights represent a "volatility curve" rather than flat distribution
-                // Some months are naturally busier (e.g. 1.5) than others (e.g. 0.5)
                 const weights = [0.6, 1.2, 0.8, 1.5, 0.5, 1.3, 1.0, 1.4, 0.7, 1.2, 1.4, 0.4];
-                const totalWeight = weights.reduce((a, b) => a + b, 0); // Should be 12, but we calculate to be safe
+                const totalWeight = weights.reduce((a, b) => a + b, 0); 
 
-                // 1. Calculate ideal float amount for each month
-                // 2. Floor it to get guaranteed integer games
                 let distributed = weights.map(w => Math.floor(total * (w / totalWeight)));
-                
-                // 3. Calculate remaining games to distribute to make sum match total exactly
                 let currentSum = distributed.reduce((a, b) => a + b, 0);
                 let remainder = total - currentSum;
 
-                // 4. Distribute remainder to months that were closest to rounding up
                 const decimalParts = weights.map(w => (total * (w / totalWeight)) % 1);
-                
-                // Sort indices by largest decimal part first
                 const indices = Array.from(decimalParts.keys()).sort((a, b) => decimalParts[b] - decimalParts[a]);
 
-                // Add 1 game to top candidates until remainder is 0
                 for (let i = 0; i < remainder; i++) {
                     distributed[indices[i]]++;
                 }
-
                 return distributed;
             };
 
             // --- Calculations ---
             useEffect(() => {
                 const calculatedData = [];
-                let currentActive = startingGames;
+                
+                // Active Pools
+                let currentActiveFlex = startingGamesFlex;
+                let currentActiveFlat = startingGamesFlat;
+                
                 let cumulativeRevenue = 0;
                 
-                const churnRate = avgRetentionMonths > 0 ? 1 / avgRetentionMonths : 1; 
+                // Rates
+                const churnRateFlex = retentionFlex > 0 ? 1 / retentionFlex : 1; 
+                const churnRateFlat = retentionFlat > 0 ? 1 / retentionFlat : 1; 
 
-                // Calculate Blended Values
+                // Flex Blended Logic
                 const mixRate = subsequentMix / 100;
                 const blendedSetupFee = (setupFeeStandard * (1 - mixRate)) + (setupFeeSubsequent * mixRate);
                 const blendedGracePeriod = (gracePeriodStandard * (1 - mixRate)) + (gracePeriodSubsequent * mixRate);
 
-                // Distribution Logic
-                const totalYear1 = Math.max(0, Math.round(newGamesYear1));
-                const gamesArrayY1 = distributeGames(totalYear1);
-                const totalYear2 = Math.max(0, Math.round(newGamesYear2));
-                const gamesArrayY2 = distributeGames(totalYear2);
-                const monthlyNewGames = [...gamesArrayY1, ...gamesArrayY2];
+                // --- DISTRIBUTION LOGIC ---
+                // Distribute explict inputs
+                const distFlexY1 = distributeGames(Math.max(0, Math.round(flexY1)));
+                const distFlatY1 = distributeGames(Math.max(0, Math.round(flatY1)));
+                
+                const distFlexY2 = distributeGames(Math.max(0, Math.round(flexY2)));
+                const distFlatY2 = distributeGames(Math.max(0, Math.round(flatY2)));
+
+                // Combined 24 Month Arrays
+                const monthlyFlexNew = [...distFlexY1, ...distFlexY2];
+                const monthlyFlatNew = [...distFlatY1, ...distFlatY2];
 
                 for (let month = 1; month <= 24; month++) {
-                    const activeNewGames = monthlyNewGames[month - 1] || 0;
-                    
-                    // 1. Setup Revenue
-                    const revenueFromSetup = activeNewGames * blendedSetupFee;
+                    const newFlex = monthlyFlexNew[month - 1] || 0;
+                    const newFlat = monthlyFlatNew[month - 1] || 0;
+                    const totalNewThisMonth = newFlex + newFlat;
 
-                    // 2. Recurring Revenue Logic (Grace Period)
-                    const graceFactorM0 = Math.min(1, Math.max(0, blendedGracePeriod));
-                    const gamesInGraceM0 = activeNewGames * graceFactorM0;
+                    // --- FLEX CALCULATION ---
+                    // Setup Revenue
+                    const revSetupFlex = newFlex * blendedSetupFee;
 
-                    const activePrev = month > 1 ? monthlyNewGames[month - 2] : 0;
-                    const gamesSurvivingM1 = activePrev * (1 - churnRate); 
-                    const graceFactorM1 = Math.min(1, Math.max(0, blendedGracePeriod - 1));
-                    const gamesInGraceM1 = gamesSurvivingM1 * graceFactorM1;
+                    // Recurring Logic (Grace Period)
+                    // Age 0 (This month)
+                    const graceM0 = Math.min(1, Math.max(0, blendedGracePeriod));
+                    const flexInGraceM0 = newFlex * graceM0;
 
-                    const activePrev2 = month > 2 ? monthlyNewGames[month - 3] : 0;
-                    const gamesSurvivingM2 = activePrev2 * Math.pow((1 - churnRate), 2);
-                    const graceFactorM2 = Math.min(1, Math.max(0, blendedGracePeriod - 2));
-                    const gamesInGraceM2 = gamesSurvivingM2 * graceFactorM2;
+                    // Age 1 (Last Month)
+                    const newFlexLastMonth = month > 1 ? monthlyFlexNew[month - 2] : 0;
+                    const flexSurvivingM1 = newFlexLastMonth * (1 - churnRateFlex);
+                    const graceM1 = Math.min(1, Math.max(0, blendedGracePeriod - 1));
+                    const flexInGraceM1 = flexSurvivingM1 * graceM1;
 
-                    const totalGamesInGrace = gamesInGraceM0 + gamesInGraceM1 + gamesInGraceM2;
-                    const totalActivePool = currentActive + activeNewGames;
-                    let payingRecurringGames = Math.round(totalActivePool - totalGamesInGrace);
-                    if (payingRecurringGames < 0) payingRecurringGames = 0;
+                    // Age 2 (2 Months Ago)
+                    const newFlex2MoAgo = month > 2 ? monthlyFlexNew[month - 3] : 0;
+                    const flexSurvivingM2 = newFlex2MoAgo * Math.pow((1 - churnRateFlex), 2);
+                    const graceM2 = Math.min(1, Math.max(0, blendedGracePeriod - 2));
+                    const flexInGraceM2 = flexSurvivingM2 * graceM2;
 
-                    const revenueFromRecurring = payingRecurringGames * recurringFee;
-                    const totalMonthlyRevenue = revenueFromSetup + revenueFromRecurring;
+                    const totalFlexInGrace = flexInGraceM0 + flexInGraceM1 + flexInGraceM2;
+                    const totalFlexPool = currentActiveFlex + newFlex;
+                    let payingFlex = Math.round(totalFlexPool - totalFlexInGrace);
+                    if (payingFlex < 0) payingFlex = 0;
 
-                    // 3. Churn Logic with Hard Lock
-                    // Logic: We identify how many "New" games from recent months are currently inside the Lock Period.
-                    // These games are REMOVED from the churnable pool.
-                    // Starting Games (currentActive at start) are assumed mature and not protected.
-                    
-                    let protectedGamesCount = 0;
-                    // Look back 'churnLockMonths' to find new additions that are safe
-                    for (let i = 1; i <= churnLockMonths; i++) {
-                        const lookbackIndex = month - 1 - i; // Index of new games added i months ago
-                        if (lookbackIndex >= 0) {
-                             // Note: In a perfect simulation we'd track exactly who survived, but 
-                             // since they are protected, 100% survive. So we just sum the original adds.
-                            protectedGamesCount += monthlyNewGames[lookbackIndex];
+                    const revRecurringFlex = payingFlex * recurringFeeFlex;
+
+                    // Flex Churn (Lock Logic) - Explicit Lookback
+                    let protectedFlexCount = 0;
+                    for (let i = 1; i <= churnLockFlex; i++) {
+                        const idx = month - 1 - i;
+                        if (idx >= 0) {
+                            // Using the explicit array is more accurate than estimation
+                            protectedFlexCount += monthlyFlexNew[idx];
                         }
                     }
-
-                    // Churn Calculation
-                    // currentActive includes everyone from start of month.
-                    // We protect the recent cohorts.
-                    const churnablePool = Math.max(0, currentActive - protectedGamesCount);
+                    const churnableFlex = Math.max(0, currentActiveFlex - protectedFlexCount);
+                    const churnedFlex = Math.round(churnableFlex * churnRateFlex);
                     
-                    const rawChurn = churnablePool * churnRate;
-                    const churnedGames = Math.round(rawChurn);
-                    
-                    // Update Active for next month
-                    const previousActive = currentActive;
-                    currentActive = previousActive + activeNewGames - churnedGames;
-                    if (currentActive < 0) currentActive = 0;
+                    // Update Flex Active
+                    const prevActiveFlex = currentActiveFlex;
+                    currentActiveFlex = prevActiveFlex + newFlex - churnedFlex;
+                    if (currentActiveFlex < 0) currentActiveFlex = 0;
 
+
+                    // --- FLAT CALCULATION ---
+                    // Revenue = (Start + New) * Fee
+                    const revRecurringFlat = (currentActiveFlat + newFlat) * recurringFeeFlat;
+
+                    // Flat Churn
+                    const churnedFlat = Math.round(currentActiveFlat * churnRateFlat);
+                    
+                    // Update Flat Active
+                    const prevActiveFlat = currentActiveFlat;
+                    currentActiveFlat = prevActiveFlat + newFlat - churnedFlat;
+                    if (currentActiveFlat < 0) currentActiveFlat = 0;
+
+
+                    // --- TOTALS ---
+                    const totalMonthlyRevenue = revSetupFlex + revRecurringFlex + revRecurringFlat;
                     cumulativeRevenue += totalMonthlyRevenue;
 
                     calculatedData.push({
                         month,
-                        newGames: activeNewGames,     
-                        churnedGames: churnedGames,   
-                        activeGames: currentActive,   
+                        newGames: totalNewThisMonth,
+                        churnedGames: churnedFlex + churnedFlat,
+                        activeGames: currentActiveFlex + currentActiveFlat,
+                        activeFlex: currentActiveFlex,
+                        activeFlat: currentActiveFlat,
+                        
                         revenue: Math.round(totalMonthlyRevenue),
-                        splitSetup: Math.round(revenueFromSetup),
-                        splitRecurring: Math.round(revenueFromRecurring),
+                        
+                        splitSetup: Math.round(revSetupFlex),
+                        splitFlexRecurring: Math.round(revRecurringFlex),
+                        splitFlatRecurring: Math.round(revRecurringFlat),
+                        
                         cumulativeRevenue: Math.round(cumulativeRevenue)
                     });
                 }
 
                 setData(calculatedData);
 
-                const effectiveRecurringMonths = Math.max(0, avgRetentionMonths - blendedGracePeriod);
-                const ltv = blendedSetupFee + (recurringFee * effectiveRecurringMonths);
+                // LTV Estimates
+                const effectiveFlexRecurringMonths = Math.max(0, retentionFlex - blendedGracePeriod);
+                const ltvFlex = blendedSetupFee + (recurringFeeFlex * effectiveFlexRecurringMonths);
+                const ltvFlat = recurringFeeFlat * retentionFlat;
+
+                // Totals for split calculation
+                const totSetup = calculatedData.reduce((s, i) => s + i.splitSetup, 0);
+                const totRec = calculatedData.reduce((s, i) => s + i.splitFlexRecurring + i.splitFlatRecurring, 0);
 
                 setMetrics({
-                    ltv: ltv,
-                    mrrYear1: calculatedData[11]?.revenue || 0,
-                    mrrYear2: calculatedData[23]?.revenue || 0,
-                    totalRevYear1: calculatedData[11]?.cumulativeRevenue || 0,
-                    blendedSetup: blendedSetupFee
+                    ltvFlex,
+                    ltvFlat,
+                    totalRevenue: cumulativeRevenue,
+                    setupRevenue: totSetup,
+                    recurringRevenue: totRec
                 });
 
-            }, [setupFeeStandard, setupFeeSubsequent, gracePeriodStandard, gracePeriodSubsequent, subsequentMix, recurringFee, avgRetentionMonths, startingGames, newGamesYear1, newGamesYear2, churnLockMonths]);
+            }, [
+                setupFeeStandard, setupFeeSubsequent, gracePeriodStandard, gracePeriodSubsequent, subsequentMix, 
+                recurringFeeFlex, retentionFlex, churnLockFlex, 
+                recurringFeeFlat, retentionFlat,
+                startingGamesFlex, startingGamesFlat, 
+                flexY1, flatY1, flexY2, flatY2
+            ]);
 
             const formatCurrency = (val) => {
                 return new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(val);
             };
 
             const copyToClipboard = () => {
-                const header = "Month,New Games,Churned Games,Total Active Games,Setup Revenue,Recurring Revenue,Total Monthly Revenue,Cumulative Revenue\n";
+                const header = "Month,New Games,Total Active,Flex Active,Flat Active,Setup Rev,Flex Recurring Rev,Flat Recurring Rev,Total Rev,Cum. Rev\n";
                 const rows = data.map(row => 
-                    `${row.month},${row.newGames},${row.churnedGames},${row.activeGames},${row.splitSetup},${row.splitRecurring},${row.revenue},${row.cumulativeRevenue}`
+                    `${row.month},${row.newGames},${row.activeGames},${row.activeFlex},${row.activeFlat},${row.splitSetup},${row.splitFlexRecurring},${row.splitFlatRecurring},${row.revenue},${row.cumulativeRevenue}`
                 ).join("\n");
                 
                 const csvContent = header + rows;
@@ -265,25 +301,19 @@
             const totalNewGames = data.reduce((sum, item) => sum + item.newGames, 0);
             const totalChurned = data.reduce((sum, item) => sum + item.churnedGames, 0);
             
-            // Percentage Split Calculations
-            const totalSetupRevenue = data.reduce((sum, item) => sum + item.splitSetup, 0);
-            const totalRecurringRevenue = data.reduce((sum, item) => sum + item.splitRecurring, 0);
-            const totalRevenueCombined = totalSetupRevenue + totalRecurringRevenue;
-            const percentSetup = totalRevenueCombined > 0 ? (totalSetupRevenue / totalRevenueCombined * 100).toFixed(1) : 0;
-            const percentRecurring = totalRevenueCombined > 0 ? (totalRecurringRevenue / totalRevenueCombined * 100).toFixed(1) : 0;
-
+            const totalRev = metrics.totalRevenue;
+            const percentSetup = totalRev > 0 ? (metrics.setupRevenue / totalRev * 100).toFixed(1) : 0;
+            const percentRecurring = totalRev > 0 ? (metrics.recurringRevenue / totalRev * 100).toFixed(1) : 0;
 
             return (
                 <div className="flex flex-col h-screen bg-slate-50 overflow-hidden text-slate-900">
                     {/* Header */}
                     <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shrink-0">
                         <div className="flex items-center gap-3">
-                            {/* Updated: Removed border classes */}
                             <div className="bg-white p-1 rounded-lg">
                                 <img src="https://tracks.secondstage.io/vite/assets/tracks-signup-logo-J-NQw5DE.png" className="h-8 w-auto" alt="Tracks Logo" />
                             </div>
                             <div>
-                                {/* Updated Text */}
                                 <h1 className="text-xl font-bold text-slate-800">Revenue Calculator</h1>
                                 <p className="text-xs text-slate-500">Sales Forecasting for Second Stage TRACKS</p>
                             </div>
@@ -299,32 +329,109 @@
 
                     <div className="flex flex-1 overflow-hidden">
                         {/* Sidebar */}
-                        <aside className="w-80 bg-white border-r border-slate-200 overflow-y-auto p-6 flex flex-col gap-8 shrink-0">
+                        <aside className="w-80 bg-white border-r border-slate-200 overflow-y-auto p-6 flex flex-col gap-8 shrink-0 pb-20">
                             
-                            {/* Logic Explanation Box */}
+                            {/* Summary Box */}
                             <div className="bg-slate-50 border border-slate-200 p-3 rounded-md text-xs text-slate-600 flex flex-col gap-2">
                                 <div className="flex gap-2">
                                     <div className="shrink-0 mt-0.5 text-[#ff0249]"><InfoIcon /></div>
-                                    <p className="font-semibold text-slate-800">Blended Logic Active</p>
+                                    <p className="font-semibold text-slate-800">Revenue Mix (24 Mo)</p>
                                 </div>
-                                <p>
-                                    <strong>Revenue:</strong> {formatCurrency(metrics.blendedSetup)} setup fee.<br/>
-                                    <strong>Churn:</strong> New games locked for {churnLockMonths} months.
-                                </p>
+                                <div className="grid grid-cols-2 gap-2 mt-1">
+                                    <div>
+                                        <span className="block text-slate-400">Flex LTV</span>
+                                        <span className="font-bold text-[#ff0249]">{formatCurrency(metrics.ltvFlex)}</span>
+                                    </div>
+                                    <div>
+                                        <span className="block text-slate-400">Flat LTV</span>
+                                        <span className="font-bold text-[#8b5cf6]">{formatCurrency(metrics.ltvFlat)}</span>
+                                    </div>
+                                </div>
+                                <div className="border-t border-slate-200 mt-2 pt-2 flex justify-between">
+                                    <span>Setup: <strong>{percentSetup}%</strong></span>
+                                    <span>Recurring: <strong>{percentRecurring}%</strong></span>
+                                </div>
                             </div>
 
-                            <div className="space-y-6">
+                            <div className="space-y-6 pt-4">
                                 
-                                {/* Sales Mix Section */}
-                                <div className="space-y-4 pt-2">
+                                {/* 1. GROWTH ENGINE */}
+                                <div className="space-y-3 border-t border-slate-100 pt-4 first:border-0 first:pt-0">
                                     <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-                                        <div className="text-[#ff0249]"><UsersIcon /></div> Sales Mix
+                                        <div className="text-[#ff0249]"><TrendIcon /></div> Growth Engine
                                     </h3>
                                     
+                                    {/* Starting Base */}
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-[10px] font-medium text-slate-500 mb-1">Existing Projects (Flex)</label>
+                                            <input type="number" value={startingGamesFlex} onChange={(e) => setStartingGamesFlex(Number(e.target.value))} className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-[#ff0249] outline-none" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] font-medium text-slate-500 mb-1">Existing Projects (Flat)</label>
+                                            <input type="number" value={startingGamesFlat} onChange={(e) => setStartingGamesFlat(Number(e.target.value))} className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-[#8b5cf6] outline-none" />
+                                        </div>
+                                    </div>
+
+                                    {/* Year 1 Config */}
+                                    <div className="space-y-2 border border-slate-100 p-2 rounded-md bg-white">
+                                        <div className="text-xs font-semibold text-slate-600">Year 1 Sales (New Games)</div>
+                                        <div className="flex items-center justify-between text-xs">
+                                            <label className="text-[#ff0249] font-medium w-16">Flex:</label>
+                                            <input type="number" value={flexY1} onChange={(e) => setFlexY1(Number(e.target.value))} className="w-16 px-1 py-1 border border-slate-300 rounded focus:ring-1 focus:ring-[#ff0249] outline-none text-right" />
+                                        </div>
+                                        <div className="flex items-center justify-between text-xs">
+                                            <label className="text-[#8b5cf6] font-medium w-16">Flat:</label>
+                                            <input type="number" value={flatY1} onChange={(e) => setFlatY1(Number(e.target.value))} className="w-16 px-1 py-1 border border-slate-300 rounded focus:ring-1 focus:ring-[#8b5cf6] outline-none text-right" />
+                                        </div>
+                                        <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 mt-1">
+                                            <label className="text-slate-500 w-16">Total:</label>
+                                            <span className="w-16 text-right font-bold text-slate-700">{flexY1 + flatY1}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Year 2 Config */}
+                                    <div className="space-y-2 border border-slate-100 p-2 rounded-md bg-white">
+                                        <div className="text-xs font-semibold text-slate-600">Year 2 Sales (New Games)</div>
+                                        <div className="flex items-center justify-between text-xs">
+                                            <label className="text-[#ff0249] font-medium w-16">Flex:</label>
+                                            <input type="number" value={flexY2} onChange={(e) => setFlexY2(Number(e.target.value))} className="w-16 px-1 py-1 border border-slate-300 rounded focus:ring-1 focus:ring-[#ff0249] outline-none text-right" />
+                                        </div>
+                                        <div className="flex items-center justify-between text-xs">
+                                            <label className="text-[#8b5cf6] font-medium w-16">Flat:</label>
+                                            <input type="number" value={flatY2} onChange={(e) => setFlatY2(Number(e.target.value))} className="w-16 px-1 py-1 border border-slate-300 rounded focus:ring-1 focus:ring-[#8b5cf6] outline-none text-right" />
+                                        </div>
+                                        <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100 mt-1">
+                                            <label className="text-slate-500 w-16">Total:</label>
+                                            <span className="w-16 text-right font-bold text-slate-700">{flexY2 + flatY2}</span>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
+                                {/* 2. FLEX PRICING */}
+                                <div className="space-y-3 border-t border-slate-100 pt-4">
+                                    <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+                                        <div className="text-[#ff0249]"><DollarIcon /></div> TRACKS Flex
+                                    </h3>
+                                    
+                                    {/* Setup Fees */}
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-[10px] font-medium text-slate-500 mb-1">Starter Fee (€)</label>
+                                            <input type="number" value={setupFeeStandard} onChange={(e) => setSetupFeeStandard(Number(e.target.value))} className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-[#ff0249] outline-none" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] font-medium text-slate-500 mb-1">Subsq Setup (€)</label>
+                                            <input type="number" value={setupFeeSubsequent} onChange={(e) => setSetupFeeSubsequent(Number(e.target.value))} className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-[#ff0249] outline-none" />
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Flex Mix */}
                                     <div>
-                                        <div className="flex justify-between text-sm mb-1">
-                                            <span className="text-slate-600">Subsequent Games</span>
-                                            <span className="font-bold text-[#ff0249]">{subsequentMix}%</span>
+                                        <div className="flex justify-between text-[10px] text-slate-500 mb-1">
+                                            <span>New Clients</span>
+                                            <span>Existing Clients</span>
                                         </div>
                                         <input 
                                             type="range" 
@@ -332,86 +439,45 @@
                                             max="100" 
                                             value={subsequentMix} 
                                             onChange={(e) => setSubsequentMix(Number(e.target.value))}
-                                            className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                                            className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer"
                                         />
-                                        <div className="flex justify-between text-xs text-slate-400 mt-1">
-                                            <span>All New Clients</span>
-                                            <span>All Repeat</span>
-                                        </div>
+                                        <div className="text-right text-[10px] text-[#ff0249]">{subsequentMix}% Subsequent</div>
                                     </div>
-                                </div>
 
-                                {/* Unit Economics Section */}
-                                <div className="space-y-3 border-t border-slate-100 pt-4">
-                                    <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-                                        <div className="text-[#ff0249]"><DollarIcon /></div> Pricing Config
-                                    </h3>
+                                    {/* Flex Recurring */}
+                                    <div>
+                                        <label className="block text-xs font-medium text-slate-600 mb-1">Avg Recurring Fee (€/mo)</label>
+                                        <input type="number" value={recurringFeeFlex} onChange={(e) => setRecurringFeeFlex(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#ff0249] outline-none" />
+                                    </div>
                                     
                                     <div className="grid grid-cols-2 gap-3">
                                         <div>
-                                            <label className="block text-xs font-medium text-slate-500 mb-1">Standard Setup</label>
-                                            <input type="number" value={setupFeeStandard} onChange={(e) => setSetupFeeStandard(Number(e.target.value))} className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-[#ff0249] outline-none" />
+                                            <label className="block text-[10px] font-medium text-slate-500 mb-1">Avg Retention (Months)</label>
+                                            <input type="number" value={retentionFlex} onChange={(e) => setRetentionFlex(Number(e.target.value))} className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-[#ff0249] outline-none" />
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-medium text-slate-500 mb-1">Subsq. Setup</label>
-                                            <input type="number" value={setupFeeSubsequent} onChange={(e) => setSetupFeeSubsequent(Number(e.target.value))} className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-[#ff0249] outline-none" />
+                                            <label className="block text-[10px] font-medium text-slate-500 mb-1">Minimum Duration (Months)</label>
+                                            <input type="number" value={churnLockFlex} onChange={(e) => setChurnLockFlex(Number(e.target.value))} className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-[#ff0249] outline-none" />
                                         </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-600 mb-1">Avg. Recurring Fee (€/mo)</label>
-                                        <input type="number" value={recurringFee} onChange={(e) => setRecurringFee(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#ff0249] outline-none" />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-600 mb-1">Avg. Retention (Months)</label>
-                                        <input type="number" value={avgRetentionMonths} onChange={(e) => setAvgRetentionMonths(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#ff0249] outline-none" />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-600 mb-1">Minimum Contract Duration (Churn Lock)</label>
-                                        <input type="number" value={churnLockMonths} onChange={(e) => setChurnLockMonths(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#ff0249] outline-none" />
                                     </div>
                                 </div>
 
-                                {/* Growth Engine Section */}
+                                {/* 3. FLAT PRICING */}
                                 <div className="space-y-3 border-t border-slate-100 pt-4">
                                     <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-                                        <div className="text-[#ff0249]"><TrendIcon /></div> Growth Engine
+                                        <div className="text-[#8b5cf6]"><DollarIcon /></div> TRACKS Flat
                                     </h3>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-600 mb-1">Starting Active Games</label>
-                                        <input type="number" value={startingGames} onChange={(e) => setStartingGames(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#ff0249] outline-none" />
+                                        <label className="block text-xs font-medium text-slate-600 mb-1">Avg Recurring Fee (€/mo)</label>
+                                        <input type="number" value={recurringFeeFlat} onChange={(e) => setRecurringFeeFlat(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#8b5cf6] outline-none" />
                                     </div>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div>
-                                            <label className="block text-xs font-medium text-slate-500 mb-1">Year 1 Sales</label>
-                                            <input type="number" value={newGamesYear1} onChange={(e) => setNewGamesYear1(Number(e.target.value))} className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-[#ff0249] outline-none" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-medium text-slate-500 mb-1">Year 2 Sales</label>
-                                            <input type="number" value={newGamesYear2} onChange={(e) => setNewGamesYear2(Number(e.target.value))} className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-[#ff0249] outline-none" />
-                                        </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-slate-600 mb-1">Avg Contract Duration (Months)</label>
+                                        <input type="number" value={retentionFlat} onChange={(e) => setRetentionFlat(Number(e.target.value))} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#8b5cf6] outline-none" />
                                     </div>
-                                    <p className="text-xs text-slate-400 italic">Total games distributed unevenly across 12 months.</p>
+                                    <p className="text-[10px] text-slate-400">No setup fee. No grace period.</p>
                                 </div>
-                            </div>
 
-                            <div className={`bg-[${BRAND_COLOR_LIGHT}] p-4 rounded-lg border border-[#ff0249]/20 mt-auto`}>
-                                <h4 className="text-[#ff0249] font-bold mb-2 text-sm">Summary</h4>
-                                <div className="space-y-2 text-sm">
-                                    <div className="flex justify-between"><span className="text-[#ff0249]">Blended LTV:</span><span className="font-bold text-slate-900">{formatCurrency(metrics.ltv)}</span></div>
-                                    <div className="flex justify-between"><span className="text-[#ff0249]">Month 12 Rev:</span><span className="font-bold text-slate-900">{formatCurrency(metrics.mrrYear1)}</span></div>
-                                    <div className="border-t border-[#ff0249]/20 my-2 pt-2">
-                                        <h5 className="text-[#ff0249] text-xs font-semibold mb-1">Revenue Split (24 Mo)</h5>
-                                        <div className="flex justify-between text-xs mb-1">
-                                            <span className="text-[#ff0249]">Setup Fees:</span>
-                                            <span className="font-bold text-slate-900">{percentSetup}%</span>
-                                        </div>
-                                        <div className="flex justify-between text-xs">
-                                            <span className="text-[#ff0249]">Recurring:</span>
-                                            <span className="font-bold text-slate-900">{percentRecurring}%</span>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </aside>
 
@@ -419,7 +485,7 @@
                         <main className="flex-1 overflow-y-auto p-6 bg-slate-50">
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                                 <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm h-80 flex flex-col">
-                                    <h3 className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">Total Revenue Forecast (Setup + Recurring)</h3>
+                                    <h3 className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">Total Revenue Forecast</h3>
                                     <div className="flex-1">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <AreaChart data={data}>
@@ -444,8 +510,8 @@
                                                 <Tooltip formatter={(value) => formatCurrency(value)} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}/>
                                                 <Legend />
                                                 <Bar dataKey="splitSetup" name="Setup Fees" fill="#10b981" barSize={20} stackId="a" />
-                                                {/* Using Brand Color for Recurring as it's the main driver */}
-                                                <Bar dataKey="splitRecurring" name="Recurring Fees" fill={BRAND_COLOR} barSize={20} stackId="a" />
+                                                <Bar dataKey="splitFlexRecurring" name="Flex Recurring" fill={BRAND_COLOR} barSize={20} stackId="a" />
+                                                <Bar dataKey="splitFlatRecurring" name="Flat Recurring" fill={BRAND_COLOR_FLAT} barSize={20} stackId="a" />
                                             </ComposedChart>
                                         </ResponsiveContainer>
                                     </div>
@@ -458,29 +524,38 @@
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-sm text-left">
                                         <thead className="text-xs text-slate-500 uppercase bg-slate-50">
-                                            <tr><th className="px-6 py-3">Month</th><th className="px-6 py-3">New Games</th><th className="px-6 py-3 text-red-500">Churned</th><th className="px-6 py-3 font-bold text-slate-700">Total Active</th><th className="px-6 py-3 bg-[${BRAND_COLOR_LIGHT}] text-[#ff0249]">Total Rev.</th><th className="px-6 py-3">Cum. Revenue</th></tr>
+                                            <tr>
+                                                <th className="px-6 py-3">Month</th>
+                                                <th className="px-6 py-3">New Games</th>
+                                                <th className="px-6 py-3 font-bold text-[#ff0249]">Active Flex</th>
+                                                <th className="px-6 py-3 font-bold text-[#8b5cf6]">Active Flat</th>
+                                                <th className="px-6 py-3 font-bold text-slate-800">Total Active</th>
+                                                <th className="px-6 py-3 text-slate-700">Total Rev.</th>
+                                                <th className="px-6 py-3">Cum. Rev</th>
+                                            </tr>
                                         </thead>
                                         <tbody>
                                             {data.map((row) => (
                                                 <tr key={row.month} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                                                     <td className="px-6 py-3 font-medium text-slate-900">{row.month}</td>
                                                     <td className="px-6 py-3 text-emerald-600">+{row.newGames}</td>
-                                                    <td className="px-6 py-3 text-red-500">-{row.churnedGames}</td>
+                                                    <td className="px-6 py-3 font-bold text-[#ff0249]">{row.activeFlex}</td>
+                                                    <td className="px-6 py-3 font-bold text-[#8b5cf6]">{row.activeFlat}</td>
                                                     <td className="px-6 py-3 font-bold text-slate-800">{row.activeGames}</td>
-                                                    <td className={`px-6 py-3 bg-[${BRAND_COLOR_LIGHT}] font-medium text-[#ff0249]`}>{formatCurrency(row.revenue)}</td>
+                                                    <td className={`px-6 py-3 bg-[${BRAND_COLOR_LIGHT}] font-medium text-slate-900`}>{formatCurrency(row.revenue)}</td>
                                                     <td className="px-6 py-3 text-slate-500">{formatCurrency(row.cumulativeRevenue)}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
-                                        {/* Added Summary Footer Row */}
                                         <tfoot className="bg-slate-100 font-bold text-slate-700 border-t-2 border-slate-200">
                                             <tr>
                                                 <td className="px-6 py-3">TOTAL (24 Mo)</td>
                                                 <td className="px-6 py-3 text-emerald-600">+{totalNewGames}</td>
-                                                <td className="px-6 py-3 text-red-500">-{totalChurned}</td>
-                                                <td className="px-6 py-3 text-slate-400">-</td>
-                                                <td className="px-6 py-3 text-slate-400">-</td>
-                                                <td className="px-6 py-3 text-slate-400">-</td>
+                                                <td className="px-6 py-3">-</td>
+                                                <td className="px-6 py-3">-</td>
+                                                <td className="px-6 py-3">-</td>
+                                                <td className="px-6 py-3 text-slate-800">{formatCurrency(metrics.totalRevenue)}</td>
+                                                <td className="px-6 py-3">-</td>
                                             </tr>
                                         </tfoot>
                                     </table>
