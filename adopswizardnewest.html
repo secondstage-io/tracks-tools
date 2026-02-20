@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRACKS Naming Convention Builder</title>
+    <style>
+        :root{--primary:#2c3e50;--bg:#f5f6fa;--card:#fff;--shadow:0 2px 8px rgba(0,0,0,.08);--radius:8px}
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:#333;padding:20px;min-height:100vh}
+        .container{max-width:940px;margin:0 auto}
+        .app-header{text-align:center;padding:24px 0 16px}
+        .app-header h1{font-size:1.5rem;color:var(--primary);font-weight:700}
+        .app-header p{color:#64748b;font-size:.9rem;margin-top:4px}
+        .mode-toggle{display:flex;justify-content:center;gap:4px;background:var(--card);border-radius:var(--radius);padding:4px;box-shadow:var(--shadow);margin-bottom:24px;max-width:420px;margin-left:auto;margin-right:auto}
+        .mode-btn{flex:1;padding:10px 16px;border:none;background:transparent;border-radius:6px;cursor:pointer;font-size:.9rem;font-weight:600;color:#64748b;transition:all .2s}
+        .mode-btn.active{background:var(--primary);color:#fff}
+        .mode-btn:hover:not(.active){background:#e2e8f0}
+        .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:16px}
+        .mode-panel{display:none}.mode-panel.active{display:block}
+        .seg{padding:3px 8px;border-radius:4px;font-weight:600;color:#fff;white-space:nowrap;font-size:.82rem;font-family:'SF Mono','Fira Code',monospace;display:inline-block}
+        .delim{color:#94a3b8;font-weight:700;font-size:1rem;font-family:'SF Mono','Fira Code',monospace}
+        .btn{padding:8px 18px;border:none;border-radius:6px;cursor:pointer;font-size:.88rem;font-weight:600;transition:all .2s}
+        .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{opacity:.85}
+        .mono{font-family:'SF Mono','Fira Code',monospace}
+
+        /* ═══ REFERENCE ═══ */
+        .ref-intro{margin-bottom:24px}
+        .ref-intro p{font-size:.88rem;color:#475569;line-height:1.6;margin-bottom:8px}
+        .ref-intro ul{font-size:.85rem;color:#475569;line-height:1.6;margin:8px 0;padding-left:20px}
+        .ref-intro li{margin-bottom:4px}
+        .ref-intro code{background:#f1f5f9;padding:1px 5px;border-radius:3px;font-size:.82rem;font-family:'SF Mono','Fira Code',monospace;color:var(--primary)}
+        .ref-section{margin-bottom:32px}.ref-section:last-child{margin-bottom:0}
+        .ref-section h2{font-size:1.1rem;color:var(--primary);margin-bottom:4px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+        .ref-section h2 .ref-chev{font-size:.7rem;color:#94a3b8;transition:transform .2s;margin-left:auto}
+        .ref-section.collapsed h2 .ref-chev{transform:rotate(-90deg)}
+        .ref-section .ref-body{transition:all .2s}
+        .ref-section.collapsed .ref-body{display:none}
+        .ref-desc{font-size:.85rem;color:#64748b;line-height:1.5;margin-bottom:12px}
+        .ref-level-badge{font-size:.72rem;padding:3px 10px;border-radius:12px;background:#e2e8f0;color:#475569;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+        .ref-pattern{display:flex;flex-wrap:wrap;align-items:center;gap:4px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:12px 16px;margin-bottom:16px}
+        .ref-fields-table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:.85rem}
+        .ref-fields-table th{text-align:left;padding:8px 10px;background:#f8fafc;color:#475569;font-size:.78rem;text-transform:uppercase;letter-spacing:.3px;border-bottom:2px solid #e2e8f0}
+        .ref-fields-table td{padding:8px 10px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+        .ref-fields-table .field-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:middle}
+        .ref-fields-table .values-list{display:flex;flex-wrap:wrap;gap:4px}
+        .ref-fields-table .val-tag{padding:2px 7px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;font-size:.78rem;font-family:'SF Mono','Fira Code',monospace;color:#475569}
+        .ref-example{margin-bottom:12px}
+        .ref-example-breakdown{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+        .ref-chip{display:flex;flex-direction:column;align-items:center;gap:1px}
+        .ref-chip-label{font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+        .ref-chip-val{padding:4px 8px;border-radius:4px;font-size:.82rem;font-weight:600;font-family:'SF Mono','Fira Code',monospace}
+        .chip-delim{color:#94a3b8;font-weight:700;font-size:1rem;align-self:flex-end;padding-bottom:4px}
+        .ref-print-hint{text-align:center;font-size:.78rem;color:#94a3b8;margin-top:8px;font-style:italic}
+        .gen-common-label{font-size:.82rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.3px;margin-bottom:8px}
+
+        /* ═══ BUILDER — Spreadsheet Rows ═══ */
+        .bld-rows{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:visible;margin-bottom:8px}
+        .bld-rows>.bld-row:first-child{border-radius:var(--radius) var(--radius) 0 0}
+        .bld-rows>.bld-row:last-child,.bld-rows>.bld-children:last-child>.bld-add-row:last-child{border-radius:0 0 var(--radius) var(--radius);border-bottom:none}
+        .bld-rows.collapsed .bld-children{display:none}
+        .camp-chev{font-size:.6rem;color:#94a3b8;cursor:pointer;transition:transform .2s;margin-right:2px;padding:4px;user-select:none;flex-shrink:0}
+        .bld-rows.collapsed .camp-chev{transform:rotate(-90deg)}
+        .camp-status{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:2px}
+        .camp-status.st-ok{background:#10b981}.camp-status.st-wrn{background:#f59e0b}.camp-status.st-err{background:#ef4444}.camp-status.st-empty{background:#d1d5db}
+        .bld-row{display:flex;align-items:center;gap:3px;padding:6px 12px;border-bottom:1px solid #f1f5f9;min-height:36px;transition:background .1s}
+        .bld-row:hover{background:#fafcff}
+        .bld-row.lv-camp{background:#f0f4ff}
+        .bld-row.lv-camp:hover{background:#e8eeff}
+        .bld-row.lv-ag{padding-left:32px;background:#f0faf8}
+        .bld-row.lv-ag:hover{background:#e4f5f1}
+        .bld-row.lv-cr{padding-left:54px;background:#fdf4f3}
+        .bld-row.lv-cr:hover{background:#fbe9e7}
+        .bld-rid{font-size:.68rem;font-weight:700;color:#94a3b8;min-width:62px;flex-shrink:0;text-align:right;margin-right:6px;font-family:'SF Mono','Fira Code',monospace}
+        .sc{padding:3px 8px;border-radius:4px;font-weight:600;font-size:.82rem;font-family:'SF Mono','Fira Code',monospace;cursor:pointer;transition:all .12s;white-space:nowrap;border:1.5px solid transparent;line-height:1.4;text-align:center}
+        .sc:hover:not(.inh):not(.ed){filter:brightness(.9);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+        .sc.mt{background:#f1f5f9!important;color:#b0b8c4!important;border:1.5px dashed #d1d5db!important;font-weight:400;font-style:italic;font-size:.78rem}
+        .bld-intro{font-size:.84rem;color:#64748b;margin-bottom:10px;line-height:1.5}
+        .bld-intro strong{color:var(--primary)}
+        .sc.inh{opacity:.5;cursor:default;border-style:dotted!important}
+        .sc.inh:hover{filter:none;box-shadow:none}
+        .sc.ed{padding:0;background:none!important;border-color:transparent!important}
+        .sc.ed input{padding:3px 6px;border:2px solid var(--primary);border-radius:4px;font-size:.82rem;font-family:'SF Mono','Fira Code',monospace;font-weight:600;outline:none;min-width:50px;background:#fff}
+        .bd{color:#cbd5e1;font-weight:700;font-family:'SF Mono','Fira Code',monospace;font-size:.82rem}
+        .bsp{flex:1;min-width:8px}
+        .ri{border:none;background:none;cursor:pointer;font-size:.92rem;padding:3px 5px;border-radius:4px;line-height:1;transition:all .12s;color:#94a3b8;position:relative}
+        .ri:hover{background:#e2e8f0;color:var(--primary)}
+        .ri.danger:hover{background:#fef2f2;color:#ef4444}
+        .ri.picked{color:#8b5cf6}
+        .ri::after{content:attr(data-tip);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;font-size:.7rem;font-weight:600;padding:3px 8px;border-radius:4px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;margin-bottom:4px}
+        .ri:hover::after{opacity:1}
+        .bld-paste{font-size:.78rem;color:#8b5cf6;background:none;border:1px dashed #8b5cf6;cursor:pointer;font-weight:600;padding:2px 8px;border-radius:4px;margin-left:8px;transition:all .12s}
+        .bld-paste:hover{background:#f5f3ff;border-color:#7c3aed}
+        .bld-add-row{display:flex;align-items:center;gap:3px;padding:4px 12px;border-bottom:1px solid #f1f5f9;min-height:28px}
+        .bld-add-row:last-child{border-bottom:none}
+        .bld-add-row.lv-ag{padding-left:32px}
+        .bld-add-row.lv-cr{padding-left:54px}
+        .bld-add{font-size:.78rem;color:#0ea5e9;background:none;border:none;cursor:pointer;font-weight:600;padding:2px 4px;transition:all .12s}
+        .bld-add:hover{color:#0284c7;text-decoration:underline}
+        .bld-setup{display:flex;align-items:center;gap:20px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;margin-bottom:12px}
+        .bld-setup-lbl{font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:6px;color:#475569}
+        .bld-setup-lbl input{padding:5px 8px;border:2px solid #e2e8f0;border-radius:4px;font-size:.88rem;font-family:'SF Mono','Fira Code',monospace;font-weight:600;outline:none;width:120px;transition:border-color .2s}
+        .bld-setup-lbl input:focus{border-color:var(--primary)}
+
+        /* Editable value lists in Reference */
+        .val-add{display:inline-flex;align-items:center;gap:4px;margin-left:6px;vertical-align:middle}
+        .val-add input{padding:2px 6px;border:1px solid #d1d5db;border-radius:4px;font-size:.78rem;width:110px;outline:none;font-family:'SF Mono','Fira Code',monospace}
+        .val-add input:focus{border-color:var(--primary)}
+        .val-add button{padding:2px 8px;border:none;background:var(--primary);color:#fff;border-radius:4px;font-size:.75rem;font-weight:700;cursor:pointer;line-height:1.4}
+        .val-add button:hover{opacity:.85}
+        .val-tag.custom{background:#e0f2fe;border-color:#7dd3fc}
+        .val-rm{margin-left:3px;cursor:pointer;color:#94a3b8;font-size:.72rem;font-weight:700;vertical-align:middle}
+        .val-rm:hover{color:#ef4444}
+
+        .fo-line{cursor:pointer}.fo-line:hover{background:#f0f9ff}
+
+        /* Full output */
+        .fo{margin-top:8px}
+        .fo h3{font-size:.95rem;color:var(--primary);margin-bottom:12px}
+        .fo-group{margin-bottom:10px}
+        .fo-label{font-size:.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+        .fo-list{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;overflow:hidden}
+        .fo-line{display:flex;align-items:center;padding:6px 12px;border-bottom:1px solid #f1f5f9;font-family:'SF Mono','Fira Code',monospace;font-size:.82rem;color:#334155;gap:8px;cursor:pointer}
+        .fo-line:last-child{border-bottom:none}
+        .fo-line:hover{background:#f0f9ff}
+        .fo-line .fo-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+        .fo-line .fo-dot.ok{background:#10b981}.fo-line .fo-dot.wrn{background:#f59e0b}.fo-line .fo-dot.err{background:#ef4444}
+        .fo-line .ln{color:#94a3b8;font-size:.72rem;min-width:18px;text-align:right}
+        .fo-line .lt{flex:1;word-break:break-all}
+        .fo-line .ll{font-size:.7rem;color:#94a3b8;white-space:nowrap}
+        .fo-line .ll.over{color:#ef4444;font-weight:600}
+        .fo-line .fo-iss{font-size:.7rem;color:#94a3b8;white-space:nowrap;font-family:-apple-system,sans-serif}
+        .fo-line .fo-iss.has{color:#ef4444;font-weight:600}
+        .fo-detail{display:none;padding:4px 12px 8px 40px;border-bottom:1px solid #f1f5f9}
+        .fo-detail.open{display:block}
+        .fo-detail .issue-list{margin:0}
+        .fo-detail .issue-list li{padding:4px 8px;font-size:.78rem;margin-bottom:3px}
+        .fo-summary{display:flex;gap:14px;padding:8px 12px;font-size:.78rem;font-weight:600;border-bottom:1px solid #e2e8f0;background:#fff}
+        .fo-summary .fs-ok{color:#10b981}.fo-summary .fs-wrn{color:#f59e0b}.fo-summary .fs-err{color:#ef4444}
+        .fo-actions{display:flex;align-items:center;gap:12px;margin-top:10px}
+        .fo-count{font-size:.82rem;color:#64748b;margin-left:auto}
+
+        /* ═══ CHECKER ═══ */
+        .chk-level-btns{display:flex;gap:8px;margin-bottom:12px;align-items:center}
+        .chk-level-btn{padding:8px 20px;border:2px solid #e2e8f0;background:transparent;border-radius:6px;cursor:pointer;font-size:.9rem;font-weight:600;color:#64748b;transition:all .2s}
+        .chk-level-btn.active{border-color:var(--primary);color:var(--primary);background:#f0f4f8}
+        .auto-tag{font-size:.78rem;color:#10b981;font-weight:600;font-style:italic;display:none}.auto-tag.visible{display:inline}
+        .chk-input{width:100%;padding:14px 16px;border:2px solid #d1d5db;border-radius:6px;font-size:.92rem;font-family:'SF Mono','Fira Code',monospace;outline:none;transition:border-color .2s;resize:vertical;min-height:48px;margin-bottom:12px}
+        .chk-input:focus{border-color:var(--primary)}
+        .chk-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+        .try-link{font-size:.8rem;color:#0ea5e9;cursor:pointer;border:none;background:none;font-weight:600;text-decoration:underline;text-underline-offset:2px}.try-link:hover{color:#0284c7}
+        .results{margin-top:16px}.results.hidden{display:none}
+        .segment-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;align-items:center}
+        .seg-chip{display:flex;flex-direction:column;align-items:center;gap:2px}
+        .seg-chip-label{font-size:.68rem;font-weight:600;color:#64748b;text-transform:uppercase}
+        .seg-chip-value{padding:6px 12px;border-radius:6px;font-size:.88rem;font-weight:600;font-family:'SF Mono','Fira Code',monospace;border:2px solid}
+        .seg-chip-value.valid{border-color:#10b981;background:#ecfdf5;color:#065f46}
+        .seg-chip-value.warning{border-color:#f59e0b;background:#fffbeb;color:#92400e}
+        .seg-chip-value.error{border-color:#ef4444;background:#fef2f2;color:#991b1b}
+        .seg-chip-value.neutral{border-color:#d1d5db;background:#f9fafb;color:#374151}
+        .verdict{padding:12px 16px;border-radius:6px;font-weight:700;font-size:.95rem;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+        .verdict.pass{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+        .verdict.fail{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+        .verdict-text{flex:1}
+        .issue-list{list-style:none;padding:0}
+        .issue-list li{padding:8px 12px;border-radius:6px;margin-bottom:6px;font-size:.88rem;line-height:1.4}
+        .issue-list li.err{background:#fef2f2;color:#991b1b;border-left:3px solid #ef4444}
+        .issue-list li.wrn{background:#fffbeb;color:#92400e;border-left:3px solid #f59e0b}
+        .batch-summary{display:flex;gap:16px;padding:12px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;margin-bottom:12px;font-size:.88rem;font-weight:600}
+        .batch-summary .bp{color:#065f46}.batch-summary .bw{color:#92400e}.batch-summary .bf{color:#991b1b}
+        .batch-line{border:1px solid #e2e8f0;border-radius:6px;margin-bottom:8px;overflow:hidden}
+        .batch-hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background .15s}
+        .batch-hdr:hover{background:#f8fafc}
+        .batch-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+        .batch-dot.pass{background:#10b981}.batch-dot.warn{background:#f59e0b}.batch-dot.fail{background:#ef4444}
+        .batch-name{flex:1;font-family:'SF Mono','Fira Code',monospace;font-size:.85rem;color:#334155;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .batch-info{font-size:.78rem;color:#64748b;white-space:nowrap}
+        .batch-chev{color:#94a3b8;font-size:.8rem;transition:transform .2s}
+        .batch-line.open .batch-chev{transform:rotate(90deg)}
+        .batch-detail{display:none;padding:0 14px 14px}.batch-line.open .batch-detail{display:block}
+        .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 20px;border-radius:6px;font-size:.88rem;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:100}.toast.show{opacity:1}
+        @media(max-width:640px){body{padding:12px}.bld-row{flex-wrap:wrap;gap:2px}.bld-row.lv-ag{padding-left:16px}.bld-row.lv-cr{padding-left:28px}.sc{font-size:.75rem;padding:2px 6px}}
+        @media print{.mode-toggle,.fo-actions,.chk-actions,.toast,.bld-add,.ri,.bld-paste{display:none!important}body{padding:0;background:#fff}.card,.bld-rows{box-shadow:none;border:1px solid #ddd}}
+
+        /* ═══ SAVED BEATS ═══ */
+        .bld-setup-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+        .btn-undo{background:none;color:#94a3b8;padding:7px 12px;border:1.5px solid #e2e8f0;border-radius:6px;cursor:pointer;font-size:.82rem;font-weight:600;transition:all .2s}
+        .btn-undo:hover{color:var(--primary);border-color:var(--primary);background:#f0f4f8}
+        .btn-gen{background:#0ea5e9;color:#fff;padding:7px 16px;border:none;border-radius:6px;cursor:pointer;font-size:.84rem;font-weight:600;transition:all .2s}
+        .btn-gen:hover{opacity:.85}
+        .bld-empty{text-align:center;padding:40px 20px;color:#94a3b8;font-size:.9rem}
+        .bld-empty strong{color:#64748b}
+        .saved-beats{display:flex;flex-wrap:wrap;gap:10px;padding:0 0 12px;margin-bottom:4px}
+        .saved-beats:empty{display:none}
+        .beats-filter{padding:4px 10px;border:2px solid #e2e8f0;border-radius:6px;font-size:.82rem;outline:none;width:180px;transition:border-color .2s;margin-bottom:8px}
+        .beats-filter:focus{border-color:var(--primary)}
+        .beats-filter::placeholder{color:#b0b8c4}
+        .beat-card{background:var(--card);border:2px solid #e2e8f0;border-radius:10px;padding:14px 16px 12px;cursor:pointer;transition:all .2s;min-width:180px;max-width:240px;position:relative;display:flex;flex-direction:column;gap:8px}
+        .beat-card:hover{border-color:#94a3b8;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+        .beat-card.active{border-color:var(--primary);box-shadow:0 0 0 2px rgba(44,62,80,.18)}
+        .beat-card-header{display:flex;align-items:center;gap:6px}
+        .beat-card-proj{font-size:.9rem;font-weight:800;color:#6366f1}
+        .beat-card-dot{color:#cbd5e1;font-size:.6rem}
+        .beat-card-beat{font-size:.9rem;font-weight:700;color:#f59e0b}
+        .beat-card-stats{display:flex;gap:10px}
+        .beat-card-stat{display:flex;align-items:center;gap:4px;font-size:.72rem;font-weight:600;color:#64748b}
+        .beat-card-stat .stat-num{font-size:.82rem;font-weight:800;color:var(--primary);font-family:'SF Mono','Fira Code',monospace}
+        .beat-card-platforms{display:flex;flex-wrap:wrap;gap:4px}
+        .beat-card-plat{font-size:.65rem;font-weight:700;padding:2px 6px;border-radius:4px;background:#f0f9ff;color:#0284c7;border:1px solid #bae6fd;text-transform:uppercase;letter-spacing:.3px}
+        .beat-card-footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #f1f5f9;padding-top:6px;margin-top:2px}
+        .beat-card-time{font-size:.65rem;color:#b0b8c4;font-weight:500}
+        .beat-card-actions{display:flex;gap:6px}
+        .beat-card-btn{background:none;border:none;cursor:pointer;color:#cbd5e1;font-size:.72rem;font-weight:700;padding:2px 6px;border-radius:4px;transition:all .15s}
+        .beat-card-btn:hover{color:var(--primary);background:#f0f4f8}
+        .beat-card-btn.danger:hover{color:#ef4444;background:#fef2f2}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="app-header">
+        <h1>TRACKS Naming Convention Builder</h1>
+        <p>Reference guide, name checker, and structure builder</p>
+    </div>
+    <div class="mode-toggle" style="max-width:420px">
+        <button class="mode-btn" data-mode="guide">Guide</button>
+        <button class="mode-btn active" data-mode="reference">Helper</button>
+        <button class="mode-btn" data-mode="generator">Builder</button>
+    </div>
+    <div id="mode-guide" class="mode-panel"></div>
+    <div id="mode-reference" class="mode-panel active"></div>
+    <div id="mode-generator" class="mode-panel"><div id="gen-setup"></div><div id="saved-beats-container"></div><div id="gen-root"></div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════
+const C={project:'#6366f1',platform:'#0ea5e9',geo:'#10b981',beat:'#f59e0b',date:'#d97706',strategy:'#8b5cf6',objective:'#ec4899',audience:'#14b8a6',type:'#f97316',format:'#ef4444',dims:'#64748b',lp:'#06b6d4',version:'#a855f7',length:'#84cc16',suffix:'#9ca3af'};
+const KNOWN={geo:['US','UK','DE','FR','ES','IT','NL','JP','KR','AU','CA','BR'],platform:['GoogleSearch','YouTube','Meta','Reddit','TikTok','DisplayVideo360','X'],strategy:['Awareness','Consideration','Conversion','Retention'],objective:['Traffic','Reach','Views','AppInstall','Purchase'],audience:['Core','Secondary','Aspirational','Broad','Mainstream','Lookalike','Retargeting'],type:['Prospecting','Retargeting','Retention'],format:['Video','Static','Carousel','Collection','HTML5'],lp:['Website','Steam','Epic','PSStore'],version:['v1','v2','v3']};
+const LIMITS={GoogleSearch:128,YouTube:128,Meta:400,Reddit:400,TikTok:512,DisplayVideo360:240,X:255};
+
+function buildCampaignName(v){const a=[v.project];a.push([v.beat,v.date].filter(Boolean).join('_'));a.push(v.platform);a.push(v.geo);a.push([v.strategy,v.objective,v.suffix].filter(Boolean).join('_'));return a.filter(Boolean).join('-')}
+function buildAgName(v){const s=[v.audience,v.type,v.suffix].filter(Boolean).join('_');return[v.geo,s].filter(Boolean).join('-')}
+function buildCrName(v){const a=[v.geo,v.format,v.dims,v.beat,v.lp,v.version,v.length,v.suffix];while(a.length&&!a[a.length-1])a.pop();return a.filter(Boolean).join('-')}
+
+const LEVELS={
+    campaign:{label:'Campaign',desc:'The top level of your ad structure. Each campaign targets one platform, geography, and funnel strategy. Project and beat are set once in the Builder setup. Groups are separated by hyphens (-), compound segments within a group by underscores (_). Expand the Field Reference below for allowed and custom values.',fields:[{key:'project',label:'Project',ph:'2s',help:'Short internal code for your game or product. Values will be configured by Tracks.',examples:['2s','nx','ab']},{key:'beat',label:'Beat',ph:'Launch',help:'Campaign beat or content phase \u2014 a themed period like a product launch, seasonal event, or content drop. Can be set in the Builder setup. Free text \u2014 the examples shown are just common patterns.',examples:['Launch','Holiday','E3','Update','Season1']},{key:'date',label:'Start Date',ph:'',isDate:true,help:'Campaign start date in YYMMDD format'},{key:'platform',label:'Platform',ph:'Meta',vals:KNOWN.platform,help:'Ad platform this campaign runs on'},{key:'geo',label:'Geo',ph:'UK',vals:KNOWN.geo,help:'Primary market or country code'},{key:'strategy',label:'Strategy',ph:'Awareness',vals:KNOWN.strategy,help:'Funnel stage: where in the customer journey'},{key:'objective',label:'Objective',ph:'Reach',vals:KNOWN.objective,help:'Platform optimization objective'},{key:'suffix',label:'Suffix',ph:'',opt:true,help:'Optional extra identifier for variants'}],pattern:[{k:'project'},{d:'-'},{k:'beat'},{d:'_'},{k:'date'},{d:'-'},{k:'platform'},{d:'-'},{k:'geo'},{d:'-'},{k:'strategy'},{d:'_'},{k:'objective'},{d:'_',opt:true},{k:'suffix',opt:true}],build:buildCampaignName,examples:[{project:'2s',beat:'Launch',date:'260219',platform:'Meta',geo:'UK',strategy:'Awareness',objective:'Reach'},{project:'2s',beat:'Holiday',date:'261115',platform:'GoogleSearch',geo:'DE',strategy:'Conversion',objective:'Traffic'},{project:'nx',beat:'E3',date:'260612',platform:'TikTok',geo:'US',strategy:'Awareness',objective:'Views',suffix:'GameplayTrailer'}]},
+    adgroup:{label:'Ad Group',desc:'Sits inside a campaign and defines who sees your ads. Geo is inherited from the campaign. Audience and targeting type are separated by underscores (_). Expand the Field Reference below for allowed and custom values.',fields:[{key:'geo',label:'Geo',ph:'UK',vals:KNOWN.geo,help:'Geography code \u2014 should match the parent campaign'},{key:'audience',label:'Audience',ph:'Core',vals:KNOWN.audience,help:'Target audience segment you are reaching'},{key:'type',label:'Type',ph:'Prospecting',vals:KNOWN.type,help:'Targeting approach: new users, returning, or retained'},{key:'suffix',label:'Suffix',ph:'',opt:true,help:'Optional qualifier like age range or interest'}],pattern:[{k:'geo'},{d:'-'},{k:'audience'},{d:'_'},{k:'type'},{d:'_',opt:true},{k:'suffix',opt:true}],build:buildAgName,examples:[{geo:'UK',audience:'Core',type:'Prospecting'},{geo:'DE',audience:'Lookalike',type:'Retargeting'},{geo:'US',audience:'Broad',type:'Prospecting',suffix:'18-34'}]},
+    creative:{label:'Creative',desc:'The actual ad asset inside an ad group. Geo and beat are inherited from the campaign. All segments are separated by hyphens (-). Describes exactly what the user sees. Expand the Field Reference below for allowed and custom values.',fields:[{key:'geo',label:'Geo',ph:'UK',vals:KNOWN.geo,help:'Geography code \u2014 inherited from the campaign'},{key:'format',label:'Format',ph:'Video',vals:KNOWN.format,help:'Creative format or ad type'},{key:'dims',label:'Dimensions',ph:'1920x1080',help:'Asset dimensions as WIDTHxHEIGHT in pixels'},{key:'beat',label:'Beat',ph:'Launch',help:'Campaign beat \u2014 inherited from the Builder setup'},{key:'lp',label:'Landing Page',ph:'Website',vals:KNOWN.lp,help:'Where the ad links to when clicked'},{key:'version',label:'Version',ph:'v1',vals:KNOWN.version,help:'Creative iteration (v1, v2, v3...)'},{key:'length',label:'Length',ph:'30s',help:'Duration for video ads (e.g. 15s, 30s). Use 0s for static.'},{key:'suffix',label:'Suffix',ph:'',opt:true,help:'Optional variant label like "dark" or "alt"'}],pattern:[{k:'geo'},{d:'-'},{k:'format'},{d:'-'},{k:'dims'},{d:'-'},{k:'beat'},{d:'-'},{k:'lp'},{d:'-'},{k:'version'},{d:'-'},{k:'length'},{d:'-',opt:true},{k:'suffix',opt:true}],build:buildCrName,examples:[{geo:'UK',format:'Video',dims:'1920x1080',beat:'Launch',lp:'Website',version:'v1',length:'30s'},{geo:'DE',format:'Static',dims:'1080x1080',beat:'Holiday',lp:'Steam',version:'v2',length:'0s'},{geo:'US',format:'Carousel',dims:'1080x1080',beat:'E3',lp:'Epic',version:'v1',length:'0s',suffix:'dark'}]}
+};
+
+const CHK_EXAMPLES={valid:{campaign:'2s-Launch_260219-Meta-UK-Awareness_Reach',adgroup:'UK-Core_Prospecting',creative:'UK-Video-1920x1080-Launch-Website-v1-30s'},invalid:{campaign:'2s-Launch_2602-Facebok-UK-awareness_Traffic',adgroup:'UK-core_prospekting',creative:'UK-Vido-1920x1080-Launch-website-v1-thirty'}};
+
+// ══════════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════════
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2000)}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function formatDate(v){if(!v)return '';const d=new Date(v);return String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')}
+function fuzzy(v,list){const l=v.toLowerCase();return list.find(i=>i.toLowerCase()===l)}
+function findClose(v,list){const l=v.toLowerCase();let b=null,bd=9;for(const i of list){const d=lev(l,i.toLowerCase());if(d<bd&&d<=3){bd=d;b=i}}return b}
+function lev(a,b){const m=a.length,n=b.length,d=Array.from({length:m+1},()=>Array(n+1).fill(0));for(let i=0;i<=m;i++)d[i][0]=i;for(let j=0;j<=n;j++)d[0][j]=j;for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=a[i-1]===b[j-1]?d[i-1][j-1]:1+Math.min(d[i-1][j],d[i][j-1],d[i-1][j-1]);return d[m][n]}
+function copyText(s){return navigator.clipboard.writeText(s)}
+function makeDl(id,vals){const dl=document.createElement('datalist');dl.id=id;vals.forEach(v=>{const o=document.createElement('option');o.value=v;dl.appendChild(o)});return dl}
+
+// Editable known values
+const CUSTOM={};
+
+function renderValsList(container,key){
+    container.innerHTML='';
+    const w=document.createElement('div');w.className='values-list';
+    KNOWN[key].forEach(x=>{
+        const t=document.createElement('span');
+        const isCustom=CUSTOM[key]&&CUSTOM[key].has(x);
+        t.className='val-tag'+(isCustom?' custom':'');
+        t.textContent=x;
+        if(isCustom){const rm=document.createElement('span');rm.className='val-rm';rm.textContent='\u00d7';rm.addEventListener('click',()=>{removeKnownValue(key,x);renderValsList(container,key)});t.appendChild(rm)}
+        w.appendChild(t);
+    });
+    container.appendChild(w);
+    const note=document.createElement('div');
+    note.style.cssText='font-size:.7rem;color:#10b981;margin-top:4px;font-style:italic';
+    note.textContent='\u270e custom values auto-saved from Builder';
+    container.appendChild(note);
+}
+
+function addKnownValue(key,val){
+    KNOWN[key].push(val);
+    if(!CUSTOM[key])CUSTOM[key]=new Set();
+    CUSTOM[key].add(val);
+    refreshDataLists(key);
+}
+
+function removeKnownValue(key,val){
+    const idx=KNOWN[key].indexOf(val);
+    if(idx>-1)KNOWN[key].splice(idx,1);
+    if(CUSTOM[key])CUSTOM[key].delete(val);
+    refreshDataLists(key);
+}
+
+function refreshDataLists(key){
+    const vals=KNOWN[key];if(!vals)return;
+    document.querySelectorAll(`datalist[id$="-${key}"]`).forEach(dl=>{
+        dl.innerHTML='';vals.forEach(v=>{const o=document.createElement('option');o.value=v;dl.appendChild(o)});
+    });
+}
+
+function switchMode(mode){
+    document.querySelectorAll('.mode-btn').forEach(x=>x.classList.remove('active'));
+    document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
+    document.querySelectorAll('.mode-panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('mode-'+mode).classList.add('active');
+}
+
+function clickCopy(el,getText){
+    el.addEventListener('click',()=>{const t=typeof getText==='function'?getText():el.textContent;if(t)copyText(t).then(()=>toast('Copied'))});
+}
+
+function parseDateSeg(v){if(!/^\d{6}$/.test(v))return '';return '20'+v.slice(0,2)+'-'+v.slice(2,4)+'-'+v.slice(4,6)}
+
+// ══════════════════════════════════════════
+// GUIDE
+// ══════════════════════════════════════════
+function buildGuide(){
+    const root=document.getElementById('mode-guide');root.innerHTML='';
+
+    // Section 1: Naming Convention
+    const s1=document.createElement('div');s1.className='card ref-intro';
+    s1.innerHTML='<h2 style="font-size:1.1rem;color:var(--primary);margin-bottom:10px">Naming Convention</h2>'+
+    '<p>Ad names are structured so the TRACKS database can immediately parse and identify the creative assets, platform, and target demographic. Three levels mirror the ad platform hierarchy:</p>'+
+    '<ul>'+
+    '<li><strong>Campaign</strong> \u2014 project, beat, platform, market, and funnel strategy</li>'+
+    '<li><strong>Ad Group</strong> \u2014 audience segment and targeting approach (geo inherited from campaign)</li>'+
+    '<li><strong>Creative</strong> \u2014 format, dimensions, landing page, and version (geo + beat inherited)</li>'+
+    '</ul>'+
+    '<p>Segments are joined by <code>-</code> (hyphens) between groups and <code>_</code> (underscores) within compound groups. For example:</p>'+
+    '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 14px;margin-bottom:8px;font-family:\'SF Mono\',\'Fira Code\',monospace;font-size:.85rem;line-height:1.8">'+
+    '<span style="color:#6366f1;font-weight:600">2s</span><span style="color:#94a3b8;font-weight:700"> - </span>'+
+    '<span style="color:#f59e0b;font-weight:600">Launch</span><span style="color:#d97706;font-weight:700"> _ </span><span style="color:#d97706;font-weight:600">260219</span><span style="color:#94a3b8;font-weight:700"> - </span>'+
+    '<span style="color:#0ea5e9;font-weight:600">Meta</span><span style="color:#94a3b8;font-weight:700"> - </span>'+
+    '<span style="color:#10b981;font-weight:600">UK</span><span style="color:#94a3b8;font-weight:700"> - </span>'+
+    '<span style="color:#8b5cf6;font-weight:600">Awareness</span><span style="color:#ec4899;font-weight:700"> _ </span><span style="color:#ec4899;font-weight:600">Reach</span>'+
+    '<div style="margin-top:6px;font-family:-apple-system,sans-serif;font-size:.78rem;color:#64748b"><code style="background:#f1f5f9;padding:1px 5px;border-radius:3px;font-size:.78rem;color:var(--primary)">-</code> separates independent groups &nbsp;\u2022&nbsp; <code style="background:#f1f5f9;padding:1px 5px;border-radius:3px;font-size:.78rem;color:var(--primary)">_</code> joins related parts (beat+date, strategy+objective)</div>'+
+    '</div>'+
+    '<p style="font-size:.82rem;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:8px 12px;line-height:1.5"><strong>Only use letters and numbers in field values.</strong> Because <code style="background:#fef3c7;padding:1px 4px;border-radius:3px;font-size:.8rem">-</code> and <code style="background:#fef3c7;padding:1px 4px;border-radius:3px;font-size:.8rem">_</code> are used as separators in the naming convention, special characters in values would break parsing. For example, use <code style="background:#fef3c7;padding:1px 4px;border-radius:3px;font-size:.8rem">PSStore</code> instead of <code style="background:#fef3c7;padding:1px 4px;border-radius:3px;font-size:.8rem">PS-Store</code>.</p>';
+    // Collapsible field overview per level
+    const fieldToggle=document.createElement('div');
+    fieldToggle.style.cssText='display:flex;align-items:center;cursor:pointer;user-select:none;padding:10px 0 4px;border-top:1px solid #e2e8f0;margin-top:12px';
+    fieldToggle.innerHTML='<span style="font-size:.88rem;font-weight:700;color:var(--primary)">Available Fields</span><span class="ref-chev" style="margin-left:auto;font-size:.7rem;color:#94a3b8;transition:transform .2s;transform:rotate(-90deg)">&#9660;</span>';
+    const fieldDetail=document.createElement('div');fieldDetail.style.display='none';
+    fieldToggle.addEventListener('click',()=>{const open=fieldDetail.style.display!=='none';fieldDetail.style.display=open?'none':'block';fieldToggle.querySelector('.ref-chev').style.transform=open?'rotate(-90deg)':'rotate(0)'});
+    s1.appendChild(fieldToggle);
+    for(const[lk,lv]of Object.entries(LEVELS)){
+        const lvH=document.createElement('div');lvH.style.cssText='font-size:.82rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.3px;margin:12px 0 6px';lvH.textContent=lv.label;
+        fieldDetail.appendChild(lvH);
+        const pat=document.createElement('div');pat.style.cssText='display:flex;flex-wrap:wrap;align-items:center;gap:4px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px;margin-bottom:6px';
+        lv.pattern.forEach(p=>{if(p.d){const s=document.createElement('span');s.className='delim';s.textContent=p.d;if(p.opt)s.style.opacity='.4';pat.appendChild(s)}else{const s=document.createElement('span');s.className='seg';s.style.background=C[p.k];s.textContent='{'+p.k+'}';if(p.opt)s.style.opacity='.6';pat.appendChild(s)}});
+        fieldDetail.appendChild(pat);
+        const tbl=document.createElement('table');tbl.className='ref-fields-table';tbl.style.cssText='margin-bottom:4px;table-layout:fixed';tbl.innerHTML='<colgroup><col style="width:18%"><col style="width:46%"><col style="width:36%"></colgroup><thead><tr><th>Field</th><th>Description</th><th>Examples</th></tr></thead>';
+        const tb=document.createElement('tbody');
+        lv.fields.forEach(f=>{const tr=document.createElement('tr');const n=document.createElement('td');n.innerHTML='<span class="field-dot" style="background:'+C[f.key]+'"></span><strong>'+f.label+'</strong>'+(f.opt?' <span style="color:#94a3b8">(opt)</span>':'');tr.appendChild(n);const d=document.createElement('td');d.style.fontSize='.82rem';d.textContent=f.help||'';tr.appendChild(d);const ex=document.createElement('td');const vals=f.vals&&KNOWN[f.key]?KNOWN[f.key].slice(0,5):f.examples?f.examples.slice(0,5):f.isDate?['YYMMDD']:[];if(vals.length){const w=document.createElement('div');w.className='values-list';vals.forEach(v=>{const t=document.createElement('span');t.className='val-tag';t.textContent=v;w.appendChild(t)});ex.appendChild(w)}else{ex.innerHTML='<span style="color:#94a3b8">Free text</span>'}tr.appendChild(ex);tb.appendChild(tr)});
+        tbl.appendChild(tb);fieldDetail.appendChild(tbl);
+    }
+    s1.appendChild(fieldDetail);
+    root.appendChild(s1);
+
+    // Section 2: Using the Helper
+    const s2=document.createElement('div');s2.className='card ref-intro';
+    s2.innerHTML='<h2 style="font-size:1.1rem;color:var(--primary);margin-bottom:10px">Helper Tab</h2>'+
+    '<p><strong>Check existing names and look up field values.</strong> The <strong>Helper</strong> tab has three sections \u2014 one for each level (Campaign, Ad Group, Creative). Each includes:</p>'+
+    '<ul>'+
+    '<li><strong>Name Checker</strong> \u2014 paste one or multiple names (one per line) to validate them. Errors and warnings are shown inline with suggestions for how to correct them.</li>'+
+    '<li><strong>Field Reference</strong> \u2014 expand to see every field, its description, and the allowed/custom values. Custom values you enter in the Builder are automatically added here.</li>'+
+    '</ul>';
+    root.appendChild(s2);
+
+    // Section 3: Using the Builder
+    const s3=document.createElement('div');s3.className='card ref-intro';
+    s3.innerHTML='<h2 style="font-size:1.1rem;color:var(--primary);margin-bottom:10px">Builder Tab</h2>'+
+    '<p><strong>Build and manage your ad naming structures.</strong> Create beats, add campaigns, ad groups, and creatives, then export the generated names. Everything autosaves as you work.</p>'+
+    '<p>Enter your <strong>Project</strong> and <strong>Beat</strong> in the setup bar, then click <strong>New Beat</strong> to create a fresh workspace with one empty campaign, ad group, and creative.</p>'+
+    '<ul>'+
+    '<li><strong>Saved beats</strong> appear as cards below the setup bar. Click a card to switch to that beat. Each card shows campaign/ad group/creative counts, platforms used, and when it was last edited. Beat names must be unique. Use <strong>Duplicate</strong> to copy a beat\u2019s structure for a new content drop.</li>'+
+    '<li><strong>Autosave:</strong> every change you make is automatically saved to the active beat. No manual save needed.</li>'+
+    '<li><strong>Click</strong> any colored segment to edit it. Fields with known options show a dropdown. Press <strong>Tab</strong> to jump to the next field in the row.</li>'+
+    '<li><strong>Row actions:</strong> <strong>Dupe</strong> duplicates a row and its children. <strong>Del</strong> removes it (with confirmation). <strong>Copy</strong> copies the row\u2019s name to the clipboard.</li>'+
+    '<li><strong>Collapse campaigns</strong> using the <strong>\u25BC</strong> chevron. A colored dot next to it shows validation status: <span style="color:#10b981;font-weight:600">green</span> = valid, <span style="color:#f59e0b;font-weight:600">yellow</span> = warnings, <span style="color:#ef4444;font-weight:600">red</span> = errors, <span style="color:#94a3b8;font-weight:600">gray</span> = incomplete.</li>'+
+    '<li><strong>Faded/dotted segments</strong> are inherited and can\u2019t be edited directly:<br>'+
+    '<span style="color:var(--primary);font-weight:600">project</span> and <span style="color:#f59e0b;font-weight:600">beat</span> come from the setup bar \u2022 '+
+    '<span style="color:#10b981;font-weight:600">geo</span> flows from the campaign to its ad groups and creatives \u2022 '+
+    '<span style="color:#f59e0b;font-weight:600">beat</span> also flows to creatives. Change them at the source and all children update.</li>'+
+    '<li><strong>Required fields:</strong> project, beat, platform, geo, strategy, and objective for campaigns. Audience and type for ad groups. Format, dims, lp, version, and length for creatives. Date and suffix are always optional.</li>'+
+    '<li><strong>Date picker:</strong> the calendar automatically converts your selection to <code>YYMMDD</code> format (e.g. Feb 19, 2026 \u2192 <code>260219</code>).</li>'+
+    '<li><strong>Character limits:</strong> each platform has a max name length (e.g. Google: 128, Meta: 400). The number next to each name in the output shows current/limit.</li>'+
+    '</ul>';
+    root.appendChild(s3);
+
+    // Section 4: Consistency callout
+    const s4=document.createElement('div');s4.className='card ref-intro';
+    s4.innerHTML='<h2 style="font-size:1.1rem;color:var(--primary);margin-bottom:10px">Why Consistency Matters</h2>'+
+    '<p>Tracks dashboards group and aggregate data based on these naming segments. If field values don\u2019t match exactly \u2014 different spelling, casing, or abbreviations \u2014 your reporting will be split across entries instead of rolling up cleanly.</p>'+
+    '<p>Use the <strong>dropdown suggestions</strong> in the Builder whenever possible. Custom values you type are auto-saved so they\u2019re available next time. Check the <strong>Field Reference</strong> in the Helper tab to see all allowed and custom values for each field.</p>';
+    root.appendChild(s4);
+
+    root.insertAdjacentHTML('beforeend','<div class="ref-print-hint">Tip: Ctrl/Cmd+P to print as cheat sheet</div>');
+}
+buildGuide();
+
+// ══════════════════════════════════════════
+// REFERENCE
+// ══════════════════════════════════════════
+function buildReference(){
+    const root=document.getElementById('mode-reference');root.innerHTML='';
+    // Purpose intro
+    const intro=document.createElement('div');intro.className='ref-intro';intro.style.cssText='margin-bottom:20px;font-size:.88rem;color:#475569;line-height:1.6';
+    intro.innerHTML='<strong style="color:var(--primary)">Check existing names and look up field values.</strong> Paste any campaign, ad group, or creative name into the checker to validate it. Paste multiple names (one per line) to batch-check them. Expand the Field Reference under each level to see allowed values and add your own.';
+    root.appendChild(intro);
+    // Level sections — each with checker + collapsible field reference
+    for(const[lk,lv]of Object.entries(LEVELS)){
+        const sec=document.createElement('div');sec.className='card ref-section';
+        const h2=document.createElement('h2');
+        h2.innerHTML=`${lv.label} <span class="ref-level-badge">${lk}</span>`;
+        h2.style.cursor='default';
+        sec.appendChild(h2);
+        if(lv.desc){const d=document.createElement('div');d.className='ref-desc';d.textContent=lv.desc;sec.appendChild(d)}
+        // Pattern
+        const pat=document.createElement('div');pat.className='ref-pattern';
+        lv.pattern.forEach(p=>{if(p.d){const s=document.createElement('span');s.className='delim';s.textContent=p.d;if(p.opt)s.style.opacity='.4';pat.appendChild(s)}else{const s=document.createElement('span');s.className='seg';s.style.background=C[p.k];s.textContent=`{${p.k}}`;if(p.opt)s.style.opacity='.6';pat.appendChild(s)}});
+        sec.appendChild(pat);
+        // Checker
+        const chk=document.createElement('div');chk.style.marginBottom='12px';
+        chk.innerHTML='<div style="font-size:.78rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px">Name Checker</div>'+
+        '<textarea class="chk-input" id="chk-input-'+lk+'" rows="2" placeholder="Paste one or more '+lv.label.toLowerCase()+' names (one per line)\u2026"></textarea>'+
+        '<div style="font-size:.72rem;color:#94a3b8;margin:-8px 0 8px;line-height:1.4">Paste multiple names on separate lines to batch-check and fix them all at once.</div>'+
+        '<div class="chk-actions">'+
+        '<button class="btn btn-primary" data-chk-btn="'+lk+'">Check</button>'+
+        '<button class="try-link" data-try-valid="'+lk+'">Try valid example</button>'+
+        '<button class="try-link" data-try-invalid="'+lk+'">Try broken example</button>'+
+        '</div>'+
+        '<div class="results hidden" id="chk-results-'+lk+'"></div>';
+        sec.appendChild(chk);
+        // Collapsible field reference
+        const toggle=document.createElement('div');
+        toggle.style.cssText='display:flex;align-items:center;cursor:pointer;user-select:none;padding:10px 0;border-top:1px solid #e2e8f0';
+        toggle.innerHTML='<span style="font-size:.88rem;font-weight:700;color:var(--primary)">Field Reference</span><span class="ref-chev" style="margin-left:auto;font-size:.7rem;color:#94a3b8;transition:transform .2s;transform:rotate(-90deg)">&#9660;</span>';
+        const detail=document.createElement('div');detail.style.display='none';
+        toggle.addEventListener('click',()=>{
+            const open=detail.style.display!=='none';
+            detail.style.display=open?'none':'block';
+            toggle.querySelector('.ref-chev').style.transform=open?'rotate(-90deg)':'rotate(0)';
+        });
+        sec.appendChild(toggle);
+        // Table
+        const tbl=document.createElement('table');tbl.className='ref-fields-table';tbl.innerHTML='<thead><tr><th>Field</th><th>Description</th><th>Allowed Values</th></tr></thead>';
+        const tb=document.createElement('tbody');
+        lv.fields.forEach(f=>{const tr=document.createElement('tr');const n=document.createElement('td');n.innerHTML=`<span class="field-dot" style="background:${C[f.key]}"></span><strong>${f.label}</strong>${f.opt?' <span style="color:#94a3b8">(opt)</span>':''}`;tr.appendChild(n);const d=document.createElement('td');d.textContent=f.help||'';tr.appendChild(d);const v=document.createElement('td');if(f.vals&&KNOWN[f.key]){renderValsList(v,f.key)}else if(f.isDate)v.innerHTML='<span class="val-tag">YYMMDD</span>';else if(f.examples){const w=document.createElement('div');w.className='values-list';f.examples.forEach(x=>{const t=document.createElement('span');t.className='val-tag';t.textContent=x;w.appendChild(t)});v.appendChild(w)}else v.innerHTML='<span style="color:#94a3b8">Free text</span>';tr.appendChild(v);tb.appendChild(tr)});
+        tbl.appendChild(tb);detail.appendChild(tbl);
+        // Examples
+        const el=document.createElement('div');el.className='gen-common-label';el.textContent='Examples';el.style.marginTop='8px';detail.appendChild(el);
+        lv.examples.forEach(ex=>{const w=document.createElement('div');w.className='ref-example';const bd=document.createElement('div');bd.className='ref-example-breakdown';let first=true;lv.pattern.forEach(p=>{if(p.d)return;const val=ex[p.k];if(!val)return;if(!first){const pi=lv.pattern.indexOf(p);for(let j=pi-1;j>=0;j--)if(lv.pattern[j].d){const dd=document.createElement('span');dd.className='chip-delim';dd.textContent=lv.pattern[j].d;bd.appendChild(dd);break}}const ch=document.createElement('div');ch.className='ref-chip';const lb=document.createElement('span');lb.className='ref-chip-label';lb.style.color=C[p.k];lb.textContent=p.k;ch.appendChild(lb);const vl=document.createElement('span');vl.className='ref-chip-val';vl.style.background=C[p.k]+'18';vl.style.color=C[p.k];vl.style.border=`1.5px solid ${C[p.k]}40`;vl.textContent=val;ch.appendChild(vl);bd.appendChild(ch);first=false});w.appendChild(bd);detail.appendChild(w)});
+        sec.appendChild(detail);
+        root.appendChild(sec);
+    }
+    root.insertAdjacentHTML('beforeend','<div class="ref-print-hint">Tip: Ctrl/Cmd+P to print as cheat sheet</div>');
+    initCheckers();
+}
+buildReference();
+
+// ══════════════════════════════════════════
+// BUILDER — Spreadsheet Rows
+// ══════════════════════════════════════════
+let _rid=0;
+const DATA=[];
+let PROJ='';
+let BEAT='';
+let CLIP=null;
+const COLLAPSED=new Set(); // campaign IDs that are collapsed
+function rid(){return ++_rid}
+
+// ═══ MULTI-BEAT STATE ═══
+let BEATS=[];
+let ACTIVE_BEAT_ID=null;
+const LS_KEY='adopswizard_beats';
+
+function genId(){return Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6)}
+
+function serializeWorkspace(){
+    return JSON.stringify({proj:PROJ,beat:BEAT,rid:_rid,data:DATA.map(camp=>({
+        id:camp.id,v:{...camp.v},
+        ags:camp.ags.map(ag=>({id:ag.id,v:{...ag.v},crs:ag.crs.map(cr=>({id:cr.id,v:{...cr.v}}))}))
+    }))});
+}
+
+function deserializeWorkspace(json){
+    const s=JSON.parse(json);
+    PROJ=s.proj||'';BEAT=s.beat||'';_rid=s.rid||0;
+    DATA.length=0;
+    (s.data||[]).forEach(cd=>{
+        const camp={id:cd.id,v:cd.v,ags:[]};
+        (cd.ags||[]).forEach(ad=>{
+            const ag={id:ad.id,v:ad.v,crs:[]};
+            (ad.crs||[]).forEach(crd=>{ag.crs.push({id:crd.id,v:crd.v})});
+            camp.ags.push(ag);
+        });
+        DATA.push(camp);
+    });
+}
+
+function persistBeats(){
+    try{localStorage.setItem(LS_KEY,JSON.stringify(BEATS))}catch(e){}
+}
+
+function loadBeatsFromStorage(){
+    try{const raw=localStorage.getItem(LS_KEY);if(raw)BEATS=JSON.parse(raw);else BEATS=[]}catch(e){BEATS=[]}
+}
+
+function beatStats(){
+    let ags=0,crs=0;const plats=new Set();
+    DATA.forEach(c=>{if(c.v.platform)plats.add(c.v.platform);c.ags.forEach(a=>{ags++;a.crs.forEach(()=>crs++)})});
+    return{campaigns:DATA.length,adgroups:ags,creatives:crs,platforms:[...plats].sort()};
+}
+
+function beatNameExists(proj,beat,excludeId){
+    const p=proj.toLowerCase(),b=beat.toLowerCase();
+    return BEATS.some(e=>e.id!==excludeId&&e.project.toLowerCase()===p&&e.beat.toLowerCase()===b);
+}
+
+function generateBeat(){
+    const proj=(document.getElementById('setup-proj')||{}).value||'';
+    const beat=(document.getElementById('setup-beat')||{}).value||'';
+    if(!proj&&!beat){toast('Enter a project or beat name first');return}
+    const p=proj.trim(),b=beat.trim();
+    if(beatNameExists(p,b,null)){toast('A beat named "'+p+' \u00b7 '+b+'" already exists');return}
+    PROJ=p;BEAT=b;
+    DATA.length=0;_rid=0;CLIP=null;
+    const c=addCampD();const a=addAgD(c);addCrD(a);
+    // Auto-create a saved beat entry
+    const stats=beatStats();
+    const entry={id:genId(),project:PROJ,beat:BEAT,data:serializeWorkspace(),campaigns:stats.campaigns,adgroups:stats.adgroups,creatives:stats.creatives,platforms:stats.platforms,updated:Date.now()};
+    BEATS.push(entry);
+    ACTIVE_BEAT_ID=entry.id;
+    persistBeats();
+    renderBuilder();
+    renderSavedBeats();
+    toast('New beat created');
+}
+
+function loadBeat(id){
+    const entry=BEATS.find(b=>b.id===id);
+    if(!entry)return;
+    deserializeWorkspace(entry.data);
+    ACTIVE_BEAT_ID=id;
+    CLIP=null;
+    updateSetupInputs();
+    renderBuilder();
+    renderSavedBeats();
+    toast('Loaded: '+[entry.project,entry.beat].filter(Boolean).join(' \u00b7 '));
+}
+
+function deleteBeat(id){
+    const entry=BEATS.find(b=>b.id===id);
+    const label=entry?[entry.project,entry.beat].filter(Boolean).join(' \u00b7 '):'this beat';
+    if(!confirm('Delete "'+label+'"? This cannot be undone.'))return;
+    BEATS=BEATS.filter(b=>b.id!==id);
+    if(ACTIVE_BEAT_ID===id){
+        ACTIVE_BEAT_ID=null;
+        DATA.length=0;_rid=0;CLIP=null;PROJ='';BEAT='';
+        updateSetupInputs();
+        renderBuilder();
+    }
+    persistBeats();
+    renderSavedBeats();
+    toast('Beat deleted');
+}
+
+function duplicateBeat(id){
+    const src=BEATS.find(b=>b.id===id);
+    if(!src)return;
+    // Find a unique name
+    let copyBeat=src.beat+' Copy',n=2;
+    while(beatNameExists(src.project,copyBeat,null)){copyBeat=src.beat+' Copy '+n;n++}
+    const entry={id:genId(),project:src.project,beat:copyBeat,data:src.data,campaigns:src.campaigns,adgroups:src.adgroups,creatives:src.creatives,platforms:src.platforms?[...src.platforms]:[],updated:Date.now()};
+    // Rewrite IDs inside the data so the copy is independent
+    const parsed=JSON.parse(entry.data);
+    let nextRid=(parsed.rid||0)+1000;
+    parsed.beat=copyBeat;
+    (parsed.data||[]).forEach(c=>{c.id=++nextRid;(c.ags||[]).forEach(a=>{a.id=++nextRid;(a.crs||[]).forEach(cr=>{cr.id=++nextRid})})});
+    parsed.rid=nextRid;
+    entry.data=JSON.stringify(parsed);
+    BEATS.push(entry);
+    persistBeats();
+    loadBeat(entry.id);
+    toast('Beat duplicated as "'+copyBeat+'"');
+}
+
+// ═══ UNDO ═══
+const UNDO_STACK=[];
+const MAX_UNDO=30;
+function pushUndo(){
+    UNDO_STACK.push({proj:PROJ,beat:BEAT,rid:_rid,data:serializeWorkspace(),activeId:ACTIVE_BEAT_ID});
+    if(UNDO_STACK.length>MAX_UNDO)UNDO_STACK.shift();
+}
+function popUndo(){
+    if(!UNDO_STACK.length){toast('Nothing to undo');return}
+    const s=UNDO_STACK.pop();
+    deserializeWorkspace(s.data);
+    PROJ=s.proj;BEAT=s.beat;_rid=s.rid;ACTIVE_BEAT_ID=s.activeId;
+    updateSetupInputs();renderBuilder();renderSavedBeats();
+    toast('Undo');
+}
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!e.shiftKey){const tag=(e.target.tagName||'').toLowerCase();if(tag==='input'||tag==='textarea')return;e.preventDefault();popUndo()}});
+
+let _autoSaveTimer=null;
+function scheduleAutoSave(){
+    clearTimeout(_autoSaveTimer);
+    _autoSaveTimer=setTimeout(()=>{
+        if(!ACTIVE_BEAT_ID||!DATA.length)return;
+        const entry=BEATS.find(b=>b.id===ACTIVE_BEAT_ID);
+        if(!entry)return;
+        if((PROJ!==entry.project||BEAT!==entry.beat)&&beatNameExists(PROJ,BEAT,ACTIVE_BEAT_ID)){
+            toast('Beat name "'+PROJ+' \u00b7 '+BEAT+'" is already taken');return;
+        }
+        const stats=beatStats();
+        entry.project=PROJ;entry.beat=BEAT;
+        entry.data=serializeWorkspace();entry.campaigns=stats.campaigns;entry.adgroups=stats.adgroups;entry.creatives=stats.creatives;entry.platforms=stats.platforms;entry.updated=Date.now();
+        persistBeats();
+        renderSavedBeats();
+    },400);
+}
+
+function formatTimeAgo(ts){
+    if(!ts)return '';
+    const s=Math.floor((Date.now()-ts)/1000);
+    if(s<60)return 'just now';
+    const m=Math.floor(s/60);if(m<60)return m+'m ago';
+    const h=Math.floor(m/60);if(h<24)return h+'h ago';
+    const d=Math.floor(h/24);if(d<7)return d+'d ago';
+    return new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+}
+
+let _beatFilter='';
+function renderSavedBeats(){
+    const container=document.getElementById('saved-beats-container');
+    if(!container)return;
+    container.innerHTML='';
+    if(!BEATS.length)return;
+    // Filter input (show when 3+ beats)
+    if(BEATS.length>=3){
+        const fi=document.createElement('input');fi.className='beats-filter';fi.type='text';fi.placeholder='Filter beats\u2026';fi.value=_beatFilter;
+        fi.addEventListener('input',()=>{_beatFilter=fi.value;renderSavedBeats();const nf=container.querySelector('.beats-filter');if(nf){nf.focus();nf.selectionStart=nf.selectionEnd=nf.value.length}});
+        container.appendChild(fi);
+    }
+    const q=_beatFilter.toLowerCase();
+    const filtered=q?BEATS.filter(b=>(b.beat||'').toLowerCase().includes(q)||(b.project||'').toLowerCase().includes(q)):BEATS;
+    const row=document.createElement('div');row.className='saved-beats';
+    filtered.forEach(b=>{
+        const card=document.createElement('div');
+        card.className='beat-card'+(b.id===ACTIVE_BEAT_ID?' active':'');
+        card.addEventListener('click',e=>{if(!e.target.closest('.beat-card-del'))loadBeat(b.id)});
+
+        // Header: beat name
+        const hdr=document.createElement('div');hdr.className='beat-card-header';
+        hdr.innerHTML='<span class="beat-card-beat">'+esc(b.beat||'Untitled')+'</span>';
+        card.appendChild(hdr);
+
+        // Stats row
+        const stats=document.createElement('div');stats.className='beat-card-stats';
+        const camps=b.campaigns||0,ags=b.adgroups||0,crs=b.creatives||0;
+        stats.innerHTML='<span class="beat-card-stat"><span class="stat-num">'+camps+'</span>camp</span>'+
+            '<span class="beat-card-stat"><span class="stat-num">'+ags+'</span>ag</span>'+
+            '<span class="beat-card-stat"><span class="stat-num">'+crs+'</span>cr</span>';
+        card.appendChild(stats);
+
+        // Platform tags
+        const plats=b.platforms||[];
+        if(plats.length){
+            const pw=document.createElement('div');pw.className='beat-card-platforms';
+            plats.forEach(p=>{const t=document.createElement('span');t.className='beat-card-plat';t.textContent=p;pw.appendChild(t)});
+            card.appendChild(pw);
+        }
+
+        // Footer: timestamp + actions
+        const foot=document.createElement('div');foot.className='beat-card-footer';
+        const time=document.createElement('span');time.className='beat-card-time';
+        time.textContent=formatTimeAgo(b.updated);
+        foot.appendChild(time);
+        const acts=document.createElement('div');acts.className='beat-card-actions';
+        const dup=document.createElement('button');dup.className='beat-card-btn';dup.textContent='Duplicate';
+        dup.addEventListener('click',e=>{e.stopPropagation();duplicateBeat(b.id)});
+        acts.appendChild(dup);
+        const del=document.createElement('button');del.className='beat-card-btn danger';del.textContent='Delete';
+        del.addEventListener('click',e=>{e.stopPropagation();deleteBeat(b.id)});
+        acts.appendChild(del);
+        foot.appendChild(acts);
+        card.appendChild(foot);
+
+        row.appendChild(card);
+    });
+    container.appendChild(row);
+}
+
+// --- Data helpers ---
+function addCampD(v){const c={id:rid(),v:{platform:'',geo:'',date:'',strategy:'',objective:'',suffix:'',...v},ags:[]};DATA.push(c);return c}
+function addAgD(camp,v){const a={id:rid(),v:{audience:'',type:'',suffix:'',...v},crs:[]};camp.ags.push(a);return a}
+function addCrD(ag,v){const c={id:rid(),v:{format:'',dims:'',lp:'',version:'',length:'',suffix:'',...v}};ag.crs.push(c);return c}
+function dupCampD(camp){const c=addCampD({...camp.v});camp.ags.forEach(ag=>{const na=addAgD(c,{...ag.v});ag.crs.forEach(cr=>addCrD(na,{...cr.v}))});return c}
+function dupAgD(camp,ag){const na=addAgD(camp,{...ag.v});ag.crs.forEach(cr=>addCrD(na,{...cr.v}));return na}
+function dupCrD(ag,cr){return addCrD(ag,{...cr.v})}
+function rmCampD(c){const i=DATA.indexOf(c);if(i>-1)DATA.splice(i,1)}
+function rmAgD(camp,ag){const i=camp.ags.indexOf(ag);if(i>-1)camp.ags.splice(i,1)}
+function rmCrD(ag,cr){const i=ag.crs.indexOf(cr);if(i>-1)ag.crs.splice(i,1)}
+
+// --- Field lookup ---
+function fieldDef(key){for(const lv of Object.values(LEVELS)){const f=lv.fields.find(f=>f.key===key);if(f)return f}return null}
+function fieldLabel(key){const f=fieldDef(key);return f?f.label:key}
+
+// --- DOM helpers ---
+function mkRid(t){const e=document.createElement('span');e.className='bld-rid';e.textContent=t;return e}
+function mkDelim(ch){const e=document.createElement('span');e.className='bd';e.textContent=ch;return e}
+function mkSpacer(){return Object.assign(document.createElement('span'),{className:'bsp'})}
+function mkIcon(icon,tip,cls,fn){
+    const b=document.createElement('button');b.className='ri'+(cls?' '+cls:'');b.textContent=icon;b.setAttribute('data-tip',tip);
+    b.addEventListener('click',ev=>{ev.stopPropagation();fn()});return b;
+}
+function mkAddRow(text,lvCls,fn){const r=document.createElement('div');r.className='bld-add-row'+(lvCls?' '+lvCls:'');const b=document.createElement('button');b.className='bld-add';b.textContent=text;b.addEventListener('click',fn);r.appendChild(b);return r}
+
+// --- Segment cell ---
+const FW={project:38,beat:60,platform:110,geo:32,date:62,strategy:90,objective:72,suffix:42,audience:88,type:82,format:62,dims:86,lp:68,version:32,length:32};
+function mkSeg(obj,key,val,inherited){
+    const cell=document.createElement('span');
+    const color=C[key]||C.suffix;
+    const mw=FW[key]||40;
+    if(inherited){
+        cell.className='sc inh';
+        if(val){cell.style.cssText=`background:${color}18;color:${color};border-color:${color}40;min-width:${mw}px`;cell.textContent=val}
+        else{cell.className='sc inh mt';cell.style.minWidth=mw+'px';cell.textContent=key}
+        cell.title=fieldLabel(key)+': '+(val||'(from campaign)');
+        return cell;
+    }
+    if(val){
+        cell.className='sc';
+        cell.style.cssText=`background:${color}18;color:${color};border-color:${color}40;min-width:${mw}px`;
+        cell.textContent=val;
+    } else {
+        cell.className='sc mt';
+        cell.style.minWidth=mw+'px';
+        cell.textContent=key;
+    }
+    cell.title=fieldLabel(key)+(val?' (click to edit)':' (click to add)');
+    cell.addEventListener('click',()=>startEdit(cell,obj,key));
+    return cell;
+}
+
+// --- Inline editing ---
+function startEdit(cell,obj,key){
+    if(cell.classList.contains('ed'))return;
+    const fd=fieldDef(key);
+    const cur=obj.v[key]||'';
+    const w=cell.offsetWidth;
+    cell.className='sc ed';cell.style.cssText='min-width:'+w+'px';cell.innerHTML='';
+    const inp=document.createElement('input');
+    if(fd&&fd.isDate){
+        inp.type='date';
+        if(cur)inp.value=parseDateSeg(cur);
+    } else {
+        inp.type='text';
+        if(fd&&fd.vals){
+            inp.value='';inp.placeholder=cur||fd.ph||key;
+            const dlId='dl-bld-'+key;
+            if(!document.getElementById(dlId))document.body.appendChild(makeDl(dlId,fd.vals));
+            inp.setAttribute('list',dlId);
+        } else {
+            inp.value=cur;inp.placeholder=fd?fd.ph:key;
+        }
+    }
+    inp.style.width=Math.max(w,fd&&fd.vals?130:w)+'px';
+    cell.appendChild(inp);inp.focus();
+    if(!fd||!fd.vals)inp.select();
+    const commit=()=>{
+        let v;
+        if(fd&&fd.isDate)v=formatDate(inp.value);
+        else v=inp.value.trim();
+        if(v&&/[^a-zA-Z0-9]/.test(v)&&!(fd&&fd.vals&&KNOWN[key]&&KNOWN[key].includes(v))){v=v.replace(/[^a-zA-Z0-9]/g,'');toast('Only letters and numbers are allowed in field values')}
+        if(!v&&fd&&fd.vals)v=cur;
+        if(v!==cur)pushUndo();
+        // Auto-save unknown values as custom
+        if(v&&fd&&fd.vals&&KNOWN[key]&&!KNOWN[key].includes(v)){
+            addKnownValue(key,v);
+            toast('Saved \u201c'+v+'\u201d as custom '+fd.label);
+        }
+        obj.v[key]=v;
+        renderBuilder();
+    };
+    let committed=false;
+    const doCommit=()=>{if(!committed){committed=true;commit()}};
+    inp.addEventListener('blur',doCommit);
+    inp.addEventListener('keydown',e=>{
+        if(e.key==='Enter'){e.preventDefault();doCommit()}
+        if(e.key==='Escape'){committed=true;renderBuilder()}
+        if(e.key==='Tab'){
+            e.preventDefault();
+            const nextKey=findNextKey(obj,key,e.shiftKey);
+            doCommit();
+            if(nextKey)setTimeout(()=>{const row=document.querySelector(`.bld-row[data-id="${obj.id}"]`);if(row){const c=row.querySelector(`.sc[data-k="${nextKey}"]`);if(c)c.click()}},30);
+        }
+    });
+    inp.addEventListener('input',()=>{inp.style.width=Math.max(50,(inp.value.length+2)*8.5)+'px'});
+}
+
+function findNextKey(obj,key,reverse){
+    const camp=DATA.find(c=>c===obj);
+    let keys;
+    if(camp)keys=['date','platform','geo','strategy','objective','suffix'];
+    else{
+        const isAg=DATA.some(c=>c.ags.includes(obj));
+        if(isAg)keys=['audience','type','suffix'];
+        else keys=['format','dims','lp','version','length','suffix'];
+    }
+    const i=keys.indexOf(key);if(i<0)return null;
+    return reverse?keys[i-1]:keys[i+1];
+}
+
+// --- Setup bar (rendered once) ---
+function initSetup(){
+    const root=document.getElementById('gen-setup');root.innerHTML='';
+    // Purpose intro
+    const intro=document.createElement('div');intro.style.cssText='margin-bottom:12px;font-size:.88rem;color:#475569;line-height:1.6';
+    intro.innerHTML='<strong style="color:var(--primary)">Build and manage your ad naming structures.</strong> Create beats, add campaigns, ad groups, and creatives, then export the generated names. Everything autosaves as you work.';
+    root.appendChild(intro);
+    const setup=document.createElement('div');setup.className='bld-setup';
+    const title=document.createElement('div');
+    title.style.cssText='font-size:.78rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.5px;margin-right:8px;white-space:nowrap';
+    title.textContent='Beat Setup';
+    setup.appendChild(title);
+    const pl=document.createElement('label');pl.className='bld-setup-lbl';
+    pl.innerHTML='<span style="color:'+C.project+'">&#9679;</span> Project';
+    const pi=document.createElement('input');pi.id='setup-proj';pi.value=PROJ;pi.placeholder='e.g. 2s';
+    pi.addEventListener('input',()=>{PROJ=pi.value.trim();renderBuilder()});
+    pl.appendChild(pi);setup.appendChild(pl);
+    const bl=document.createElement('label');bl.className='bld-setup-lbl';
+    bl.innerHTML='<span style="color:'+C.beat+'">&#9679;</span> Beat';
+    const bi=document.createElement('input');bi.id='setup-beat';bi.value=BEAT;bi.placeholder='e.g. Launch';
+    bi.addEventListener('input',()=>{BEAT=bi.value.trim();renderBuilder()});
+    bl.appendChild(bi);setup.appendChild(bl);
+    const actions=document.createElement('div');actions.className='bld-setup-actions';
+    const genBtn=document.createElement('button');genBtn.className='btn-gen';genBtn.textContent='New Beat';
+    genBtn.title='Clear workspace and start a fresh beat';
+    genBtn.addEventListener('click',generateBeat);
+    actions.appendChild(genBtn);
+    setup.appendChild(actions);
+    root.appendChild(setup);
+}
+function updateSetupInputs(){const pi=document.getElementById('setup-proj');const bi=document.getElementById('setup-beat');if(pi)pi.value=PROJ;if(bi)bi.value=BEAT}
+
+// --- Render full builder ---
+function renderBuilder(){
+    const root=document.getElementById('gen-root');root.innerHTML='';
+    if(!DATA.length){
+        root.innerHTML='<div class="bld-empty">Set a <strong>Project</strong> and <strong>Beat</strong> above, then click <strong>New Beat</strong> to start building.</div>';
+        scheduleAutoSave();
+        return;
+    }
+    // Undo button top-right
+    const undoWrap=document.createElement('div');undoWrap.style.cssText='display:flex;justify-content:flex-end;margin-bottom:6px';
+    const undoBtn=document.createElement('button');undoBtn.className='btn-undo';undoBtn.textContent='\u21A9 Undo';
+    undoBtn.title='Undo last change (Ctrl+Z)';
+    undoBtn.addEventListener('click',popUndo);
+    undoWrap.appendChild(undoBtn);
+    root.appendChild(undoWrap);
+    let ci=0,ai=0,cri=0;
+    DATA.forEach(camp=>{
+        ci++;
+        const card=document.createElement('div');card.className='bld-rows'+(COLLAPSED.has(camp.id)?' collapsed':'');
+        card.appendChild(mkCampRow(camp,ci));
+        const children=document.createElement('div');children.className='bld-children';
+        camp.ags.forEach(ag=>{
+            ai++;
+            children.appendChild(mkAgRow(ag,camp,ai));
+            ag.crs.forEach(cr=>{cri++;children.appendChild(mkCrRow(cr,ag,camp,cri))});
+            const crAdd=mkAddRow('+ Creative','lv-cr',()=>{addCrD(ag);renderBuilder();updateFullOutput()});
+            if(CLIP&&CLIP.type==='cr'){const pb=document.createElement('button');pb.className='bld-paste';pb.textContent='Paste Creative';pb.addEventListener('click',()=>{addCrD(ag,{...CLIP.v});CLIP=null;renderBuilder();updateFullOutput();toast('Creative pasted')});crAdd.appendChild(pb)}
+            children.appendChild(crAdd);
+        });
+        const agAdd=mkAddRow('+ Ad Group','lv-ag',()=>{const a=addAgD(camp);addCrD(a);renderBuilder();updateFullOutput()});
+        if(CLIP&&CLIP.type==='ag'){const pb=document.createElement('button');pb.className='bld-paste';pb.textContent='Paste Ad Group';pb.addEventListener('click',()=>{const na=addAgD(camp,{...CLIP.v});CLIP.crs.forEach(c=>addCrD(na,{...c}));CLIP=null;renderBuilder();updateFullOutput();toast('Ad Group pasted')});agAdd.appendChild(pb)}
+        children.appendChild(agAdd);
+        card.appendChild(children);
+        root.appendChild(card);
+    });
+    const addCampCard=document.createElement('div');addCampCard.className='bld-rows';
+    addCampCard.appendChild(mkAddRow('+ Campaign','',()=>{const c=addCampD();const a=addAgD(c);addCrD(a);renderBuilder();updateFullOutput()}));
+    root.appendChild(addCampCard);
+    // Full output panel
+    const fo=document.createElement('div');fo.className='card fo';fo.id='gen-fo';fo.style.display='none';
+    fo.innerHTML='<h3 style="margin-bottom:2px">Generated Names</h3><p style="font-size:.78rem;color:#94a3b8;margin-bottom:12px">Live preview with validation \u2014 click a valid name to copy, click an issue to expand details.</p><div id="fo-body"></div><div class="fo-actions"><button class="btn btn-primary" id="fo-copy">Copy All</button><div id="fo-csv-wrap" style="position:relative;display:inline-block"></div><span class="fo-count" id="fo-count"></span></div>';
+    root.appendChild(fo);
+    document.getElementById('fo-copy').addEventListener('click',copyFullSet);
+    buildCsvMenu();
+    updateFullOutput();
+    scheduleAutoSave();
+}
+
+// --- Campaign health check ---
+function campStatus(camp){
+    let hasErr=false,hasWrn=false,hasName=false;
+    const cn=buildCampaignName({project:PROJ,beat:BEAT,...camp.v});
+    if(cn){hasName=true;const r=validateName(cn,'campaign');const limit=LIMITS[camp.v.platform]||128;if(cn.length>limit)hasErr=true;r.issues.forEach(i=>{if(i.t==='e')hasErr=true;else hasWrn=true})}
+    camp.ags.forEach(ag=>{
+        const an=buildAgName({geo:camp.v.geo,...ag.v});
+        if(an){hasName=true;const r=validateName(an,'adgroup');r.issues.forEach(i=>{if(i.t==='e')hasErr=true;else hasWrn=true})}
+        ag.crs.forEach(cr=>{
+            const crn=buildCrName({geo:camp.v.geo,...cr.v,beat:BEAT});
+            if(crn){hasName=true;const r=validateName(crn,'creative');r.issues.forEach(i=>{if(i.t==='e')hasErr=true;else hasWrn=true})}
+        });
+    });
+    if(!hasName)return 'empty';
+    if(hasErr)return 'err';
+    if(hasWrn)return 'wrn';
+    return 'ok';
+}
+
+// --- Row builders ---
+function mkCampRow(camp,idx){
+    const r=document.createElement('div');r.className='bld-row lv-camp';r.dataset.id=camp.id;
+    const chev=document.createElement('span');chev.className='camp-chev';chev.textContent='\u25BC';
+    chev.addEventListener('click',e=>{e.stopPropagation();const card=r.closest('.bld-rows');if(COLLAPSED.has(camp.id)){COLLAPSED.delete(camp.id);card.classList.remove('collapsed')}else{COLLAPSED.add(camp.id);card.classList.add('collapsed')}});
+    r.appendChild(chev);
+    const dot=document.createElement('span');const st=campStatus(camp);dot.className='camp-status st-'+st;
+    dot.title=st==='ok'?'All names valid':st==='wrn'?'Has warnings':st==='err'?'Has errors':'Incomplete';
+    r.appendChild(dot);
+    r.appendChild(mkRid('Campaign '+idx));
+    // project(inh) - beat(inh) _ date - platform - geo - strategy _ objective [_ suffix]
+    const v=camp.v;
+    r.appendChild(mkSeg(null,'project',PROJ,true));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(null,'beat',BEAT,true));r.appendChild(mkDelim('_'));
+    r.appendChild(mkSeg(camp,'date',v.date));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(camp,'platform',v.platform));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(camp,'geo',v.geo));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(camp,'strategy',v.strategy));r.appendChild(mkDelim('_'));
+    r.appendChild(mkSeg(camp,'objective',v.objective));
+    if(v.suffix){r.appendChild(mkDelim('_'));r.appendChild(mkSeg(camp,'suffix',v.suffix))}
+    else{const d=mkDelim('_');d.style.opacity='.3';r.appendChild(d);r.appendChild(mkSeg(camp,'suffix',''))}
+    r.appendChild(mkSpacer());
+    r.appendChild(mkIcon('\u29c9','Duplicate','',()=>{dupCampD(camp);renderBuilder();updateFullOutput()}));
+    r.appendChild(mkIcon('\u2715','Delete','danger',()=>{if(!confirm('Delete Campaign '+idx+' and all its ad groups/creatives?'))return;pushUndo();rmCampD(camp);renderBuilder();updateFullOutput()}));
+    r.appendChild(mkIcon('\ud83d\udccb','Copy name','',()=>{const n=buildCampaignName({project:PROJ,beat:BEAT,...v});if(n)copyText(n).then(()=>toast('Copied'))}));
+    r.querySelectorAll('.sc').forEach(c=>{const k=cellKey(c);if(k)c.dataset.k=k});
+    return r;
+}
+
+function mkAgRow(ag,camp,idx){
+    const r=document.createElement('div');r.className='bld-row lv-ag';r.dataset.id=ag.id;
+    r.appendChild(mkRid('Ad Group '+idx));
+    // geo(inherited) - audience _ type [_ suffix]
+    r.appendChild(mkSeg(null,'geo',camp.v.geo,true));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(ag,'audience',ag.v.audience));r.appendChild(mkDelim('_'));
+    r.appendChild(mkSeg(ag,'type',ag.v.type));
+    if(ag.v.suffix){r.appendChild(mkDelim('_'));r.appendChild(mkSeg(ag,'suffix',ag.v.suffix))}
+    else{const d=mkDelim('_');d.style.opacity='.3';r.appendChild(d);r.appendChild(mkSeg(ag,'suffix',''))}
+    r.appendChild(mkSpacer());
+    const agPicked=CLIP&&CLIP.type==='ag'&&CLIP.id===ag.id;
+    r.appendChild(mkIcon('\u29c9','Duplicate','',()=>{dupAgD(camp,ag);renderBuilder();updateFullOutput()}));
+    r.appendChild(mkIcon('\u2715','Delete','danger',()=>{pushUndo();rmAgD(camp,ag);renderBuilder();updateFullOutput()}));
+    r.appendChild(mkIcon(agPicked?'\u2714':'\ud83d\udccc',agPicked?'Cancel pick':'Pick to paste elsewhere',agPicked?'picked':'',()=>{if(agPicked){CLIP=null}else{CLIP={type:'ag',id:ag.id,v:{...ag.v},crs:ag.crs.map(c=>({...c.v}))};toast('Ad Group picked \u2014 paste into any campaign')}renderBuilder()}));
+    r.appendChild(mkIcon('\ud83d\udccb','Copy name','',()=>{const n=buildAgName({geo:camp.v.geo,...ag.v});if(n)copyText(n).then(()=>toast('Copied'))}));
+    r.querySelectorAll('.sc:not(.inh)').forEach(c=>{const k=cellKey(c);if(k)c.dataset.k=k});
+    return r;
+}
+
+function mkCrRow(cr,ag,camp,idx){
+    const r=document.createElement('div');r.className='bld-row lv-cr';r.dataset.id=cr.id;
+    r.appendChild(mkRid('Creative '+idx));
+    // geo(inh) - format - dims - beat(inh) - lp - version - length [- suffix]
+    r.appendChild(mkSeg(null,'geo',camp.v.geo,true));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(cr,'format',cr.v.format));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(cr,'dims',cr.v.dims));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(null,'beat',BEAT,true));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(cr,'lp',cr.v.lp));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(cr,'version',cr.v.version));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(cr,'length',cr.v.length));
+    if(cr.v.suffix){r.appendChild(mkDelim('-'));r.appendChild(mkSeg(cr,'suffix',cr.v.suffix))}
+    else{const d=mkDelim('-');d.style.opacity='.3';r.appendChild(d);r.appendChild(mkSeg(cr,'suffix',''))}
+    r.appendChild(mkSpacer());
+    const crPicked=CLIP&&CLIP.type==='cr'&&CLIP.id===cr.id;
+    r.appendChild(mkIcon('\u29c9','Duplicate','',()=>{dupCrD(ag,cr);renderBuilder();updateFullOutput()}));
+    r.appendChild(mkIcon('\u2715','Delete','danger',()=>{pushUndo();rmCrD(ag,cr);renderBuilder();updateFullOutput()}));
+    r.appendChild(mkIcon(crPicked?'\u2714':'\ud83d\udccc',crPicked?'Cancel pick':'Pick to paste elsewhere',crPicked?'picked':'',()=>{if(crPicked){CLIP=null}else{CLIP={type:'cr',id:cr.id,v:{...cr.v}};toast('Creative picked \u2014 paste into any ad group')}renderBuilder()}));
+    r.appendChild(mkIcon('\ud83d\udccb','Copy name','',()=>{const n=buildCrName({geo:camp.v.geo,...cr.v,beat:BEAT});if(n)copyText(n).then(()=>toast('Copied'))}));
+    r.querySelectorAll('.sc:not(.inh)').forEach(c=>{const k=cellKey(c);if(k)c.dataset.k=k});
+    return r;
+}
+
+function cellKey(cell){
+    // Infer key from the cell's text content or title
+    const t=cell.title||'';const m=t.match(/^(\w[\w\s]*?)[\s:]/);
+    if(m){const label=m[1];for(const lv of Object.values(LEVELS)){const f=lv.fields.find(f=>f.label===label);if(f)return f.key}}
+    // Fallback: if it's an empty cell, text = key
+    if(cell.classList.contains('mt'))return cell.textContent;
+    return '';
+}
+
+// --- Collect names from DATA ---
+function collectAllNames(){
+    const names={campaign:[],adgroups:[],creatives:[]};
+    DATA.forEach(camp=>{
+        const cn=buildCampaignName({project:PROJ,beat:BEAT,...camp.v});
+        const limit=LIMITS[camp.v.platform]||128;
+        if(cn)names.campaign.push({name:cn,limit,level:'campaign'});
+        camp.ags.forEach(ag=>{
+            const an=buildAgName({geo:camp.v.geo,audience:ag.v.audience,type:ag.v.type,suffix:ag.v.suffix});
+            if(an)names.adgroups.push({name:an,limit,level:'adgroup'});
+            ag.crs.forEach(cr=>{
+                const crn=buildCrName({geo:camp.v.geo,format:cr.v.format,dims:cr.v.dims,beat:BEAT,lp:cr.v.lp,version:cr.v.version,length:cr.v.length,suffix:cr.v.suffix});
+                if(crn)names.creatives.push({name:crn,limit,level:'creative'});
+            });
+        });
+    });
+    return names;
+}
+
+function validateName(name,level){
+    if(level==='campaign')return parseCampaign(name);
+    if(level==='adgroup')return parseAdGroup(name);
+    return parseCreative(name);
+}
+
+function updateFullOutput(){
+    const names=collectAllNames();
+    const total=names.campaign.length+names.adgroups.length+names.creatives.length;
+    const fo=document.getElementById('gen-fo');
+    if(!fo)return;
+    if(total===0){fo.style.display='none';return}
+    fo.style.display='block';
+    const body=document.getElementById('fo-body');body.innerHTML='';
+    let num=0,totOk=0,totWrn=0,totErr=0;
+    [{label:'Campaigns',list:names.campaign},{label:'Ad Groups',list:names.adgroups},{label:'Creatives',list:names.creatives}].forEach(g=>{
+        if(!g.list.length)return;
+        const grp=document.createElement('div');grp.className='fo-group';
+        grp.innerHTML='<div class="fo-label">'+g.label+' ('+g.list.length+')</div>';
+        const ol=document.createElement('div');ol.className='fo-list';
+        g.list.forEach(n=>{
+            num++;
+            const res=validateName(n.name,n.level);
+            const dedup=new Set();res.issues=res.issues.filter(i=>{if(dedup.has(i.m))return false;dedup.add(i.m);return true});
+            const errs=res.issues.filter(i=>i.t==='e'),wrns=res.issues.filter(i=>i.t==='w');
+            const over=n.name.length>n.limit;
+            if(over)errs.push({t:'e',m:'Name exceeds '+n.limit+' character limit ('+n.name.length+' chars)'});
+            const status=errs.length?'err':wrns.length?'wrn':'ok';
+            if(status==='ok')totOk++;else if(status==='wrn')totWrn++;else totErr++;
+            const issCount=errs.length+wrns.length;
+            const line=document.createElement('div');line.className='fo-line';
+            line.innerHTML='<span class="fo-dot '+status+'"></span><span class="ln">'+num+'</span><span class="lt">'+esc(n.name)+'</span><span class="ll'+(over?' over':'')+'">'+n.name.length+'/'+n.limit+'</span>'+(issCount?'<span class="fo-iss has">'+issCount+' issue'+(issCount>1?'s':'')+'</span>':'');
+            const detail=document.createElement('div');detail.className='fo-detail';
+            if(issCount){
+                const ul=document.createElement('ul');ul.className='issue-list';
+                [...errs,...wrns].forEach(is=>{const li=document.createElement('li');li.className=is.t==='e'?'err':'wrn';li.textContent=is.m;ul.appendChild(li)});
+                detail.appendChild(ul);
+                line.addEventListener('click',()=>{detail.classList.toggle('open')});
+            } else {
+                line.addEventListener('click',()=>copyText(n.name).then(()=>toast('Copied')));
+                line.title='Click to copy';
+            }
+            ol.appendChild(line);ol.appendChild(detail);
+        });
+        grp.appendChild(ol);body.appendChild(grp);
+    });
+    // Summary
+    const summ=document.createElement('div');summ.className='fo-summary';
+    summ.innerHTML='<span class="fs-ok">'+totOk+' valid</span>'+(totWrn?'<span class="fs-wrn">'+totWrn+' warning'+(totWrn>1?'s':'')+'</span>':'')+(totErr?'<span class="fs-err">'+totErr+' error'+(totErr>1?'s':'')+'</span>':'');
+    body.insertBefore(summ,body.firstChild);
+    document.getElementById('fo-count').textContent=total+' name'+(total>1?'s':'')+' total';
+    buildCsvMenu();
+}
+
+function copyFullSet(){
+    const names=collectAllNames();
+    const lines=[...names.campaign,...names.adgroups,...names.creatives].map(n=>n.name);
+    if(lines.length){
+        copyText(lines.join('\n')).then(()=>{
+            const btn=document.getElementById('fo-copy');btn.textContent='Copied!';toast('All names copied');
+            setTimeout(()=>btn.textContent='Copy All',1500);
+        });
+    }
+}
+
+function collectTree(){
+    const rows=[];
+    DATA.forEach(camp=>{
+        const cn=buildCampaignName({project:PROJ,beat:BEAT,...camp.v});
+        if(!cn)return;
+        const plat=camp.v.platform||'Unknown';
+        camp.ags.forEach(ag=>{
+            const an=buildAgName({geo:camp.v.geo,...ag.v});
+            if(!an)return;
+            if(!ag.crs.length){rows.push({platform:plat,campaign:cn,adgroup:an,creative:''});return}
+            ag.crs.forEach(cr=>{
+                const crn=buildCrName({geo:camp.v.geo,...cr.v,beat:BEAT});
+                rows.push({platform:plat,campaign:cn,adgroup:an,creative:crn||''});
+            });
+        });
+    });
+    return rows;
+}
+
+function getUsedPlatforms(){
+    const p=new Set();DATA.forEach(c=>{if(c.v.platform)p.add(c.v.platform)});return[...p].sort();
+}
+
+function makeCsv(headers,rows){
+    const lines=[headers,...rows].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(','));
+    return lines.join('\n');
+}
+
+function triggerDownload(csv,filename){
+    const blob=new Blob([csv],{type:'text/csv'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=filename;a.click();
+    URL.revokeObjectURL(url);
+}
+
+function downloadCsvAll(){
+    const tree=collectTree();if(!tree.length)return;
+    const csv=makeCsv(['Platform','Campaign','Ad Group','Creative'],tree.map(r=>[r.platform,r.campaign,r.adgroup,r.creative]));
+    triggerDownload(csv,'naming_conventions_all.csv');
+    toast('CSV downloaded (all platforms)');
+}
+
+function downloadCsvPlatform(plat){
+    const tree=collectTree().filter(r=>r.platform===plat);if(!tree.length)return;
+    const csv=makeCsv(['Campaign','Ad Group','Creative'],tree.map(r=>[r.campaign,r.adgroup,r.creative]));
+    const safe=plat.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase();
+    triggerDownload(csv,'naming_conventions_'+safe+'.csv');
+    toast('CSV downloaded ('+plat+')');
+}
+
+function buildCsvMenu(){
+    const wrap=document.getElementById('fo-csv-wrap');if(!wrap)return;wrap.innerHTML='';
+    const btn=document.createElement('button');btn.className='btn';btn.style.cssText='background:#475569;color:#fff';btn.textContent='Export CSV \u25BE';
+    const menu=document.createElement('div');
+    menu.style.cssText='display:none;position:absolute;bottom:100%;left:0;margin-bottom:4px;background:#fff;border:1px solid #e2e8f0;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:200px;z-index:50;overflow:hidden';
+    // Per-platform options
+    const plats=getUsedPlatforms();
+    plats.forEach(p=>{
+        const opt=document.createElement('button');
+        opt.style.cssText='display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;cursor:pointer;font-size:.84rem;font-weight:600;color:#334155;transition:background .1s';
+        opt.textContent=p;
+        opt.addEventListener('mouseenter',()=>opt.style.background='#f1f5f9');
+        opt.addEventListener('mouseleave',()=>opt.style.background='none');
+        opt.addEventListener('click',()=>{downloadCsvPlatform(p);menu.style.display='none'});
+        menu.appendChild(opt);
+    });
+    // Separator + All
+    if(plats.length){const sep=document.createElement('div');sep.style.cssText='height:1px;background:#e2e8f0;margin:2px 0';menu.appendChild(sep)}
+    const all=document.createElement('button');
+    all.style.cssText='display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;cursor:pointer;font-size:.84rem;font-weight:600;color:#64748b;transition:background .1s';
+    all.textContent='All platforms';
+    all.addEventListener('mouseenter',()=>all.style.background='#f1f5f9');
+    all.addEventListener('mouseleave',()=>all.style.background='none');
+    all.addEventListener('click',()=>{downloadCsvAll();menu.style.display='none'});
+    menu.appendChild(all);
+    btn.addEventListener('click',()=>{menu.style.display=menu.style.display==='none'?'block':'none'});
+    document.addEventListener('click',e=>{if(!wrap.contains(e.target))menu.style.display='none'});
+    wrap.appendChild(menu);wrap.appendChild(btn);
+}
+
+// Init builder
+(function(){
+    loadBeatsFromStorage();
+    initSetup();
+    renderBuilder();
+    renderSavedBeats();
+})();
+
+// ══════════════════════════════════════════
+// BRIDGE: Checker → Builder
+// ══════════════════════════════════════════
+function sendToBuilder(segments,level){
+    switchMode('generator');
+    if(level==='campaign'){
+        const vals={};
+        segments.forEach(s=>{const v=s.value;if(s.label==='project'){PROJ=v;updateSetupInputs()}else if(s.label==='beat'){BEAT=v;updateSetupInputs()}else vals[s.label]=v});
+        const c=addCampD(vals);const a=addAgD(c);addCrD(a);
+    } else if(level==='adgroup'){
+        let camp=DATA[DATA.length-1];
+        if(!camp){camp=addCampD();addAgD(camp);addCrD(camp.ags[0])}
+        const vals={};
+        segments.forEach(s=>{const v=s.value;if(s.label==='geo'&&!camp.v.geo)camp.v.geo=v;else if(s.label!=='geo')vals[s.label]=v});
+        const a=addAgD(camp,vals);addCrD(a);
+    } else if(level==='creative'){
+        let camp=DATA[DATA.length-1];
+        if(!camp)camp=addCampD();
+        let ag=camp.ags[camp.ags.length-1];
+        if(!ag){ag=addAgD(camp)}
+        const vals={};
+        segments.forEach(s=>{const v=s.value;if(s.label==='geo'&&!camp.v.geo)camp.v.geo=v;else if(s.label==='beat'){BEAT=v;updateSetupInputs()}else if(s.label!=='geo'&&s.label!=='beat')vals[s.label]=v});
+        addCrD(ag,vals);
+    }
+    renderBuilder();
+    toast('Loaded in Builder');
+}
+
+// ══════════════════════════════════════════
+// CHECKER (embedded in Reference)
+// ══════════════════════════════════════════
+document.querySelectorAll('.mode-btn').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.mode-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.mode-panel').forEach(p=>p.classList.remove('active'));document.getElementById('mode-'+b.dataset.mode).classList.add('active')}));
+function initCheckers(){
+    for(const lk of Object.keys(LEVELS)){
+        const inp=document.getElementById('chk-input-'+lk);
+        if(!inp)continue;
+        const btn=document.querySelector('[data-chk-btn="'+lk+'"]');
+        const tv=document.querySelector('[data-try-valid="'+lk+'"]');
+        const ti=document.querySelector('[data-try-invalid="'+lk+'"]');
+        if(btn)btn.addEventListener('click',()=>runCheckerFor(lk));
+        if(tv)tv.addEventListener('click',()=>{inp.value=CHK_EXAMPLES.valid[lk];runCheckerFor(lk)});
+        if(ti)ti.addEventListener('click',()=>{inp.value=CHK_EXAMPLES.invalid[lk];runCheckerFor(lk)});
+        inp.addEventListener('input',()=>runCheckerFor(lk));
+    }
+}
+
+function parseCampaign(name){const segs=[],iss=[];const g=name.split('-');if(g.length<5)iss.push({t:'e',m:`Expected 5 groups by '-', found ${g.length}`});if(g[0])segs.push({label:'project',value:g[0],status:'neutral',color:C.project});if(g.length>=2){const p=g[1].split('_');if(p[0])segs.push({label:'beat',value:p[0],status:'neutral',color:C.beat,d:'-'});if(p[1])segs.push({label:'date',value:p[1],status:'neutral',color:C.date,d:'_'})}if(g.length>=3)segs.push({label:'platform',value:g[2],status:'neutral',color:C.platform,d:'-'});if(g.length>=4)segs.push({label:'geo',value:g[3],status:'neutral',color:C.geo,d:'-'});if(g.length>=5){const r=g.slice(4).join('-').split('_');if(r[0])segs.push({label:'strategy',value:r[0],status:'neutral',color:C.strategy,d:'-'});if(r[1])segs.push({label:'objective',value:r[1],status:'neutral',color:C.objective,d:'_'});if(r[2])segs.push({label:'suffix',value:r.slice(2).join('_'),status:'neutral',color:C.suffix,d:'_'})}segs.forEach(s=>valSeg(s,iss));return{segments:segs,issues:iss}}
+function parseAdGroup(name){const segs=[],iss=[];const g=name.split('-');if(g.length<2)iss.push({t:'e',m:`Expected 2 groups by '-', found ${g.length}`});if(g[0])segs.push({label:'geo',value:g[0],status:'neutral',color:C.geo});if(g.length>=2){const r=g.slice(1).join('-').split('_');if(r[0])segs.push({label:'audience',value:r[0],status:'neutral',color:C.audience,d:'-'});if(r[1])segs.push({label:'type',value:r[1],status:'neutral',color:C.type,d:'_'});if(r[2])segs.push({label:'suffix',value:r.slice(2).join('_'),status:'neutral',color:C.suffix,d:'_'})}segs.forEach(s=>valSeg(s,iss));return{segments:segs,issues:iss}}
+function parseCreative(name){const segs=[],iss=[];const p=name.split('-');const labels=['geo','format','dims','beat','lp','version','length','suffix'];if(p.length<7)iss.push({t:'e',m:`Expected 7 segments by '-', found ${p.length}`});p.forEach((v,i)=>{const l=labels[i]||'suffix';segs.push({label:l,value:v,status:'neutral',color:C[l]||C.suffix,d:i>0?'-':undefined})});segs.forEach(s=>valSeg(s,iss));return{segments:segs,issues:iss}}
+
+function valSeg(seg,iss){
+    const v=seg.value;if(!v){seg.status='error';return}
+    if(/[\s!@#$%^&*()+={}\[\]|\\:;"'<>,?/]/.test(v)){iss.push({t:'e',m:`'${v}' in ${seg.label} has forbidden characters`});seg.status='error';return}
+    const km={geo:'geo',platform:'platform',strategy:'strategy',objective:'objective',audience:'audience',type:'type',format:'format',lp:'lp'};
+    if(km[seg.label]){const list=KNOWN[km[seg.label]];const m=fuzzy(v,list);if(m&&m!==v){iss.push({t:'w',m:`${seg.label} '${v}' should be '${m}'`});seg.status='warning'}else if(!m){const cl=findClose(v,list);if(cl){iss.push({t:'w',m:`${seg.label} '${v}' not recognized — did you mean '${cl}'?`})}else iss.push({t:'w',m:`${seg.label} '${v}' not in known values (custom?)`});seg.status='warning'}else seg.status='valid';return}
+    if(seg.label==='date'){if(!/^\d{6}$/.test(v)){iss.push({t:'e',m:`Date '${v}' doesn't match YYMMDD`});seg.status='error'}else{const mm=+v.slice(2,4),dd=+v.slice(4,6);if(mm<1||mm>12||dd<1||dd>31){iss.push({t:'e',m:`Date '${v}' invalid month/day`});seg.status='error'}else seg.status='valid'}return}
+    if(seg.label==='dims'){if(!/^\d+x\d+$/.test(v)){iss.push({t:'e',m:`Dimensions '${v}' should be WIDTHxHEIGHT`});seg.status='error'}else seg.status='valid';return}
+    if(seg.label==='version'){if(!/^v\d+$/i.test(v)){iss.push({t:'e',m:`Version '${v}' should be v+number`});seg.status='error'}else seg.status='valid';return}
+    if(seg.label==='length'){if(!/^\d+s$/.test(v)){iss.push({t:'e',m:`Length '${v}' should be number+s`});seg.status='error'}else seg.status='valid';return}
+    if(v)seg.status='valid';
+}
+
+
+function renderResult(el,res,level,name){
+    const chips=document.createElement('div');chips.className='segment-chips';
+    res.segments.forEach((s,i)=>{if(i>0&&s.d){const d=document.createElement('span');d.className='chip-delim';d.textContent=s.d;chips.appendChild(d)}const ch=document.createElement('div');ch.className='seg-chip';const lb=document.createElement('span');lb.className='seg-chip-label';lb.style.color=s.color;lb.textContent=s.label;ch.appendChild(lb);const vl=document.createElement('span');vl.className='seg-chip-value '+s.status;vl.textContent=s.value;ch.appendChild(vl);chips.appendChild(ch)});
+    el.appendChild(chips);
+    const errs=res.issues.filter(i=>i.t==='e'),wrns=res.issues.filter(i=>i.t==='w');
+    const vd=document.createElement('div');
+    if(!errs.length&&!wrns.length){vd.className='verdict pass';vd.innerHTML='<span class="verdict-text">Valid</span>'}
+    else{vd.className='verdict fail';const parts=[];if(errs.length)parts.push(errs.length+' error'+(errs.length>1?'s':''));if(wrns.length)parts.push(wrns.length+' warning'+(wrns.length>1?'s':''));vd.innerHTML=`<span class="verdict-text">${parts.join(', ')}</span>`}
+    el.appendChild(vd);
+    if(res.issues.length){const ul=document.createElement('ul');ul.className='issue-list';res.issues.forEach(is=>{const li=document.createElement('li');li.className=is.t==='e'?'err':'wrn';li.textContent=is.m;ul.appendChild(li)});el.appendChild(ul)}
+}
+
+function runCheckerFor(lk){
+    const inp=document.getElementById('chk-input-'+lk);
+    const panel=document.getElementById('chk-results-'+lk);
+    if(!inp||!panel)return;
+    const raw=inp.value;
+    const lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);
+    if(!lines.length){panel.classList.add('hidden');return}
+    panel.innerHTML='';panel.classList.remove('hidden');
+    const parse=n=>lk==='campaign'?parseCampaign(n):lk==='adgroup'?parseAdGroup(n):parseCreative(n);
+    const dedup=r=>{const s=new Set();r.issues=r.issues.filter(i=>{if(s.has(i.m))return false;s.add(i.m);return true})};
+    if(lines.length===1){const r=parse(lines[0]);dedup(r);const w=document.createElement('div');renderResult(w,r,lk,lines[0]);panel.appendChild(w)}
+    else{
+        const results=lines.map(l=>{const r=parse(l);dedup(r);return{line:l,...r}});
+        let pc=0,wc=0,fc=0;results.forEach(r=>{const e=r.issues.filter(i=>i.t==='e').length;const w=r.issues.filter(i=>i.t==='w').length;if(e)fc++;else if(w)wc++;else pc++});
+        panel.insertAdjacentHTML('beforeend',`<div class="batch-summary"><span class="bp">${pc} valid</span><span class="bw">${wc} warnings</span><span class="bf">${fc} errors</span><span style="margin-left:auto;color:#64748b">${lines.length} checked</span></div>`);
+        results.forEach(r=>{const e=r.issues.filter(i=>i.t==='e').length,w=r.issues.filter(i=>i.t==='w').length;const sc=e?'fail':w?'warn':'pass';const st=e?e+' error'+(e>1?'s':''):w?w+' warning'+(w>1?'s':''):'Valid';const bl=document.createElement('div');bl.className='batch-line';const hd=document.createElement('div');hd.className='batch-hdr';hd.innerHTML=`<span class="batch-dot ${sc}"></span><span class="batch-name">${esc(r.line)}</span><span class="batch-info">${st}</span><span class="batch-chev">&#9654;</span>`;hd.addEventListener('click',()=>bl.classList.toggle('open'));const dt=document.createElement('div');dt.className='batch-detail';renderResult(dt,r,lk,r.line);bl.appendChild(hd);bl.appendChild(dt);panel.appendChild(bl)});
+    }
+}
+</script>
+</body>
+</html>
