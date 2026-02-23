@@ -239,17 +239,17 @@
 // DATA
 // ══════════════════════════════════════════
 const C={project:'#6366f1',platform:'#0ea5e9',geo:'#10b981',beat:'#f59e0b',date:'#d97706',strategy:'#8b5cf6',objective:'#ec4899',audience:'#14b8a6',type:'#f97316',format:'#ef4444',dims:'#64748b',lp:'#06b6d4',version:'#a855f7',length:'#84cc16',suffix:'#9ca3af'};
-const KNOWN={geo:['US','UK','DE','FR','ES','IT','NL','JP','KR','AU','CA','BR'],platform:['GoogleSearch','YouTube','Meta','Reddit','TikTok','DisplayVideo360','X'],strategy:['Awareness','Consideration','Conversion','Retention'],objective:['Traffic','Reach','Views','AppInstall','Purchase'],audience:['Core','Secondary','Aspirational','Broad','Mainstream','Lookalike','Retargeting'],type:['Prospecting','Retargeting','Retention'],format:['Video','Static','Carousel','Collection','HTML5'],lp:['Website','Steam','Epic','PSStore'],version:['v1','v2','v3']};
-const LIMITS={GoogleSearch:128,YouTube:128,Meta:400,Reddit:400,TikTok:512,DisplayVideo360:240,X:255};
+const KNOWN={geo:['US','UK','DE','FR','ES','IT','NL','JP','KR','AU','CA','BR','CN','MX','IN','SE','PL','TW','TR','SA','ID','AR'],platform:['GoogleSearch','YouTube','PerformanceMax','Meta','Reddit','TikTok','GoogleDemandGen','DisplayVideo360','X'],strategy:['Awareness','Consideration','Conversion','Retention'],objective:['Traffic','Reach','Views','AppInstall','Purchase','Wishlists'],audience:['Core','Secondary','Aspirational','Broad','Mainstream','Lookalike','Retargeting','Growth','Reach'],type:['Prospecting','Retargeting','Retention'],format:['Video','Static','Carousel','Collection','HTML5'],lp:['Website','Steam','EGS','PSStore','MSStore','eShop'],version:['v1','v2','v3']};
+const LIMITS={GoogleSearch:128,YouTube:128,PerformanceMax:128,Meta:400,Reddit:400,TikTok:512,GoogleDemandGen:128,DisplayVideo360:240,X:255};
 
 function buildCampaignName(v){const a=[v.project];a.push([v.beat,v.date].filter(Boolean).join('_'));a.push(v.platform);a.push(v.geo);a.push([v.strategy,v.objective,v.suffix].filter(Boolean).join('_'));return a.filter(Boolean).join('-')}
 function buildAgName(v){const s=[v.audience,v.type,v.suffix].filter(Boolean).join('_');return[v.geo,s].filter(Boolean).join('-')}
 function buildCrName(v){const a=[v.geo,v.format,v.dims,v.beat,v.lp,v.version,v.length,v.suffix];while(a.length&&!a[a.length-1])a.pop();return a.filter(Boolean).join('-')}
 
 const LEVELS={
-    campaign:{label:'Campaign',desc:'The top level of your ad structure. Each campaign targets one platform, geography, and funnel strategy. Project and beat are set once in the Builder setup. Groups are separated by hyphens (-), compound segments within a group by underscores (_). Expand the Field Reference below for allowed and custom values.',fields:[{key:'project',label:'Project',ph:'ENS',help:'Auto-generated 3-letter code based on the game name. Must be unique per game (e.g. Enshrouded = ENS, Outlast Trials = OLT).',examples:['ENS','OLT','ABX']},{key:'beat',label:'Beat',ph:'Launch',help:'Campaign beat or content phase \u2014 a themed period like a product launch, seasonal event, or content drop. Can be set in the Builder setup. Free text \u2014 the examples shown are just common patterns.',examples:['Launch','Holiday','E3','Update','Season1']},{key:'date',label:'Start Date',ph:'',isDate:true,help:'Campaign start date in YYMMDD format'},{key:'platform',label:'Platform',ph:'Meta',vals:KNOWN.platform,help:'Ad platform this campaign runs on'},{key:'geo',label:'Geo',ph:'UK',vals:KNOWN.geo,help:'Primary market or country code'},{key:'strategy',label:'Strategy',ph:'Awareness',vals:KNOWN.strategy,help:'Funnel stage: where in the customer journey'},{key:'objective',label:'Objective',ph:'Reach',vals:KNOWN.objective,help:'Platform optimization objective'},{key:'suffix',label:'Suffix',ph:'',opt:true,help:'Optional extra identifier for variants'}],pattern:[{k:'project'},{d:'-'},{k:'beat'},{d:'_'},{k:'date'},{d:'-'},{k:'platform'},{d:'-'},{k:'geo'},{d:'-'},{k:'strategy'},{d:'_'},{k:'objective'},{d:'_',opt:true},{k:'suffix',opt:true}],build:buildCampaignName,examples:[{project:'ENS',beat:'Launch',date:'260219',platform:'Meta',geo:'UK',strategy:'Awareness',objective:'Reach'},{project:'ENS',beat:'Holiday',date:'261115',platform:'GoogleSearch',geo:'DE',strategy:'Conversion',objective:'Traffic'},{project:'OLT',beat:'E3',date:'260612',platform:'TikTok',geo:'US',strategy:'Awareness',objective:'Views',suffix:'GameplayTrailer'}]},
-    adgroup:{label:'Ad Group',desc:'Sits inside a campaign and defines who sees your ads. Geo is inherited from the campaign. Audience and targeting type are separated by underscores (_). Expand the Field Reference below for allowed and custom values.',fields:[{key:'geo',label:'Geo',ph:'UK',vals:KNOWN.geo,help:'Geography code \u2014 should match the parent campaign'},{key:'audience',label:'Audience',ph:'Core',vals:KNOWN.audience,help:'Target audience segment you are reaching'},{key:'type',label:'Type',ph:'Prospecting',vals:KNOWN.type,help:'Targeting approach: new users, returning, or retained'},{key:'suffix',label:'Suffix',ph:'',opt:true,help:'Optional qualifier like age range or interest'}],pattern:[{k:'geo'},{d:'-'},{k:'audience'},{d:'_'},{k:'type'},{d:'_',opt:true},{k:'suffix',opt:true}],build:buildAgName,examples:[{geo:'UK',audience:'Core',type:'Prospecting'},{geo:'DE',audience:'Lookalike',type:'Retargeting'},{geo:'US',audience:'Broad',type:'Prospecting',suffix:'18-34'}]},
-    creative:{label:'Creative',desc:'The actual ad asset inside an ad group. Geo and beat are inherited from the campaign. All segments are separated by hyphens (-). Describes exactly what the user sees. Expand the Field Reference below for allowed and custom values.',fields:[{key:'geo',label:'Geo',ph:'UK',vals:KNOWN.geo,help:'Geography code \u2014 inherited from the campaign'},{key:'format',label:'Format',ph:'Video',vals:KNOWN.format,help:'Creative format or ad type'},{key:'dims',label:'Dimensions',ph:'1920x1080',help:'Asset dimensions as WIDTHxHEIGHT in pixels'},{key:'beat',label:'Beat',ph:'Launch',help:'Campaign beat \u2014 inherited from the Builder setup'},{key:'lp',label:'Landing Page',ph:'Website',vals:KNOWN.lp,help:'Where the ad links to when clicked'},{key:'version',label:'Version',ph:'v1',vals:KNOWN.version,help:'Creative iteration (v1, v2, v3...)'},{key:'length',label:'Length',ph:'30s',help:'Duration for video ads (e.g. 15s, 30s). Use 0s for static.'},{key:'suffix',label:'Suffix',ph:'',opt:true,help:'Optional variant label like "dark" or "alt"'}],pattern:[{k:'geo'},{d:'-'},{k:'format'},{d:'-'},{k:'dims'},{d:'-'},{k:'beat'},{d:'-'},{k:'lp'},{d:'-'},{k:'version'},{d:'-'},{k:'length'},{d:'-',opt:true},{k:'suffix',opt:true}],build:buildCrName,examples:[{geo:'UK',format:'Video',dims:'1920x1080',beat:'Launch',lp:'Website',version:'v1',length:'30s'},{geo:'DE',format:'Static',dims:'1080x1080',beat:'Holiday',lp:'Steam',version:'v2',length:'0s'},{geo:'US',format:'Carousel',dims:'1080x1080',beat:'E3',lp:'Epic',version:'v1',length:'0s',suffix:'dark'}]}
+    campaign:{label:'Campaign',desc:'The top level of your ad structure. Each campaign targets one platform, geography, and funnel strategy. Project and beat are set once in the Builder setup. Spaces are not allowed \u2014 groups are separated by hyphens (-) and compound segments within a group by underscores (_). Expand the Field Reference below for allowed and custom values.',fields:[{key:'project',label:'Project',ph:'ENS',help:'Auto-generated 3-letter code based on the game name. Must be unique per game (e.g. Enshrouded = ENS, Outlast Trials = OLT).',examples:['ENS','OLT','ABX']},{key:'beat',label:'Beat',ph:'Launch',help:'Campaign beat or content phase \u2014 a themed period like a product launch, seasonal event, or content drop. Can be set in the Builder setup. Free text \u2014 the examples shown are just common patterns.',examples:['Launch','Holiday','Announcement','Update','Season1']},{key:'date',label:'Start Date',ph:'',isDate:true,help:'Campaign start date in YYMMDD format'},{key:'platform',label:'Platform',ph:'Meta',vals:KNOWN.platform,help:'Ad platform this campaign runs on'},{key:'geo',label:'Geo',ph:'UK',vals:KNOWN.geo,help:'Primary market or country code'},{key:'strategy',label:'Strategy',ph:'Awareness',vals:KNOWN.strategy,help:'Funnel stage: where in the customer journey'},{key:'objective',label:'Objective',ph:'Reach',vals:KNOWN.objective,help:'Platform optimization objective'},{key:'suffix',label:'Suffix',ph:'',opt:true,help:'Optional extra identifier for variants'}],pattern:[{k:'project'},{d:'-'},{k:'beat'},{d:'_'},{k:'date'},{d:'-'},{k:'platform'},{d:'-'},{k:'geo'},{d:'-'},{k:'strategy'},{d:'_'},{k:'objective'},{d:'_',opt:true},{k:'suffix',opt:true}],build:buildCampaignName,examples:[{project:'ENS',beat:'Launch',date:'260219',platform:'Meta',geo:'UK',strategy:'Awareness',objective:'Reach'},{project:'ENS',beat:'Holiday',date:'261115',platform:'GoogleSearch',geo:'DE',strategy:'Conversion',objective:'Traffic'},{project:'OLT',beat:'Announcement',date:'260612',platform:'TikTok',geo:'US',strategy:'Awareness',objective:'Views',suffix:'GameplayTrailer'}]},
+    adgroup:{label:'Ad Group',desc:'Sits inside a campaign and defines who sees your ads. Geo is inherited from the campaign. Spaces are not allowed \u2014 audience and targeting type are separated by underscores (_), with hyphens (-) between groups. Expand the Field Reference below for allowed and custom values.',fields:[{key:'geo',label:'Geo',ph:'UK',vals:KNOWN.geo,help:'Geography code \u2014 should match the parent campaign'},{key:'audience',label:'Audience',ph:'Core',vals:KNOWN.audience,help:'Target audience segment you are reaching'},{key:'type',label:'Type',ph:'Prospecting',vals:KNOWN.type,help:'Targeting approach: new users, returning, or retained'},{key:'suffix',label:'Suffix',ph:'',opt:true,help:'Optional qualifier like age range or interest'}],pattern:[{k:'geo'},{d:'-'},{k:'audience'},{d:'_'},{k:'type'},{d:'_',opt:true},{k:'suffix',opt:true}],build:buildAgName,examples:[{geo:'UK',audience:'Core',type:'Prospecting'},{geo:'DE',audience:'Lookalike',type:'Retargeting'},{geo:'US',audience:'Broad',type:'Prospecting',suffix:'18-34'}]},
+    creative:{label:'Creative',desc:'The actual ad asset inside an ad group. Geo and beat are inherited from the campaign. Spaces are not allowed \u2014 all segments are separated by hyphens (-). Describes exactly what the user sees. Expand the Field Reference below for allowed and custom values.',fields:[{key:'geo',label:'Geo',ph:'UK',vals:KNOWN.geo,help:'Geography code \u2014 inherited from the campaign'},{key:'format',label:'Format',ph:'Video',vals:KNOWN.format,help:'Creative format or ad type'},{key:'dims',label:'Dimensions',ph:'1920x1080',help:'Asset dimensions as WIDTHxHEIGHT in pixels'},{key:'beat',label:'Beat',ph:'Launch',help:'Campaign beat \u2014 inherited from the Builder setup'},{key:'lp',label:'Landing Page',ph:'Website',vals:KNOWN.lp,help:'Where the ad links to when clicked'},{key:'version',label:'Version',ph:'v1',vals:KNOWN.version,help:'Creative iteration (v1, v2, v3...)'},{key:'length',label:'Length',ph:'30s',help:'Duration for video ads (e.g. 15s, 30s). Use 0s for static.'},{key:'suffix',label:'Suffix',ph:'',opt:true,help:'Optional variant label like "dark" or "alt"'}],pattern:[{k:'geo'},{d:'-'},{k:'format'},{d:'-'},{k:'dims'},{d:'-'},{k:'beat'},{d:'-'},{k:'lp'},{d:'-'},{k:'version'},{d:'-'},{k:'length'},{d:'-',opt:true},{k:'suffix',opt:true}],build:buildCrName,examples:[{geo:'UK',format:'Video',dims:'1920x1080',beat:'Launch',lp:'Website',version:'v1',length:'30s'},{geo:'DE',format:'Static',dims:'1080x1080',beat:'Holiday',lp:'Steam',version:'v2',length:'0s'},{geo:'US',format:'Carousel',dims:'1080x1080',beat:'Announcement',lp:'EGS',version:'v1',length:'0s',suffix:'dark'}]}
 };
 
 const CHK_EXAMPLES={valid:{campaign:'ENS-Launch_260219-Meta-UK-Awareness_Reach',adgroup:'UK-Core_Prospecting',creative:'UK-Video-1920x1080-Launch-Website-v1-30s'},invalid:{campaign:'ENS-Launch_2602-Facebok-UK-awareness_Traffic',adgroup:'UK-core_prospekting',creative:'UK-Vido-1920x1080-Launch-website-v1-thirty'}};
@@ -292,6 +292,7 @@ function addKnownValue(key,val){
     if(!CUSTOM[key])CUSTOM[key]=new Set();
     CUSTOM[key].add(val);
     refreshDataLists(key);
+    buildGuide();
 }
 
 function removeKnownValue(key,val){
@@ -299,6 +300,7 @@ function removeKnownValue(key,val){
     if(idx>-1)KNOWN[key].splice(idx,1);
     if(CUSTOM[key])CUSTOM[key].delete(val);
     refreshDataLists(key);
+    buildGuide();
 }
 
 function refreshDataLists(key){
@@ -338,14 +340,16 @@ function buildGuide(){
     '</ul>'+
     '<p>Segments are joined by <code>-</code> (hyphens) between groups and <code>_</code> (underscores) within compound groups. For example:</p>'+
     '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 14px;margin-bottom:8px;font-family:\'SF Mono\',\'Fira Code\',monospace;font-size:.85rem;line-height:1.8">'+
-    '<span style="color:#6366f1;font-weight:600">ENS</span><span style="color:#94a3b8;font-weight:700"> - </span>'+
-    '<span style="color:#f59e0b;font-weight:600">Launch</span><span style="color:#d97706;font-weight:700"> _ </span><span style="color:#d97706;font-weight:600">260219</span><span style="color:#94a3b8;font-weight:700"> - </span>'+
-    '<span style="color:#0ea5e9;font-weight:600">Meta</span><span style="color:#94a3b8;font-weight:700"> - </span>'+
-    '<span style="color:#10b981;font-weight:600">UK</span><span style="color:#94a3b8;font-weight:700"> - </span>'+
-    '<span style="color:#8b5cf6;font-weight:600">Awareness</span><span style="color:#ec4899;font-weight:700"> _ </span><span style="color:#ec4899;font-weight:600">Reach</span>'+
+    '<span style="color:#6366f1;font-weight:600">ENS</span><span style="color:#94a3b8;font-weight:700">-</span>'+
+    '<span style="color:#f59e0b;font-weight:600">Launch</span><span style="color:#d97706;font-weight:700">_</span><span style="color:#d97706;font-weight:600">260219</span><span style="color:#94a3b8;font-weight:700">-</span>'+
+    '<span style="color:#0ea5e9;font-weight:600">Meta</span><span style="color:#94a3b8;font-weight:700">-</span>'+
+    '<span style="color:#10b981;font-weight:600">UK</span><span style="color:#94a3b8;font-weight:700">-</span>'+
+    '<span style="color:#8b5cf6;font-weight:600">Awareness</span><span style="color:#ec4899;font-weight:700">_</span><span style="color:#ec4899;font-weight:600">Reach</span>'+
     '<div style="margin-top:6px;font-family:-apple-system,sans-serif;font-size:.78rem;color:#64748b"><code style="background:#f1f5f9;padding:1px 5px;border-radius:3px;font-size:.78rem;color:var(--primary)">-</code> separates independent groups &nbsp;\u2022&nbsp; <code style="background:#f1f5f9;padding:1px 5px;border-radius:3px;font-size:.78rem;color:var(--primary)">_</code> joins related parts (beat+date, strategy+objective)</div>'+
     '</div>'+
-    '<p style="font-size:.82rem;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:8px 12px;line-height:1.5"><strong>Only use letters and numbers in field values.</strong> Because <code style="background:#fef3c7;padding:1px 4px;border-radius:3px;font-size:.8rem">-</code> and <code style="background:#fef3c7;padding:1px 4px;border-radius:3px;font-size:.8rem">_</code> are used as separators in the naming convention, special characters in values would break parsing. For example, use <code style="background:#fef3c7;padding:1px 4px;border-radius:3px;font-size:.8rem">PSStore</code> instead of <code style="background:#fef3c7;padding:1px 4px;border-radius:3px;font-size:.8rem">PS-Store</code>.</p>';
+    '<p style="font-size:.82rem;color:#1e40af;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:8px 12px;line-height:1.5;margin-bottom:8px"><strong>No spaces allowed.</strong> Names must not contain any spaces. Hyphens (<code style="background:#dbeafe;padding:1px 4px;border-radius:3px;font-size:.8rem">-</code>) and underscores (<code style="background:#dbeafe;padding:1px 4px;border-radius:3px;font-size:.8rem">_</code>) are the only separators \u2014 everything else should be continuous text with no whitespace.</p>'+
+    '<p style="font-size:.82rem;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:8px 12px;line-height:1.5"><strong>Only use letters and numbers in field values.</strong> Because <code style="background:#fef3c7;padding:1px 4px;border-radius:3px;font-size:.8rem">-</code> and <code style="background:#fef3c7;padding:1px 4px;border-radius:3px;font-size:.8rem">_</code> are used as separators in the naming convention, special characters in values would break parsing. For example, use <code style="background:#fef3c7;padding:1px 4px;border-radius:3px;font-size:.8rem">PSStore</code> instead of <code style="background:#fef3c7;padding:1px 4px;border-radius:3px;font-size:.8rem">PS-Store</code>.</p>'+
+    '<p style="font-size:.82rem;color:#065f46;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:6px;padding:8px 12px;line-height:1.5"><strong>Custom values are supported.</strong> Fields like Platform, Geo, Strategy, and others come with predefined values, but you can add your own. Simply type a new value into any dropdown field in the <strong>Builder</strong> tab and it will be auto-saved as a custom value. Custom values appear <span style="background:#e0f2fe;border:1px solid #7dd3fc;padding:1px 6px;border-radius:4px;font-size:.78rem;font-family:\'SF Mono\',\'Fira Code\',monospace">highlighted in blue</span> in the field tables below, in the Helper tab, and in all dropdowns. You can remove a custom value from the Helper tab\u2019s Field Reference by clicking the \u00d7 next to it.</p>';
     // Collapsible field overview per level
     const fieldToggle=document.createElement('div');
     fieldToggle.style.cssText='display:flex;align-items:center;cursor:pointer;user-select:none;padding:10px 0 4px;border-top:1px solid #e2e8f0;margin-top:12px';
@@ -361,7 +365,7 @@ function buildGuide(){
         fieldDetail.appendChild(pat);
         const tbl=document.createElement('table');tbl.className='ref-fields-table';tbl.style.cssText='margin-bottom:4px;table-layout:fixed';tbl.innerHTML='<colgroup><col style="width:18%"><col style="width:46%"><col style="width:36%"></colgroup><thead><tr><th>Field</th><th>Description</th><th>Examples</th></tr></thead>';
         const tb=document.createElement('tbody');
-        lv.fields.forEach(f=>{const tr=document.createElement('tr');const n=document.createElement('td');n.innerHTML='<span class="field-dot" style="background:'+C[f.key]+'"></span><strong>'+f.label+'</strong>'+(f.opt?' <span style="color:#94a3b8">(opt)</span>':'');tr.appendChild(n);const d=document.createElement('td');d.style.fontSize='.82rem';d.textContent=f.help||'';tr.appendChild(d);const ex=document.createElement('td');const vals=f.vals&&KNOWN[f.key]?KNOWN[f.key].slice(0,5):f.examples?f.examples.slice(0,5):f.isDate?['YYMMDD']:[];if(vals.length){const w=document.createElement('div');w.className='values-list';vals.forEach(v=>{const t=document.createElement('span');t.className='val-tag';t.textContent=v;w.appendChild(t)});ex.appendChild(w)}else{ex.innerHTML='<span style="color:#94a3b8">Free text</span>'}tr.appendChild(ex);tb.appendChild(tr)});
+        lv.fields.forEach(f=>{const tr=document.createElement('tr');const n=document.createElement('td');n.innerHTML='<span class="field-dot" style="background:'+C[f.key]+'"></span><strong>'+f.label+'</strong>'+(f.opt?' <span style="color:#94a3b8">(opt)</span>':'');tr.appendChild(n);const d=document.createElement('td');d.style.fontSize='.82rem';d.textContent=f.help||'';tr.appendChild(d);const ex=document.createElement('td');const vals=f.vals&&KNOWN[f.key]?KNOWN[f.key]:f.examples?f.examples:f.isDate?['YYMMDD']:[];if(vals.length){const w=document.createElement('div');w.className='values-list';vals.forEach(v=>{const isCustom=CUSTOM[f.key]&&CUSTOM[f.key].has(v);const t=document.createElement('span');t.className='val-tag'+(isCustom?' custom':'');t.textContent=v;w.appendChild(t)});ex.appendChild(w)}else{ex.innerHTML='<span style="color:#94a3b8">Free text</span>'}tr.appendChild(ex);tb.appendChild(tr)});
         tbl.appendChild(tb);fieldDetail.appendChild(tbl);
     }
     s1.appendChild(fieldDetail);
@@ -424,7 +428,7 @@ function buildDevGuide(){
     '<h3 style="font-size:.95rem;color:var(--primary);margin:14px 0 6px">Core Concepts</h3>'+
     '<ul>'+
     '<li><strong>Three-level hierarchy</strong> \u2014 Campaign \u2192 Ad Group \u2192 Creative, mirroring ad platform structures.</li>'+
-    '<li><strong>Naming pattern</strong> \u2014 groups separated by <code>-</code>, compound segments within a group by <code>_</code>. Only alphanumeric values allowed in fields.</li>'+
+    '<li><strong>Naming pattern</strong> \u2014 no spaces allowed. Groups separated by <code>-</code>, compound segments within a group by <code>_</code>. Only alphanumeric values allowed in fields.</li>'+
     '<li><strong>Field inheritance</strong> \u2014 project code (auto-generated from game name) and beat flow from setup into campaigns; geo flows from campaign into ad groups and creatives; beat also flows into creatives.</li>'+
     '<li><strong>Beats</strong> \u2014 a beat is a themed campaign period (launch, holiday, etc.). Each beat is a saved workspace containing one or more campaigns with their full ad group/creative trees.</li>'+
     '</ul>'+
@@ -434,7 +438,7 @@ function buildDevGuide(){
     '<tr><td><strong>Project code</strong></td><td>Auto-generated unique 3-letter code from game name (e.g. Enshrouded \u2192 ENS). Read-only in the builder, used as the first segment in every campaign name.</td></tr>'+
     '<tr><td><strong>Beat management</strong></td><td>Create, switch, duplicate, delete, and filter saved beats. LocalStorage persistence as a stand-in for database.</td></tr>'+
     '<tr><td><strong>Name checker</strong></td><td>Paste one or multiple names to validate structure, known values (fuzzy + Levenshtein), and format constraints. Batch checking with summary.</td></tr>'+
-    '<tr><td><strong>Field reference</strong></td><td>Collapsible per-level field tables with known + custom values. Custom values auto-sync from Builder.</td></tr>'+
+    '<tr><td><strong>Field reference</strong></td><td>Collapsible per-level field tables with known + custom values. Custom values auto-sync from Builder across all tabs (Guide, Helper, Builder dropdowns). Custom values highlighted in blue with remove option.</td></tr>'+
     '<tr><td><strong>CSV export</strong></td><td>Per-platform and all-platforms export of Campaign / Ad Group / Creative name trees.</td></tr>'+
     '<tr><td><strong>Undo</strong></td><td>30-step undo stack for field edits, deletes, and structural changes (Ctrl+Z or button).</td></tr>'+
     '</tbody></table>';
@@ -444,10 +448,10 @@ function buildDevGuide(){
     const c2=document.createElement('div');c2.className='card ref-intro';
     c2.innerHTML='<h2 style="font-size:1.1rem;color:var(--primary);margin-bottom:10px">Implementation Plan \u2014 TRACKS App</h2>'+
     '<p>Step-by-step plan for integrating the naming convention tool into the <strong>TRACKS</strong> application. TRACKS is a <strong>Rails 8.1 / Hotwire (Turbo + Stimulus) / PostgreSQL</strong> app using <strong>Tabler Core</strong> UI, <strong>Vite</strong> for asset bundling, and <strong>I18n</strong> for all user-facing strings. The tool will follow the same pattern as the existing <strong>UTM Links</strong> tool (<code>Tools::UtmLinksController</code>).</p>'+
-    '<p style="font-size:.82rem;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:8px 12px;line-height:1.5"><strong>POC reference file:</strong> The single-file HTML proof-of-concept at <code>Desktop/tracks tools/adopswizardnewest.html</code> is the behavioral source of truth. All naming logic, field definitions, known values, build/parse functions, validation rules, and UI interactions are implemented there. Extract and port to Ruby/Stimulus as described below.</p>'+
+    '<p style="font-size:.82rem;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:8px 12px;line-height:1.5"><strong>POC reference file:</strong> The single-file HTML proof-of-concept at <code>Desktop/TRACKS Tools/adopswizardnewest.html</code> is the behavioral source of truth. All naming logic, field definitions, known values, build/parse functions, validation rules, and UI interactions are implemented there. Extract and port to Ruby/Stimulus as described below.</p>'+
 
     '<h3 style="font-size:.95rem;color:var(--primary);margin:16px 0 6px">1. Naming Patterns (exact specification)</h3>'+
-    '<p>Three levels. Groups separated by <code>-</code> (hyphen), compound segments within a group by <code>_</code> (underscore). Only alphanumeric characters allowed in field values \u2014 hyphens and underscores are reserved as structural delimiters.</p>'+
+    '<p>Three levels. <strong>Spaces are not allowed</strong> anywhere in a name. Groups are separated by <code>-</code> (hyphen), compound segments within a group by <code>_</code> (underscore) \u2014 these are the only separators. Only alphanumeric characters are allowed in field values; hyphens and underscores are reserved as structural delimiters.</p>'+
 
     '<p style="font-weight:600;margin:10px 0 4px">Campaign</p>'+
     '<pre style="background:#f1f5f9;padding:8px 12px;border-radius:6px;font-size:.8rem;margin:0 0 4px">{project}-{beat}_{date}-{platform}-{geo}-{strategy}_{objective}[_{suffix}]</pre>'+
@@ -486,16 +490,16 @@ function buildDevGuide(){
     '<p style="font-size:.82rem"><strong>Inheritance rules:</strong> <code>project</code> comes from <code>@game.project_code</code> (never editable). <code>beat</code> is set once on the beat and flows into all campaign and creative names. <code>geo</code> is set on the campaign and auto-fills into its ad groups and creatives (shown as read-only inherited segments). Users edit inherited fields at the source level only.</p>'+
 
     '<h3 style="font-size:.95rem;color:var(--primary);margin:16px 0 6px">3. Known Values &amp; Character Limits</h3>'+
-    '<p>Default known values (seed via YAML, extendable per-game through custom values). Any game member can add custom values per field without approval \u2014 custom values are scoped to the game via <code>Game::NamingKnownValue</code> and immediately available in dropdowns and validation:</p>'+
+    '<p>Default known values (seed via YAML, extendable per-game through custom values). Any game member can add custom values per field without approval \u2014 custom values are scoped to the game via <code>Game::NamingKnownValue</code> and immediately available in dropdowns, validation, and all tabs (Guide, Helper, Builder). When a user types an unknown value into a dropdown field in the Builder, it is automatically saved as a custom known value. Custom values appear highlighted (blue background) in the Guide\u2019s Available Fields tables, the Helper\u2019s Field Reference tables, and all Builder dropdowns. Custom values can be removed from the Helper tab\u2019s Field Reference via a \u00d7 button, which deletes the <code>Game::NamingKnownValue</code> record:</p>'+
     '<table class="ref-fields-table" style="margin-bottom:6px"><thead><tr><th style="width:18%">Field</th><th>Default Known Values</th></tr></thead><tbody>'+
-    '<tr><td>platform</td><td><code>GoogleSearch</code>, <code>YouTube</code>, <code>Meta</code>, <code>Reddit</code>, <code>TikTok</code>, <code>DisplayVideo360</code>, <code>X</code></td></tr>'+
-    '<tr><td>geo</td><td><code>US</code>, <code>UK</code>, <code>DE</code>, <code>FR</code>, <code>ES</code>, <code>IT</code>, <code>NL</code>, <code>JP</code>, <code>KR</code>, <code>AU</code>, <code>CA</code>, <code>BR</code></td></tr>'+
+    '<tr><td>platform</td><td><code>GoogleSearch</code>, <code>YouTube</code>, <code>PerformanceMax</code>, <code>Meta</code>, <code>Reddit</code>, <code>TikTok</code>, <code>GoogleDemandGen</code>, <code>DisplayVideo360</code>, <code>X</code></td></tr>'+
+    '<tr><td>geo</td><td><code>US</code>, <code>UK</code>, <code>DE</code>, <code>FR</code>, <code>ES</code>, <code>IT</code>, <code>NL</code>, <code>JP</code>, <code>KR</code>, <code>AU</code>, <code>CA</code>, <code>BR</code>, <code>CN</code>, <code>MX</code>, <code>IN</code>, <code>SE</code>, <code>PL</code>, <code>TW</code>, <code>TR</code>, <code>SA</code>, <code>ID</code>, <code>AR</code></td></tr>'+
     '<tr><td>strategy</td><td><code>Awareness</code>, <code>Consideration</code>, <code>Conversion</code>, <code>Retention</code></td></tr>'+
-    '<tr><td>objective</td><td><code>Traffic</code>, <code>Reach</code>, <code>Views</code>, <code>AppInstall</code>, <code>Purchase</code></td></tr>'+
-    '<tr><td>audience</td><td><code>Core</code>, <code>Secondary</code>, <code>Aspirational</code>, <code>Broad</code>, <code>Mainstream</code>, <code>Lookalike</code>, <code>Retargeting</code></td></tr>'+
+    '<tr><td>objective</td><td><code>Traffic</code>, <code>Reach</code>, <code>Views</code>, <code>AppInstall</code>, <code>Purchase</code>, <code>Wishlists</code></td></tr>'+
+    '<tr><td>audience</td><td><code>Core</code>, <code>Secondary</code>, <code>Aspirational</code>, <code>Broad</code>, <code>Mainstream</code>, <code>Lookalike</code>, <code>Retargeting</code>, <code>Growth</code>, <code>Reach</code></td></tr>'+
     '<tr><td>type</td><td><code>Prospecting</code>, <code>Retargeting</code>, <code>Retention</code></td></tr>'+
     '<tr><td>format</td><td><code>Video</code>, <code>Static</code>, <code>Carousel</code>, <code>Collection</code>, <code>HTML5</code></td></tr>'+
-    '<tr><td>lp</td><td><code>Website</code>, <code>Steam</code>, <code>Epic</code>, <code>PSStore</code></td></tr>'+
+    '<tr><td>lp</td><td><code>Website</code>, <code>Steam</code>, <code>EGS</code>, <code>PSStore</code>, <code>MSStore</code>, <code>eShop</code></td></tr>'+
     '<tr><td>version</td><td><code>v1</code>, <code>v2</code>, <code>v3</code></td></tr>'+
     '</tbody></table>'+
 
@@ -503,11 +507,13 @@ function buildDevGuide(){
     '<table class="ref-fields-table" style="margin-bottom:6px"><thead><tr><th>Platform</th><th>Max Characters</th></tr></thead><tbody>'+
     '<tr><td>GoogleSearch</td><td>128</td></tr>'+
     '<tr><td>YouTube</td><td>128</td></tr>'+
+    '<tr><td>PerformanceMax</td><td>128</td></tr>'+
     '<tr><td>Meta</td><td>400</td></tr>'+
     '<tr><td>Reddit</td><td>400</td></tr>'+
+    '<tr><td>TikTok</td><td>512</td></tr>'+
+    '<tr><td>GoogleDemandGen</td><td>128</td></tr>'+
     '<tr><td>DisplayVideo360</td><td>240</td></tr>'+
     '<tr><td>X</td><td>255</td></tr>'+
-    '<tr><td>TikTok</td><td>512</td></tr>'+
     '</tbody></table>'+
     '<p style="font-size:.82rem">Character limits apply to <strong>all three name levels</strong> (campaign, ad group, creative). The limit is determined by the campaign\u2019s <code>platform</code> field and inherited downward. The builder shows <code>current/limit</code> next to each generated name. Names exceeding the limit are flagged as errors.</p>'+
 
@@ -582,6 +588,7 @@ function buildDevGuide(){
     '    pattern: "{geo}-{format}-{dims}-{beat}-{lp}-{version}-{length}[-{suffix}]"\n'+
     '    fields:\n'+
     '      - key: geo\n'+
+    '        label: Geo\n'+
     '        inherited: true\n'+
     '        source: naming_campaign.geo\n'+
     '      - key: format\n'+
@@ -603,6 +610,7 @@ function buildDevGuide(){
     '        label: Version\n'+
     '        known_values_key: version\n'+
     '        validation: "^v\\\\d+$"\n'+
+    '        case_insensitive: true\n'+
     '      - key: length\n'+
     '        label: Length\n'+
     '        type: freetext\n'+
@@ -614,24 +622,26 @@ function buildDevGuide(){
     '        type: freetext\n'+
     '\n'+
     'known_values:\n'+
-    '  platform: [GoogleSearch, YouTube, Meta, Reddit, TikTok, DisplayVideo360, X]\n'+
-    '  geo: [US, UK, DE, FR, ES, IT, NL, JP, KR, AU, CA, BR]\n'+
+    '  platform: [GoogleSearch, YouTube, PerformanceMax, Meta, Reddit, TikTok, GoogleDemandGen, DisplayVideo360, X]\n'+
+    '  geo: [US, UK, DE, FR, ES, IT, NL, JP, KR, AU, CA, BR, CN, MX, IN, SE, PL, TW, TR, SA, ID, AR]\n'+
     '  strategy: [Awareness, Consideration, Conversion, Retention]\n'+
-    '  objective: [Traffic, Reach, Views, AppInstall, Purchase]\n'+
-    '  audience: [Core, Secondary, Aspirational, Broad, Mainstream, Lookalike, Retargeting]\n'+
+    '  objective: [Traffic, Reach, Views, AppInstall, Purchase, Wishlists]\n'+
+    '  audience: [Core, Secondary, Aspirational, Broad, Mainstream, Lookalike, Retargeting, Growth, Reach]\n'+
     '  type: [Prospecting, Retargeting, Retention]\n'+
     '  format: [Video, Static, Carousel, Collection, HTML5]\n'+
-    '  lp: [Website, Steam, Epic, PSStore]\n'+
+    '  lp: [Website, Steam, EGS, PSStore, MSStore, eShop]\n'+
     '  version: [v1, v2, v3]\n'+
     '\n'+
     'character_limits:\n'+
     '  GoogleSearch: 128\n'+
     '  YouTube: 128\n'+
+    '  PerformanceMax: 128\n'+
     '  Meta: 400\n'+
     '  Reddit: 400\n'+
+    '  TikTok: 512\n'+
+    '  GoogleDemandGen: 128\n'+
     '  DisplayVideo360: 240\n'+
     '  X: 255\n'+
-    '  TikTok: 512\n'+
     '\n'+
     'colors:\n'+
     '  project: "#6366f1"\n'+
@@ -650,7 +660,7 @@ function buildDevGuide(){
     '  length: "#84cc16"\n'+
     '  suffix: "#9ca3af"\n'+
     '</pre>'+
-    '<p>Create a <code>NamingConvention</code> service (co-located with its YAML like <code>UtmChannel</code>, loaded via <code>File.expand_path("naming_convention.yml", __dir__)</code>). Unlike the simpler <code>UtmChannel</code>, this service must expose multiple methods: (1) <code>.config</code> \u2014 loads and caches the full YAML, (2) <code>.build_name(level, fields)</code> \u2014 generates a name string per the level\u2019s pattern, (3) <code>.parse_name(level, name_string)</code> \u2014 splits a name into labeled segments, (4) <code>.validate_name(level, name_string, game:)</code> \u2014 returns errors/warnings using known values + fuzzy matching, (5) <code>.known_values_for(field_key, game:)</code> \u2014 merges YAML defaults with game-specific <code>Game::NamingKnownValue</code> records, (6) <code>.character_limit(platform)</code> \u2014 returns the max length for a platform. This is the <strong>single source of truth</strong> \u2014 both server-side validation and client-side rendering read from it. The <code>colors</code> map is used by the builder UI to color-code each field\u2019s inline segment (small colored chips with the field value).</p>'+
+    '<p>Create a <code>NamingConvention</code> service (co-located with its YAML like <code>UtmChannel</code>, loaded via <code>File.expand_path("naming_convention.yml", __dir__)</code>). Unlike the simpler <code>UtmChannel</code>, this service must expose multiple methods: (1) <code>.config</code> \u2014 loads and caches the full YAML, (2) <code>.build_name(level, fields)</code> \u2014 generates a name string per the level\u2019s pattern (never includes spaces), (3) <code>.parse_name(level, name_string)</code> \u2014 splits a name into labeled segments, (4) <code>.validate_name(level, name_string, game:)</code> \u2014 returns errors/warnings using known values + fuzzy matching (rejects names containing spaces as an immediate error), (5) <code>.known_values_for(field_key, game:)</code> \u2014 merges YAML defaults with game-specific <code>Game::NamingKnownValue</code> records, (6) <code>.character_limit(platform)</code> \u2014 returns the max length for a platform. This is the <strong>single source of truth</strong> \u2014 both server-side validation and client-side rendering read from it. The <code>colors</code> map is used by the builder UI to color-code each field\u2019s inline segment (small colored chips with the field value).</p>'+
 
     '<h3 style="font-size:.95rem;color:var(--primary);margin:16px 0 6px">6. Database Migrations (PostgreSQL, UUID PKs)</h3>'+
     '<p>Create Active Record migrations following TRACKS conventions (UUID primary keys, <code>belongs_to :game</code>):</p>'+
@@ -673,7 +683,7 @@ function buildDevGuide(){
     '<li><code>Game::NamingCreative</code> \u2014 <code>self.table_name = :game_naming_creatives</code>. <code>belongs_to :naming_ad_group, class_name: "Game::NamingAdGroup", inverse_of: :naming_creatives</code>. <code>acts_as_list scope: :naming_ad_group_id</code>.</li>'+
     '<li><code>Game::NamingKnownValue</code> \u2014 <code>self.table_name = :game_naming_known_values</code>. <code>belongs_to :game, inverse_of: :naming_known_values</code>. Validates uniqueness on [game_id, field_key, value] (case-insensitive).</li>'+
     '</ul>'+
-    '<p>Use <code>accepts_nested_attributes_for</code> with <code>allow_destroy: true</code> on beat \u2192 campaigns \u2192 ad groups \u2192 creatives so the entire tree can be saved in a single form submission via Turbo. Use <code>acts_as_list</code> default <code>position</code> column (not <code>position</code>) to match the existing TRACKS convention and gem defaults. No drag-and-drop reordering in v1 \u2014 insertion order only.</p>'+
+    '<p>Use <code>accepts_nested_attributes_for</code> with <code>allow_destroy: true</code> on beat \u2192 campaigns \u2192 ad groups \u2192 creatives so the entire tree can be saved in a single form submission via Turbo. Use <code>acts_as_list</code> with the default <code>position</code> column to match the existing TRACKS convention and gem defaults. No drag-and-drop reordering in v1 \u2014 insertion order only.</p>'+
 
     '<h3 style="font-size:.95rem;color:var(--primary);margin:16px 0 6px">8. Controller &amp; Routes</h3>'+
     '<p>Add <code>Tools::NamingConventionsController</code> following the <code>Tools::UtmLinksController</code> pattern:</p>'+
@@ -681,29 +691,47 @@ function buildDevGuide(){
     '<li>Include <code>Controller::GameLookup</code> concern for game scoping. Auth and permissions are inherited from game-level access \u2014 no additional role checks needed.</li>'+
     '<li>Actions: <code>index</code> (list beats + builder workspace), <code>show</code> (load a beat into the workspace via Turbo Frame), <code>create</code> / <code>update</code> / <code>destroy</code> for beats, <code>duplicate</code> for deep-clone, <code>validate</code> for name checking.</li>'+
     '<li>Use <code>params.expect()</code> (Rails 8 pattern) for strong parameters with nested attributes.</li>'+
-    '<li>Respond with <strong>Turbo Stream</strong> for create/delete/duplicate actions (appends, removes, replaces chips and campaign cards) and <strong>Turbo Frame</strong> for <code>show</code> (loads beat workspace). <code>update</code> responds with <code>turbo_stream</code> for autosave (PATCH with nested params) \u2014 debounced 400ms from the Stimulus controller.</li>'+
+    '<li>Respond with <strong>Turbo Stream</strong> for create/delete/duplicate actions (appends, removes, replaces chips and campaign cards) and <strong>Turbo Frame</strong> for <code>show</code> (loads beat workspace). <code>update</code> responds with <code>turbo_stream</code> for autosave \u2014 debounced 400ms from the Stimulus controller.</li>'+
     '</ul>'+
-    '<p><strong>Nested params structure</strong> for <code>update</code> (autosave):</p>'+
+
+    '<h4 style="font-size:.88rem;color:var(--primary);margin:14px 0 6px">Autosave Strategy: Per-Campaign Granular Updates</h4>'+
+    '<p>Sending the entire beat tree on every keystroke creates two problems: (1) the payload grows large with many campaigns (10 campaigns \u00d7 5 ad groups \u00d7 3 creatives = 150 nested records per PATCH), and (2) overlapping requests risk stale-write conflicts when the user edits across campaigns faster than the server responds.</p>'+
+    '<p><strong>Solution: scope each autosave to the campaign subtree that changed.</strong> Instead of a single <code>PATCH /naming_conventions/:beat_id</code> with the full tree, use per-level update endpoints:</p>'+
+    '<ul>'+
+    '<li><code>PATCH /naming_conventions/:beat_id/campaigns/:id</code> \u2014 sends only the changed campaign + its nested ad groups and creatives. This is the primary autosave target \u2014 most field edits happen inside a single campaign.</li>'+
+    '<li><code>PATCH /naming_conventions/:beat_id</code> \u2014 reserved for beat-level changes only (renaming the beat). Does not send nested campaign data.</li>'+
+    '</ul>'+
+    '<p><strong>Nested params for per-campaign autosave:</strong></p>'+
     '<pre style="background:#f1f5f9;padding:10px;border-radius:6px;font-size:.75rem;overflow-x:auto;margin:6px 0 10px;line-height:1.5">'+
     'params.expect(\n'+
-    '  naming_convention: [\n'+
-    '    :beat,\n'+
-    '    naming_campaigns_attributes: [[\n'+
-    '      :id, :platform, :geo, :date, :strategy, :objective, :suffix, :position, :_destroy,\n'+
-    '      naming_ad_groups_attributes: [[\n'+
-    '        :id, :audience, :type, :suffix, :position, :_destroy,\n'+
-    '        naming_creatives_attributes: [[\n'+
-    '          :id, :format, :dims, :lp, :version, :length, :suffix, :position, :_destroy\n'+
-    '        ]]\n'+
+    '  naming_campaign: [\n'+
+    '    :id, :platform, :geo, :date, :strategy, :objective, :suffix, :position,\n'+
+    '    naming_ad_groups_attributes: [[\n'+
+    '      :id, :audience, :type, :suffix, :position, :_destroy,\n'+
+    '      naming_creatives_attributes: [[\n'+
+    '        :id, :format, :dims, :lp, :version, :length, :suffix, :position, :_destroy\n'+
     '      ]]\n'+
     '    ]]\n'+
     '  ]\n'+
     ')\n'+
     '</pre>'+
+    '<p>This keeps payloads small (one campaign subtree) and eliminates cross-campaign conflicts \u2014 edits to Campaign 1 never overwrite Campaign 2.</p>'+
+
+    '<h4 style="font-size:.88rem;color:var(--primary);margin:14px 0 6px">Save Queue (Client-Side)</h4>'+
+    '<p>The Stimulus builder controller must implement a <strong>save queue</strong> to prevent overlapping in-flight requests for the same campaign:</p>'+
+    '<ul>'+
+    '<li>Maintain a <code>Map&lt;campaignId, { pending, inflight }&gt;</code>. Each entry tracks whether there\u2019s a pending save and whether one is currently in-flight.</li>'+
+    '<li>On field commit: mark the campaign as <code>pending</code>. Start a 400ms debounce timer scoped to that campaign ID.</li>'+
+    '<li>When the timer fires: if a request is already in-flight for this campaign, do nothing (it will re-fire after the in-flight completes). Otherwise, send the PATCH and mark as <code>inflight</code>.</li>'+
+    '<li>On response: clear <code>inflight</code>. If <code>pending</code> was set again while the request was in-flight (the user edited again), immediately fire a new save.</li>'+
+    '<li>On failure: keep <code>pending</code> set, show a non-intrusive error indicator (toast or red dot on the campaign row), and retry on the next edit or after a 5-second backoff.</li>'+
+    '</ul>'+
+    '<p>This ensures at most <strong>one in-flight request per campaign</strong>, no lost edits, and no blocking the user.</p>'+
+
     '<p style="font-size:.82rem;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:8px 12px;line-height:1.5;margin:8px 0"><strong>Note:</strong> Unlike the UTM Links tool (which uses full-page redirects with <code>data: { turbo: false }</code>), the naming conventions tool uses <strong>Turbo Stream</strong> responses for inline updates. This is a new Turbo pattern for the tools namespace.</p>'+
     '<p>Routes (in <code>config/routes.rb</code>, nested inside the <code>resources :games</code> block alongside existing tools). The <code>naming_conventions</code> resource maps to <code>Game::NamingBeat</code> records \u2014 each \u201cnaming convention\u201d is a beat with its nested campaign/ad group/creative tree:</p>'+
-    '<pre style="background:#f1f5f9;padding:10px;border-radius:6px;font-size:.78rem;overflow-x:auto;margin:6px 0 10px">resources :games, only: %i[new create show edit update] do\n  # ... existing routes ...\n  namespace :tools do\n    # ... existing utm_links ...\n    resources :naming_conventions, only: [:index, :show, :create, :update, :destroy] do\n      collection do\n        post :validate\n      end\n      member do\n        post :duplicate\n      end\n    end\n    resources :naming_known_values, only: [:create, :destroy]\n  end\nend</pre>'+
-    '<p>URL pattern: <code>/games/:game_id/tools/naming_conventions</code>. The <code>validate</code> action is a collection route (accepts <code>{ level: "campaign", names: ["..."] }</code> and returns validation results as Turbo Stream \u2014 enables server-side validation with access to game-specific custom known values). <code>naming_known_values</code> is a separate resource for adding/removing custom known values per game. The <code>duplicate</code> action deep-clones the beat and its entire nested tree; the cloned beat name is <code>"#{original.beat} Copy"</code>, incrementing the suffix number if that name already exists.</p>'+
+    '<pre style="background:#f1f5f9;padding:10px;border-radius:6px;font-size:.78rem;overflow-x:auto;margin:6px 0 10px">resources :games, only: %i[new create show edit update] do\n  # ... existing routes ...\n  namespace :tools do\n    # ... existing utm_links ...\n    resources :naming_conventions, only: [:index, :show, :create, :update, :destroy] do\n      collection do\n        post :validate\n      end\n      member do\n        post :duplicate\n      end\n      resources :naming_campaigns, only: [:create, :update, :destroy]\n    end\n    resources :naming_known_values, only: [:create, :destroy]\n  end\nend</pre>'+
+    '<p>URL pattern: <code>/games/:game_id/tools/naming_conventions</code>. The <code>validate</code> action is a collection route (accepts <code>{ level: "campaign", names: ["..."] }</code> and returns validation results as Turbo Stream \u2014 enables server-side validation with access to game-specific custom known values). <code>naming_campaigns</code> is nested under a beat for per-campaign autosave (<code>PATCH /naming_conventions/:beat_id/naming_campaigns/:id</code>) \u2014 this is the primary autosave endpoint. <code>naming_known_values</code> is a separate resource for adding/removing custom known values per game. The <code>duplicate</code> action deep-clones the beat and its entire nested tree; the cloned beat name is <code>"#{original.beat} Copy"</code>, incrementing the suffix number if that name already exists.</p>'+
 
     '<h3 style="font-size:.95rem;color:var(--primary);margin:16px 0 6px">9. Nav Integration</h3>'+
     '<p>Add the tool to the tools index page (<code>app/views/tools/index.html.erb</code>) following the UTM Links card pattern:</p>'+
@@ -778,6 +806,10 @@ function buildDevGuide(){
     '      add_custom_value: Add\n'+
     '      custom_note: "Custom values auto-saved from Builder"\n'+
     '      remove_value: Remove\n'+
+    '    guide:\n'+
+    '      no_spaces: "No spaces allowed. Names must not contain any spaces. Hyphens (-) and underscores (_) are the only separators."\n'+
+    '      alphanumeric_only: "Only use letters and numbers in field values. Hyphens and underscores are reserved as structural delimiters."\n'+
+    '      custom_values: "Custom values are supported. Type a new value into any dropdown field in the Builder and it will be auto-saved. Custom values appear highlighted in blue across all tabs. Remove them from the Helper tab\\\'s Field Reference."\n'+
     '    export:\n'+
     '      csv: Export CSV\n'+
     '      all_platforms: All Platforms\n'+
@@ -797,7 +829,7 @@ function buildDevGuide(){
     '</pre>'+
     '<p>Build views with Tabler card/table classes:</p>'+
     '<ul>'+
-    '<li><code>index.html.erb</code> \u2014 main layout with tab navigation (Guide, Helper, Builder). Each tab is a Turbo Frame. When <code>@game.naming_beats.empty?</code>, show the empty state message (<code>t("tools.naming_conventions.builder.empty")</code>). Include the beat setup bar and the workspace Turbo Frame target.</li>'+
+    '<li><code>index.html.erb</code> \u2014 main layout with tab navigation (Guide, Helper, Builder). Tab switching via Stimulus (show/hide panels) rather than Turbo Frames \u2014 this keeps all three panels in the DOM so cross-tab updates work without extra requests. Use a <code>naming_tabs_controller.js</code> that toggles <code>.active</code> on the panels. When <code>@game.naming_beats.empty?</code>, show the empty state message (<code>t("tools.naming_conventions.builder.empty")</code>). Include the beat setup bar and the workspace Turbo Frame target.</li>'+
     '<li><code>show.html.erb</code> \u2014 beat workspace loaded via Turbo Frame. <strong>Must wrap content in <code>turbo_frame_tag</code></strong> matching the frame ID in <code>index.html.erb</code>. Contains the builder rows for the loaded beat.</li>'+
     '<li><code>_beat_setup.html.erb</code> \u2014 displays the existing game title + project code (both read-only from <code>@game</code>), beat name input, New Beat button, saved beats chip row. Filter input for searching beats.</li>'+
     '<li><code>_builder_rows.html.erb</code> \u2014 <strong>spreadsheet-style row layout</strong> (not cards). Campaigns, ad groups, and creatives are displayed as indented rows with level-specific background colors (campaigns: blue tint, ad groups: green tint, creatives: pink tint). Each row contains: collapse chevron (campaigns only), status dot (green=complete, yellow=warnings, red=errors, gray=empty), hierarchical row ID label (<code>C1</code>, <code>AG1.1</code>, <code>CR1.1.1</code>), inline colored field segments (clickable to edit), spacer, generated name with char count, and action buttons (duplicate, delete, copy). Delete buttons use <code>data-turbo-confirm</code> with a confirmation message.</li>'+
@@ -805,29 +837,31 @@ function buildDevGuide(){
     '<li><code>_generated_name.html.erb</code> \u2014 renders the computed name string with <code>current/limit</code> character count badge. Flagged red when exceeding the platform\u2019s character limit.</li>'+
     '<li><code>_full_output.html.erb</code> \u2014 flat list of all generated names across the current beat\u2019s tree, grouped by level (Campaigns, Ad Groups, Creatives) with count labels. Each line: status dot, row number, generated name string, character count badge, issue count. Clicking a valid name copies it to clipboard; clicking a name with issues expands the detail panel. Summary bar at the top with total valid/warning/error counts. Action bar with \u201cCopy All\u201d button (copies all names to clipboard) and the Export CSV dropdown.</li>'+
     '<li><code>_name_checker.html.erb</code> \u2014 <strong>three separate checker sections</strong>, one per level (campaign, ad group, creative). Each section has: a <code>&lt;textarea&gt;</code>, \u201cCheck\u201d / \u201cTry valid example\u201d / \u201cTry broken example\u201d buttons, and a results panel showing per-segment validation with color-coded chips and verdicts.</li>'+
-    '<li><code>_field_reference.html.erb</code> \u2014 collapsible field table. Each field row shows all known values (YAML defaults + custom DB values). Custom values have a remove button (\u00d7). Below the values list, an inline form to add a new custom value (text input + \u201cAdd\u201d button) that posts to <code>naming_known_values#create</code>.</li>'+
-    '<li><code>_guide.html.erb</code> \u2014 four card sections matching the POC\u2019s Guide tab: (1) \u201cNaming Convention\u201d \u2014 three-level hierarchy, delimiter rules, color-coded example, collapsible \u201cAvailable Fields\u201d accordion with pattern visualizations per level; (2) \u201cHelper Tab\u201d \u2014 checker and field reference explanations; (3) \u201cBuilder Tab\u201d \u2014 detailed usage instructions (beats, autosave, inline editing, row actions, collapse/status dots, inherited fields, date picker, character limits); (4) \u201cWhy Consistency Matters\u201d \u2014 motivation for TRACKS dashboards.</li>'+
+    '<li><code>_field_reference.html.erb</code> \u2014 collapsible field table. Each field row shows all known values (YAML defaults + custom DB values). Custom values are highlighted with a blue background and have a remove button (\u00d7). Both add and remove actions post to <code>naming_known_values#create</code> / <code>#destroy</code> and return a <strong>Turbo Stream response that replaces the value lists in all three panels</strong> (Guide, Helper, Builder datalists) using targeted <code>turbo_stream.replace</code> actions. This works because all panels are in the DOM simultaneously (show/hide tabs, not Turbo Frame navigation). Give each values container a stable DOM ID like <code>known-values-{field_key}</code> so the Turbo Stream can target them across panels. Below the values list, an inline form to add a new custom value (text input + \u201cAdd\u201d button).</li>'+
+    '<li><code>_guide.html.erb</code> \u2014 four card sections matching the POC\u2019s Guide tab: (1) \u201cNaming Convention\u201d \u2014 three-level hierarchy, delimiter rules, color-coded example (no spaces between delimiters), three callout boxes (\u201cNo spaces allowed\u201d in blue, \u201cOnly letters and numbers\u201d in yellow, \u201cCustom values are supported\u201d in green explaining how to add custom values via the Builder and remove them via the Helper), collapsible \u201cAvailable Fields\u201d accordion with pattern visualizations and value tables per level \u2014 value tables show <strong>all</strong> known values including custom ones (highlighted in blue). Each value table container has a stable DOM ID (<code>guide-known-values-{field_key}</code>) so that Turbo Stream responses from <code>naming_known_values#create</code>/<code>#destroy</code> can replace them in-place; (2) \u201cHelper Tab\u201d \u2014 checker and field reference explanations; (3) \u201cBuilder Tab\u201d \u2014 detailed usage instructions (beats, autosave, inline editing, row actions, collapse/status dots, inherited fields, date picker, character limits); (4) \u201cWhy Consistency Matters\u201d \u2014 motivation for TRACKS dashboards.</li>'+
     '</ul>'+
-    '<p>Use Tabler\u2019s <code>.card</code>, <code>.badge</code>, <code>.btn</code>, <code>.table</code> classes for consistent styling. Tab switching via Stimulus or Turbo Frames.</p>'+
+    '<p>Use Tabler\u2019s <code>.card</code>, <code>.badge</code>, <code>.btn</code>, <code>.table</code> classes for consistent styling.</p>'+
 
     '<h3 style="font-size:.95rem;color:var(--primary);margin:16px 0 6px">11. Stimulus Controllers (JavaScript)</h3>'+
     '<p>Register in <code>app/javascript/controllers/</code> (auto-loaded via <code>stimulus-vite-helpers</code>: <code>registerControllers</code> with <code>import.meta.glob</code>). Place new controllers with the <code>_controller.js</code> suffix \u2014 they\u2019ll be auto-registered.</p>'+
     '<ul>'+
-    '<li><code>naming_builder_controller.js</code> \u2014 main orchestrator. Manages workspace state, inline editing, autosave (debounced 400ms PATCH with nested params, last-write-wins). On autosave failure (network error or validation error), show a non-intrusive error indicator (toast or red dot) and retry on next edit \u2014 do not block the user from continuing to edit. Add/remove campaigns/ad groups/creatives via Turbo Streams. Computes generated names dynamically \u2014 since names change as fields are edited, update <code>data-clipboard-text-value</code> on every field change (or compute the name on-the-fly in the copy action).<br><br>'+
+    '<li><code>naming_builder_controller.js</code> \u2014 main orchestrator. Manages workspace state, inline editing, and autosave. Autosave is <strong>per-campaign</strong>: each field edit triggers a debounced 400ms PATCH scoped to the campaign that was modified (not the entire beat tree). Implements a <strong>save queue</strong> \u2014 at most one in-flight request per campaign. If the user edits the same campaign while a save is in-flight, the edit is queued and sent after the current request completes. On autosave failure (network error or validation error), show a non-intrusive error indicator (toast or red dot on the campaign row) and retry on next edit or after a 5-second backoff \u2014 do not block the user from continuing to edit. Beat-level changes (renaming the beat) use a separate <code>PATCH /naming_conventions/:id</code>. Add/remove campaigns/ad groups/creatives via Turbo Streams. Computes generated names dynamically \u2014 since names change as fields are edited, update <code>data-clipboard-text-value</code> on every field change (or compute the name on-the-fly in the copy action).<br><br>'+
     '<strong>Auto-scaffolding:</strong> creating a new beat scaffolds one empty campaign with one AG and one CR. Adding a campaign auto-creates one AG + one CR inside it. Adding an AG auto-creates one CR inside it. This ensures the user always starts with an editable tree.<br><br>'+
-    '<strong>Inline editing lifecycle:</strong> click cell \u2192 creates <code>&lt;input&gt;</code> (text or date depending on field type) \u2192 binds datalist for known-value fields \u2192 commit on <code>blur</code> or <code>Enter</code> \u2192 strips non-alphanumeric characters (toast: \u201cOnly letters and numbers are allowed\u201d) \u2192 if the value is not in known values, auto-creates a <code>Game::NamingKnownValue</code> record (toast: \u201cSaved X as custom FieldLabel\u201d) \u2192 re-renders. <code>Escape</code> cancels editing without saving. <code>Tab</code> / <code>Shift+Tab</code> commits and opens the next/previous editable field in the row.<br><br>'+
+    '<strong>Inline editing lifecycle:</strong> click cell \u2192 creates <code>&lt;input&gt;</code> (text or date depending on field type) \u2192 binds datalist for known-value fields \u2192 commit on <code>blur</code> or <code>Enter</code> \u2192 strips spaces and non-alphanumeric characters (toast: \u201cOnly letters and numbers are allowed\u201d \u2014 spaces are never permitted in any field value) \u2192 if the value is not in known values, posts to <code>naming_known_values#create</code> (the Turbo Stream response replaces all value lists across Guide, Helper, and Builder datalists in one response) and shows toast: \u201cSaved X as custom FieldLabel\u201d \u2192 triggers the per-campaign autosave for the field change. <code>Escape</code> cancels editing without saving. <code>Tab</code> / <code>Shift+Tab</code> commits and opens the next/previous editable field in the row.<br><br>'+
     '<strong>Empty field visual:</strong> when a field has no value, the cell shows the field key name (e.g. \u201cplatform\u201d, \u201cgeo\u201d) in italic gray with a dashed border. Inherited fields show at 50% opacity with a dotted border and are not clickable.<br><br>'+
     '<strong>Pick/Paste clipboard:</strong> ad group and creative rows have a \u201cPick\u201d (pushpin) action that stores the row into a clipboard variable. A \u201cPaste\u201d button then appears on the <code>+ Ad Group</code> / <code>+ Creative</code> add-rows, allowing users to move or copy rows between campaigns (for AGs) or between ad groups (for CRs).<br><br>'+
     '<strong>Status dot computation:</strong> validate all campaign + AG + CR names in the tree and check character limits. If any name has errors or exceeds the platform limit \u2192 red dot. If any warnings \u2192 yellow. If no names generated (all fields empty) \u2192 gray. Otherwise \u2192 green.</li>'+
-    '<li><code>naming_checker_controller.js</code> \u2014 name validation. Posts to the <code>validate</code> collection endpoint for server-side validation (enables access to game-specific custom known values). Debounce live validation on input (400ms) to avoid excessive server requests. Deduplicate identical issue messages before display. <strong>Parse logic per level:</strong><br>'+
+    '<li><code>naming_checker_controller.js</code> \u2014 name validation. Posts to the <code>validate</code> collection endpoint for server-side validation (enables access to game-specific custom known values). Debounce live validation on input (400ms) to avoid excessive server requests. Deduplicate identical issue messages before display. <strong>First check:</strong> reject names containing spaces with an error (\u201cSpaces are not allowed in names\u201d) before parsing. <strong>Parse logic per level:</strong><br>'+
     '\u2022 Campaign: split on <code>-</code>. Groups: [0]=project, [1]=split on <code>_</code> for beat+date, [2]=platform, [3]=geo, [4..]=rejoin remaining with <code>-</code> then split on <code>_</code> for strategy/objective/suffix.<br>'+
     '\u2022 Ad Group: split on <code>-</code>. [0]=geo, [1..]=rejoin remaining with <code>-</code> then split on <code>_</code> for audience/type/suffix.<br>'+
     '\u2022 Creative: split on <code>-</code>. Map positionally: [geo, format, dims, beat, lp, version, length, suffix\u2026].<br>'+
     'Then check each segment: (1) exact case-insensitive match against known values \u2192 valid, (2) Levenshtein distance \u2264 3 \u2192 warning with suggestion, (3) no close match \u2192 <strong>warning</strong> (\u201cnot in known values (custom?)\u201d) since users can add custom values. Per-field format validation: <code>date</code> matches <code>/^\\d{6}$/</code> + month 01\u201312 + day 01\u201331, <code>dims</code> matches <code>/^\\d+x\\d+$/</code>, <code>version</code> matches <code>/^v\\d+$/i</code>, <code>length</code> matches <code>/^\\d+s$/</code>.</li>'+
     '<li><code>naming_beats_controller.js</code> \u2014 beat chip list management. Filter input, load/delete/duplicate beats. When the active beat is deleted, clear the workspace and show the empty state. Communicates with builder controller via Stimulus outlets or custom events.</li>'+
     '<li><code>naming_export_controller.js</code> \u2014 CSV export. Dropdown button with per-platform options + \u201cAll platforms\u201d option. Per-platform CSV columns: [Campaign, Ad Group, Creative]. All-platforms columns: [Platform, Campaign, Ad Group, Creative]. Rows with empty/incomplete names are skipped. Triggers browser download via Blob URL.</li>'+
+    '<li><code>naming_tabs_controller.js</code> \u2014 simple show/hide tab controller. All three panels (Guide, Helper, Builder) stay in the DOM at all times \u2014 switching tabs toggles an <code>.active</code> class on the corresponding panel. This is critical for cross-tab Turbo Stream updates: when a custom value is added from the Builder, the <code>naming_known_values#create</code> response can replace value list elements in all three panels in a single Turbo Stream response, because they\u2019re all in the DOM.</li>'+
     '</ul>'+
     '<p>Reuse existing app controllers where possible: <code>clipboard_controller</code> for copy buttons, <code>collapse_controller</code> for collapsible sections.</p>'+
+    '<p><strong>Additional server-side controller:</strong> <code>Tools::NamingCampaignsController</code> \u2014 handles per-campaign CRUD nested under a beat. Actions: <code>create</code> (adds campaign with auto-scaffolded AG + CR, responds with Turbo Stream append), <code>update</code> (primary autosave endpoint \u2014 accepts campaign + nested ad groups/creatives), <code>destroy</code> (removes campaign and children, responds with Turbo Stream remove). Include <code>Controller::GameLookup</code> for game scoping. Loads the parent beat via <code>@beat = @game.naming_beats.find(params[:naming_convention_id])</code>.</p>'+
 
     '<h3 style="font-size:.95rem;color:var(--primary);margin:16px 0 6px">12. Testing (RSpec + Capybara)</h3>'+
     '<p>Follow <code>utm_links_spec.rb</code> patterns. Refer to CLAUDE.md testing guidance (layered approach, mock-based unit tests, wiring covered by feature specs):</p>'+
@@ -841,14 +875,14 @@ function buildDevGuide(){
 
     '<h3 style="font-size:.95rem;color:var(--primary);margin:16px 0 6px">13. Implementation Order</h3>'+
     '<ol style="padding-left:20px">'+
-    '<li><strong>YAML config + <code>NamingConvention</code> service</strong> \u2014 define levels, fields, patterns, known values, character limits. Extract build/parse/validate logic from POC into Ruby methods. Write unit tests.<br><em>Done when:</em> <code>NamingConvention.build_campaign_name(fields)</code> returns the same string as the POC\u2019s <code>buildCampaignName()</code> for the same inputs. Parse + validate round-trip works. All tests green.</li>'+
+    '<li><strong>YAML config + <code>NamingConvention</code> service</strong> \u2014 define levels, fields, patterns, known values, character limits. Extract build/parse/validate logic from POC into Ruby methods. Write unit tests.<br><em>Done when:</em> <code>NamingConvention.build_name(:campaign, fields)</code> returns the same string as the POC\u2019s <code>buildCampaignName()</code> for the same inputs (and likewise for ad_group and creative). Parse + validate round-trip works. All tests green.</li>'+
     '<li><strong>Database migrations</strong> \u2014 add <code>project_code</code> to games table. Create all five naming tables with UUID PKs and foreign keys. Run <code>rails db:migrate</code>. Backfill project codes for existing games.<br><em>Done when:</em> <code>db/structure.sql</code> has the new tables. Existing games have project codes. Schema loads cleanly.</li>'+
     '<li><strong>Active Record models</strong> \u2014 associations, validations, nested attributes, <code>acts_as_list</code> for position. Model specs.<br><em>Done when:</em> creating a beat with nested campaigns/ad groups/creatives saves the full tree. Validation rejects missing required fields. All model specs green.</li>'+
-    '<li><strong>Controller + routes</strong> \u2014 <code>Tools::NamingConventionsController</code> with all actions. Strong params with nested attributes. Request specs.<br><em>Done when:</em> <code>/games/:id/tools/naming_conventions</code> renders. CRUD + duplicate + validate actions work with correct Turbo responses. All request specs green.</li>'+
+    '<li><strong>Controllers + routes</strong> \u2014 <code>Tools::NamingConventionsController</code> (beat-level CRUD + duplicate + validate), <code>Tools::NamingCampaignsController</code> (per-campaign autosave + create/destroy), <code>Tools::NamingKnownValuesController</code> (custom value add/remove with multi-target Turbo Stream response). Strong params with nested attributes. Request specs for all three controllers.<br><em>Done when:</em> <code>/games/:id/tools/naming_conventions</code> renders. Beat CRUD + duplicate + validate work. Per-campaign PATCH saves a campaign subtree. Known value create/destroy returns Turbo Streams that update all panels. All request specs green.</li>'+
     '<li><strong>Nav integration</strong> \u2014 add tool card to <code>app/views/tools/index.html.erb</code>. Add I18n strings.<br><em>Done when:</em> the naming conventions card appears on the tools index page and links to the tool.</li>'+
     '<li><strong>Views: Builder tab</strong> \u2014 <code>_beat_setup</code>, <code>_builder_rows</code>, <code>_segment_cell</code>, <code>_full_output</code> partials. Turbo Frames for beat loading + Turbo Stream templates. Stimulus controllers for inline editing, autosave, pick/paste.<br><em>Done when:</em> can create a beat (auto-scaffolds one campaign + AG + CR), add campaigns/ad groups/creatives (auto-scaffolding children), edit field values inline with Tab navigation, see generated names with character counts and full output panel. Behavior matches the POC.</li>'+
     '<li><strong>Views: Helper tab</strong> \u2014 <code>_name_checker</code> with batch validation. <code>_field_reference</code> with collapsible tables and custom value additions.<br><em>Done when:</em> pasting a name shows per-segment validation with fuzzy matching. Field reference tables show known + custom values.</li>'+
-    '<li><strong>Views: Guide tab</strong> \u2014 static guide content, collapsible field overview, naming convention explanation.<br><em>Done when:</em> guide content matches the POC\u2019s Guide tab.</li>'+
+    '<li><strong>Views: Guide tab</strong> \u2014 guide content with three callout boxes (no spaces, alphanumeric only, custom values), collapsible field overview showing all known + custom values (highlighted in blue), auto-refreshes when custom values change.<br><em>Done when:</em> guide content matches the POC\u2019s Guide tab, including callouts and dynamic value tables that update on custom value add/remove.</li>'+
     '<li><strong>Beat management</strong> \u2014 saved beats chip row, filter, duplicate, delete. Turbo Stream updates.<br><em>Done when:</em> can switch between beats, duplicate, delete, and filter. Active beat is highlighted.</li>'+
     '<li><strong>CSV export</strong> \u2014 Stimulus controller to build and download CSV per platform.<br><em>Done when:</em> clicking export downloads a CSV with correct campaign/ad group/creative name columns per platform.</li>'+
     '<li><strong>Feature specs</strong> \u2014 end-to-end Capybara tests for all major flows.<br><em>Done when:</em> all feature specs pass covering create beat, edit fields, validate names, export CSV, switch beats, pick/paste, delete with confirmations.</li>'+
@@ -876,6 +910,7 @@ function buildDevGuide(){
     'app/models/naming_convention.yml         # field definitions + known values\n'+
     '\n'+
     'app/controllers/tools/naming_conventions_controller.rb\n'+
+    'app/controllers/tools/naming_campaigns_controller.rb  # per-campaign autosave\n'+
     'app/controllers/tools/naming_known_values_controller.rb\n'+
     '\n'+
     'app/views/tools/index.html.erb           # add tool card\n'+
@@ -885,7 +920,16 @@ function buildDevGuide(){
     '  create.turbo_stream.erb                # append beat chip + workspace\n'+
     '  destroy.turbo_stream.erb               # remove beat chip + clear workspace\n'+
     '  duplicate.turbo_stream.erb             # append cloned beat chip\n'+
-    '  update.turbo_stream.erb                # autosave response\n'+
+    '  update.turbo_stream.erb                # beat-level autosave response\n'+
+    '\n'+
+    'app/views/tools/naming_campaigns/\n'+
+    '  create.turbo_stream.erb                # append campaign row + scaffolded children\n'+
+    '  update.turbo_stream.erb                # per-campaign autosave response\n'+
+    '  destroy.turbo_stream.erb               # remove campaign row\n'+
+    '\n'+
+    'app/views/tools/naming_known_values/\n'+
+    '  create.turbo_stream.erb                # replace value lists across all tabs\n'+
+    '  destroy.turbo_stream.erb               # replace value lists across all tabs\n'+
     '  _beat_setup.html.erb\n'+
     '  _builder_rows.html.erb                 # spreadsheet-style row layout\n'+
     '  _segment_cell.html.erb\n'+
@@ -900,6 +944,7 @@ function buildDevGuide(){
     '  naming_checker_controller.js\n'+
     '  naming_beats_controller.js\n'+
     '  naming_export_controller.js\n'+
+    '  naming_tabs_controller.js          # show/hide tab panels\n'+
     '\n'+
     'config/locales/en.yml                    # add tools.naming_conventions.*\n'+
     'config/routes.rb                         # add under namespace :tools\n'+
@@ -911,6 +956,7 @@ function buildDevGuide(){
     'spec/models/game/naming_known_value_spec.rb\n'+
     'spec/models/naming_convention_spec.rb\n'+
     'spec/requests/tools/naming_conventions_spec.rb\n'+
+    'spec/requests/tools/naming_campaigns_spec.rb\n'+
     'spec/requests/tools/naming_known_values_spec.rb\n'+
     'spec/features/tools/naming_conventions_spec.rb\n'+
     '</pre>'+
