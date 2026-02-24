@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRACKS Naming Conventions</title>
+    <style>
+        :root{--primary:#2c3e50;--accent:#ff0249;--bg:#f5f6fa;--card:#fff;--shadow:0 2px 8px rgba(0,0,0,.08);--radius:8px;--green:#27ae60;--blue:#3b82f6;--orange:#f59e0b;--tblr-primary:#FF0249;--tblr-primary-rgb:255,2,73;--tblr-body-bg:#f9fafb;--tblr-body-color:#1f2937;--tblr-border-color:rgba(4,32,69,.1);--tblr-secondary:#6b7280;--tblr-border-radius:6px;--tblr-border-radius-lg:8px}
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--tblr-body-bg);color:var(--tblr-body-color);font-size:.875rem;line-height:1.4286;padding:0;min-height:100vh}
+        /* ═══ APP SHELL ═══ */
+        .page{display:flex;flex-direction:column;min-height:100vh}
+        .main-navbar{background:var(--tblr-primary);padding:0 1rem;height:3.25rem;display:flex;align-items:center;justify-content:space-between}
+        .navbar-brand{display:flex;align-items:center;font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:1px;text-decoration:none}
+        .navbar-user{display:flex;align-items:center;gap:8px;color:#fff;font-size:.82rem}
+        .navbar-avatar{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;color:#fff}
+        .secondary-nav{background:#fff;border-bottom:1px solid var(--tblr-border-color);padding:0 1rem;display:flex;align-items:center;height:2.75rem;gap:1.5rem}
+        .secondary-nav a{color:var(--tblr-secondary);font-size:.82rem;font-weight:500;text-decoration:none;display:flex;align-items:center;gap:6px}
+        .secondary-nav a:hover{color:var(--tblr-body-color)}
+        .secondary-nav a.active{color:var(--tblr-body-color);font-weight:600}
+        .page-wrapper{flex:1;display:flex;flex-direction:column}
+        .page-header{padding:1.25rem 1.5rem .5rem}
+        .page-pretitle{font-size:.75rem;font-weight:500;text-transform:uppercase;letter-spacing:.04em;color:var(--tblr-secondary);margin-bottom:2px}
+        .page-pretitle a{color:var(--tblr-secondary);text-decoration:none}
+        .page-pretitle a:hover{text-decoration:underline}
+        .page-title{font-size:1.25rem;font-weight:700;margin:0}
+        .page-body{flex:1;padding:1.25rem 1.5rem}
+        .container-xl{max-width:1200px;margin:0 auto;width:100%}
+        .card.constrained{max-width:1000px;margin:0 auto;border:1px solid var(--tblr-border-color);border-radius:var(--tblr-border-radius-lg);background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.04);overflow:hidden;padding:0;margin-bottom:0}
+        .card-img-top-hero{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 40%,#0f3460 100%);height:200px;position:relative}
+        .hero-devguide-btn{position:absolute;top:12px;right:12px;z-index:10;background:rgba(255,255,255,.15);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.25);padding:5px 12px;border-radius:5px;font-size:.75rem;font-weight:600;cursor:pointer;transition:all .2s;backdrop-filter:blur(4px)}
+        .hero-devguide-btn:hover{background:rgba(255,255,255,.25);color:#fff}
+        .card-img-top-hero .hero-overlay{background:linear-gradient(transparent,rgba(0,0,0,.55));display:flex;flex-direction:column;justify-content:flex-end;height:100%;padding:1.5rem}
+        .card-img-top-hero .hero-overlay h1{color:#fff;font-size:1.5rem;font-weight:700;margin:0 0 4px}
+        .card-img-top-hero .hero-overlay p{color:rgba(255,255,255,.75);font-size:.9rem;margin:0}
+        .card-body-main{padding:1.5rem}
+        .app-footer{padding:1rem 1.5rem;text-align:center;font-size:.78rem;color:var(--tblr-secondary);border-top:1px solid #e5e7eb;margin-top:auto}
+        .app-footer a{color:var(--tblr-secondary);text-decoration:none}
+        .app-footer a:hover{text-decoration:underline}
+        @media print{.main-navbar,.secondary-nav,.page-header,.app-footer,.card-img-top-hero{display:none!important}}
+        /* ═══ TOOL CONTENT ═══ */
+        .tool-inner{max-width:940px;margin:0 auto}
+        .mode-toggle{display:flex;justify-content:center;gap:4px;background:var(--card);border-radius:var(--radius);padding:4px;box-shadow:var(--shadow);margin-bottom:24px;max-width:420px;margin-left:auto;margin-right:auto}
+        .mode-btn{flex:1;padding:10px 16px;border:none;background:transparent;border-radius:6px;cursor:pointer;font-size:.9rem;font-weight:600;color:#64748b;transition:all .2s}
+        .mode-btn.active{background:var(--primary);color:#fff}
+        .mode-btn:hover:not(.active){background:#e2e8f0}
+        .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:16px}
+        .card h2{font-size:1.1rem;color:var(--primary);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+        .card-desc{font-size:.85rem;color:#64748b;line-height:1.5;margin-bottom:16px}
+        .mode-panel{display:none}.mode-panel.active{display:block}
+        .seg{padding:3px 8px;border-radius:4px;font-weight:600;color:#fff;white-space:nowrap;font-size:.82rem;font-family:'SF Mono','Fira Code',monospace;display:inline-block}
+        .delim{color:#94a3b8;font-weight:700;font-size:1rem;font-family:'SF Mono','Fira Code',monospace}
+        .btn{padding:8px 18px;border:none;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+        .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{opacity:.85}
+        .btn-green{background:var(--green);color:#fff}.btn-green:hover{opacity:.85}
+        .btn-accent{background:var(--accent);color:#fff}.btn-accent:hover{opacity:.85}
+        .btn-outline{background:transparent;color:var(--primary);border:1px solid #e2e8f0}.btn-outline:hover{background:#f8fafc}
+        .btn-sm{padding:5px 10px;font-size:.78rem;border-radius:4px}
+        .btn-remove{background:transparent;color:#e74c3c;border:1px solid #e74c3c;padding:4px 8px;font-size:.78rem;cursor:pointer;border-radius:4px}.btn-remove:hover{background:#e74c3c;color:#fff}
+        .btn-dup{background:transparent;color:var(--blue);border:1px solid var(--blue);padding:4px 8px;font-size:.78rem;cursor:pointer;border-radius:4px}.btn-dup:hover{background:var(--blue);color:#fff}
+        .mono{font-family:'SF Mono','Fira Code',monospace}
+
+        /* ═══ REFERENCE ═══ */
+        .ref-intro{margin-bottom:24px}
+        .ref-intro p{font-size:.88rem;color:#475569;line-height:1.6;margin-bottom:8px}
+        .ref-intro ul{font-size:.85rem;color:#475569;line-height:1.6;margin:8px 0;padding-left:20px}
+        .ref-intro li{margin-bottom:4px}
+        .ref-intro code{background:#f1f5f9;padding:1px 5px;border-radius:3px;font-size:.82rem;font-family:'SF Mono','Fira Code',monospace;color:var(--primary)}
+        .ref-section{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:16px}.ref-section:last-child{margin-bottom:0}
+        .ref-section h2{font-size:1.1rem;color:var(--primary);margin-bottom:4px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+        .ref-section h2 .ref-chev{font-size:.7rem;color:#94a3b8;transition:transform .2s;margin-left:auto}
+        .ref-section.collapsed h2 .ref-chev{transform:rotate(-90deg)}
+        .ref-section .ref-body{transition:all .2s}
+        .ref-section.collapsed .ref-body{display:none}
+        .ref-desc{font-size:.85rem;color:#64748b;line-height:1.5;margin-bottom:12px}
+        .ref-level-badge{font-size:.72rem;padding:3px 10px;border-radius:12px;background:#e2e8f0;color:#475569;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+        .ref-pattern{display:flex;flex-wrap:wrap;align-items:center;gap:4px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:12px 16px;margin-bottom:16px}
+        .ref-fields-table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:.85rem}
+        .ref-fields-table th{text-align:left;padding:8px 10px;background:#f8fafc;color:#475569;font-size:.78rem;text-transform:uppercase;letter-spacing:.3px;border-bottom:2px solid #e2e8f0}
+        .ref-fields-table td{padding:8px 10px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+        .ref-fields-table .field-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:middle}
+        .ref-fields-table .values-list{display:flex;flex-wrap:wrap;gap:4px}
+        .ref-fields-table .val-tag{padding:2px 7px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;font-size:.78rem;font-family:'SF Mono','Fira Code',monospace;color:#475569}
+        .ref-example{margin-bottom:12px}
+        .ref-example-breakdown{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+        .ref-chip{display:flex;flex-direction:column;align-items:center;gap:1px}
+        .ref-chip-label{font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+        .ref-chip-val{padding:4px 8px;border-radius:4px;font-size:.82rem;font-weight:600;font-family:'SF Mono','Fira Code',monospace}
+        .chip-delim{color:#94a3b8;font-weight:700;font-size:1rem;align-self:flex-end;padding-bottom:4px}
+        .ref-print-hint{text-align:center;font-size:.78rem;color:#94a3b8;margin-top:8px;font-style:italic}
+        .gen-common-label{font-size:.82rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.3px;margin-bottom:8px}
+
+        /* ═══ BUILDER — Spreadsheet Rows ═══ */
+        .bld-rows{background:#f8fafc;border:1px solid #e2e8f0;border-radius:var(--radius);overflow:visible;margin-bottom:8px}
+        .bld-rows>.bld-row:first-child{border-radius:var(--radius) var(--radius) 0 0}
+        .bld-rows>.bld-row:last-child,.bld-rows>.bld-children:last-child>.bld-add-row:last-child{border-radius:0 0 var(--radius) var(--radius);border-bottom:none}
+        .bld-rows.collapsed .bld-children{display:none}
+        .camp-chev{font-size:.6rem;color:#94a3b8;cursor:pointer;transition:transform .2s;margin-right:2px;padding:4px;user-select:none;flex-shrink:0}
+        .bld-rows.collapsed .camp-chev{transform:rotate(-90deg)}
+        .camp-status{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:2px}
+        .camp-status.st-ok{background:#10b981}.camp-status.st-wrn{background:#f59e0b}.camp-status.st-err{background:#ef4444}.camp-status.st-empty{background:#d1d5db}
+        .bld-row{display:flex;align-items:center;gap:3px;padding:6px 12px;border-bottom:1px solid #f1f5f9;min-height:36px;transition:background .1s}
+        .bld-row:hover{background:#fafcff}
+        .bld-row.lv-camp{background:#f0f4ff}
+        .bld-row.lv-camp:hover{background:#e8eeff}
+        .bld-row.lv-ag{padding-left:32px;background:#f0faf8}
+        .bld-row.lv-ag:hover{background:#e4f5f1}
+        .bld-row.lv-cr{padding-left:54px;background:#fdf4f3}
+        .bld-row.lv-cr:hover{background:#fbe9e7}
+        .bld-rid{font-size:.68rem;font-weight:700;color:#94a3b8;min-width:62px;flex-shrink:0;text-align:right;margin-right:6px;font-family:'SF Mono','Fira Code',monospace}
+        .sc{padding:3px 8px;border-radius:4px;font-weight:600;font-size:.82rem;font-family:'SF Mono','Fira Code',monospace;cursor:pointer;transition:all .12s;white-space:nowrap;border:1.5px solid transparent;line-height:1.4;text-align:center}
+        .sc:hover:not(.inh):not(.ed){filter:brightness(.9);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+        .sc.mt{background:#f1f5f9!important;color:#b0b8c4!important;border:1.5px dashed #d1d5db!important;font-weight:400;font-style:italic;font-size:.78rem}
+        .bld-intro{font-size:.84rem;color:#64748b;margin-bottom:10px;line-height:1.5}
+        .bld-intro strong{color:var(--primary)}
+        .sc.inh{opacity:.5;cursor:default;border-style:dotted!important}
+        .sc.inh:hover{filter:none;box-shadow:none}
+        .sc.ed{padding:0;background:none!important;border-color:transparent!important}
+        .sc.ed input{padding:3px 6px;border:2px solid var(--primary);border-radius:4px;font-size:.82rem;font-family:'SF Mono','Fira Code',monospace;font-weight:600;outline:none;min-width:50px;background:#fff}
+        .bd{color:#cbd5e1;font-weight:700;font-family:'SF Mono','Fira Code',monospace;font-size:.82rem}
+        .bsp{flex:1;min-width:8px}
+        .ri{border:none;background:none;cursor:pointer;font-size:.92rem;padding:3px 5px;border-radius:4px;line-height:1;transition:all .12s;color:#94a3b8;position:relative}
+        .ri:hover{background:#e2e8f0;color:var(--primary)}
+        .ri.danger:hover{background:#fef2f2;color:#ef4444}
+        .ri.picked{color:#8b5cf6}
+        .ri::after{content:attr(data-tip);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;font-size:.7rem;font-weight:600;padding:3px 8px;border-radius:4px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;margin-bottom:4px}
+        .ri:hover::after{opacity:1}
+        .bld-paste{font-size:.78rem;color:#8b5cf6;background:none;border:1px dashed #8b5cf6;cursor:pointer;font-weight:600;padding:2px 8px;border-radius:4px;margin-left:8px;transition:all .12s}
+        .bld-paste:hover{background:#f5f3ff;border-color:#7c3aed}
+        .bld-add-row{display:flex;align-items:center;gap:3px;padding:4px 12px;border-bottom:1px solid #f1f5f9;min-height:28px}
+        .bld-add-row:last-child{border-bottom:none}
+        .bld-add-row.lv-ag{padding-left:32px}
+        .bld-add-row.lv-cr{padding-left:54px}
+        .bld-add{font-size:.78rem;color:#0ea5e9;background:none;border:none;cursor:pointer;font-weight:600;padding:2px 4px;transition:all .12s}
+        .bld-add:hover{color:#0284c7;text-decoration:underline}
+        .bld-setup{display:flex;align-items:center;gap:20px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:var(--radius);padding:14px 16px;margin-bottom:12px}
+        .bld-setup-lbl{font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:6px;color:#475569}
+        .bld-setup-lbl input{padding:5px 8px;border:2px solid #e2e8f0;border-radius:4px;font-size:.88rem;font-family:'SF Mono','Fira Code',monospace;font-weight:600;outline:none;width:120px;transition:border-color .2s}
+        .bld-setup-lbl input:focus{border-color:var(--primary)}
+
+        /* Editable value lists in Reference */
+        .val-add{display:inline-flex;align-items:center;gap:4px;margin-left:6px;vertical-align:middle}
+        .val-add input{padding:2px 6px;border:1px solid #d1d5db;border-radius:4px;font-size:.78rem;width:110px;outline:none;font-family:'SF Mono','Fira Code',monospace}
+        .val-add input:focus{border-color:var(--primary)}
+        .val-add button{padding:2px 8px;border:none;background:var(--primary);color:#fff;border-radius:4px;font-size:.75rem;font-weight:700;cursor:pointer;line-height:1.4}
+        .val-add button:hover{opacity:.85}
+        .val-tag.custom{background:#e0f2fe;border-color:#7dd3fc}
+        .val-rm{margin-left:3px;cursor:pointer;color:#94a3b8;font-size:.72rem;font-weight:700;vertical-align:middle}
+        .val-rm:hover{color:#ef4444}
+
+        .fo-line{cursor:pointer}.fo-line:hover{background:#f0f9ff}
+
+        /* Full output */
+        .fo{margin-top:16px;padding-top:16px;border-top:1px solid #e2e8f0}
+        .fo-group{margin-bottom:10px}
+        .fo-label{font-size:.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+        .fo-list{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;overflow:hidden}
+        .fo-line{display:flex;align-items:center;padding:6px 12px;border-bottom:1px solid #f1f5f9;font-family:'SF Mono','Fira Code',monospace;font-size:.82rem;color:#334155;gap:8px;cursor:pointer}
+        .fo-line:last-child{border-bottom:none}
+        .fo-line:hover{background:#f0f9ff}
+        .fo-line .fo-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+        .fo-line .fo-dot.ok{background:#10b981}.fo-line .fo-dot.wrn{background:#f59e0b}.fo-line .fo-dot.err{background:#ef4444}
+        .fo-line .ln{color:#94a3b8;font-size:.72rem;min-width:18px;text-align:right}
+        .fo-line .lt{flex:1;word-break:break-all}
+        .fo-line .ll{font-size:.7rem;color:#94a3b8;white-space:nowrap}
+        .fo-line .ll.over{color:#ef4444;font-weight:600}
+        .fo-line .fo-iss{font-size:.7rem;color:#94a3b8;white-space:nowrap;font-family:-apple-system,sans-serif}
+        .fo-line .fo-iss.has{color:#ef4444;font-weight:600}
+        .fo-detail{display:none;padding:4px 12px 8px 40px;border-bottom:1px solid #f1f5f9}
+        .fo-detail.open{display:block}
+        .fo-detail .issue-list{margin:0}
+        .fo-detail .issue-list li{padding:4px 8px;font-size:.78rem;margin-bottom:3px}
+        .fo-summary{display:flex;gap:14px;padding:8px 12px;font-size:.78rem;font-weight:600;border-bottom:1px solid #e2e8f0;background:#fff}
+        .fo-summary .fs-ok{color:#10b981}.fo-summary .fs-wrn{color:#f59e0b}.fo-summary .fs-err{color:#ef4444}
+        .fo-actions{display:flex;align-items:center;gap:12px;margin-top:10px}
+        .fo-count{font-size:.82rem;color:#64748b;margin-left:auto}
+
+        /* ═══ CHECKER ═══ */
+        .chk-level-btns{display:flex;gap:8px;margin-bottom:12px;align-items:center}
+        .chk-level-btn{padding:8px 20px;border:2px solid #e2e8f0;background:transparent;border-radius:6px;cursor:pointer;font-size:.9rem;font-weight:600;color:#64748b;transition:all .2s}
+        .chk-level-btn.active{border-color:var(--primary);color:var(--primary);background:#f0f4f8}
+        .auto-tag{font-size:.78rem;color:#10b981;font-weight:600;font-style:italic;display:none}.auto-tag.visible{display:inline}
+        .chk-input{width:100%;padding:14px 16px;border:2px solid #d1d5db;border-radius:6px;font-size:.92rem;font-family:'SF Mono','Fira Code',monospace;outline:none;transition:border-color .2s;resize:vertical;min-height:48px;margin-bottom:12px}
+        .chk-input:focus{border-color:var(--primary)}
+        .chk-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+        .try-link{font-size:.8rem;color:#0ea5e9;cursor:pointer;border:none;background:none;font-weight:600;text-decoration:underline;text-underline-offset:2px}.try-link:hover{color:#0284c7}
+        .results{margin-top:16px}.results.hidden{display:none}
+        .segment-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;align-items:center}
+        .seg-chip{display:flex;flex-direction:column;align-items:center;gap:2px}
+        .seg-chip-label{font-size:.68rem;font-weight:600;color:#64748b;text-transform:uppercase}
+        .seg-chip-value{padding:6px 12px;border-radius:6px;font-size:.88rem;font-weight:600;font-family:'SF Mono','Fira Code',monospace;border:2px solid}
+        .seg-chip-value.valid{border-color:#10b981;background:#ecfdf5;color:#065f46}
+        .seg-chip-value.warning{border-color:#f59e0b;background:#fffbeb;color:#92400e}
+        .seg-chip-value.error{border-color:#ef4444;background:#fef2f2;color:#991b1b}
+        .seg-chip-value.neutral{border-color:#d1d5db;background:#f9fafb;color:#374151}
+        .verdict{padding:12px 16px;border-radius:6px;font-weight:700;font-size:.95rem;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+        .verdict.pass{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+        .verdict.fail{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+        .verdict-text{flex:1}
+        .issue-list{list-style:none;padding:0}
+        .issue-list li{padding:8px 12px;border-radius:6px;margin-bottom:6px;font-size:.88rem;line-height:1.4}
+        .issue-list li.err{background:#fef2f2;color:#991b1b;border-left:3px solid #ef4444}
+        .issue-list li.wrn{background:#fffbeb;color:#92400e;border-left:3px solid #f59e0b}
+        .batch-summary{display:flex;gap:16px;padding:12px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;margin-bottom:12px;font-size:.88rem;font-weight:600}
+        .batch-summary .bp{color:#065f46}.batch-summary .bw{color:#92400e}.batch-summary .bf{color:#991b1b}
+        .batch-line{border:1px solid #e2e8f0;border-radius:6px;margin-bottom:8px;overflow:hidden}
+        .batch-hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background .15s}
+        .batch-hdr:hover{background:#f8fafc}
+        .batch-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+        .batch-dot.pass{background:#10b981}.batch-dot.warn{background:#f59e0b}.batch-dot.fail{background:#ef4444}
+        .batch-name{flex:1;font-family:'SF Mono','Fira Code',monospace;font-size:.85rem;color:#334155;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .batch-info{font-size:.78rem;color:#64748b;white-space:nowrap}
+        .batch-chev{color:#94a3b8;font-size:.8rem;transition:transform .2s}
+        .batch-line.open .batch-chev{transform:rotate(90deg)}
+        .batch-detail{display:none;padding:0 14px 14px}.batch-line.open .batch-detail{display:block}
+        .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 20px;border-radius:6px;font-size:.88rem;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:100}.toast.show{opacity:1}
+        @media(max-width:768px){.saved-beats{grid-template-columns:1fr}}
+        @media(max-width:640px){body{padding:12px}.bld-row{flex-wrap:wrap;gap:2px}.bld-row.lv-ag{padding-left:16px}.bld-row.lv-cr{padding-left:28px}.sc{font-size:.75rem;padding:2px 6px}}
+        @media print{.mode-toggle,.fo-actions,.chk-actions,.toast,.bld-add,.ri,.bld-paste{display:none!important}body{padding:0;background:#fff}.card,.bld-rows{box-shadow:none;border:1px solid #ddd}}
+
+        /* ═══ GUIDE SECTIONS ═══ */
+        .gc{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid #e2e8f0}
+        .gc:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+        .gc h2{font-size:1.1rem;color:var(--primary);margin-bottom:10px}
+        .gc p{font-size:.85rem;color:#475569;line-height:1.6;margin-bottom:8px}
+        .gc ul,.gc ol{font-size:.85rem;color:#475569;line-height:1.6;margin:6px 0 10px;padding-left:22px}
+        .gc li{margin-bottom:4px}
+        .gc code{background:#f1f5f9;padding:1px 5px;border-radius:3px;font-size:.8rem;font-family:'SF Mono','Fira Code',monospace;color:var(--primary)}
+
+        /* ═══ CALLOUT ═══ */
+        .callout{padding:12px 16px;border-radius:6px;font-size:.85rem;line-height:1.5;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px}
+        .callout-blue{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}
+        .callout-amber{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+        .callout-green{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46}
+
+        /* ═══ DEV GUIDE ═══ */
+        .dg{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid #e2e8f0}
+        .dg:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+        .dg h2{font-size:1.1rem;color:var(--primary);margin-bottom:10px}
+        .dg h3{font-size:.95rem;color:var(--primary);margin:18px 0 6px;padding-top:14px;border-top:1px solid #e2e8f0}
+        .dg h3:first-child{border-top:none;padding-top:0}
+        .dg p{font-size:.85rem;color:#475569;line-height:1.6;margin-bottom:8px}
+        .dg ul,.dg ol{font-size:.85rem;color:#475569;line-height:1.6;margin:6px 0 10px;padding-left:22px}
+        .dg li{margin-bottom:4px}
+        .dg code{background:#f1f5f9;padding:1px 5px;border-radius:3px;font-size:.8rem;font-family:'SF Mono','Fira Code',monospace;color:var(--primary)}
+        .dg pre{background:#f1f5f9;padding:12px 14px;border-radius:6px;font-size:.75rem;overflow-x:auto;margin:6px 0 12px;line-height:1.5;font-family:'SF Mono','Fira Code',monospace;white-space:pre;color:#334155}
+        .dg table{min-width:auto}
+        .dg th{font-size:.75rem;padding:8px 10px;background:#f8fafc;color:#475569;text-transform:uppercase;letter-spacing:.3px;border-bottom:2px solid #e2e8f0}
+        .dg td{padding:8px 10px;border-bottom:1px solid #f1f5f9;vertical-align:top;font-size:.83rem}
+        .dg strong{color:#1e293b}
+        .dg .warn{font-size:.82rem;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:8px 12px;line-height:1.5;margin:8px 0}
+        .dg .info{font-size:.82rem;color:#1e40af;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:8px 12px;line-height:1.5;margin:8px 0}
+
+        /* ═══ SAVED BEATS ═══ */
+        .bld-setup-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+        .btn-undo{background:none;color:#94a3b8;padding:7px 12px;border:1.5px solid #e2e8f0;border-radius:6px;cursor:pointer;font-size:.82rem;font-weight:600;transition:all .2s}
+        .btn-undo:hover{color:var(--primary);border-color:var(--primary);background:#f0f4f8}
+        .btn-gen{background:#0ea5e9;color:#fff;padding:7px 16px;border:none;border-radius:6px;cursor:pointer;font-size:.84rem;font-weight:600;transition:all .2s}
+        .btn-gen:hover{opacity:.85}
+        .bld-empty{text-align:center;padding:40px 20px;color:#94a3b8;font-size:.9rem}
+        .bld-empty strong{color:#64748b}
+        .saved-beats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:0 0 12px;margin-bottom:4px}
+        .saved-beats:empty{display:none}
+        .beats-filter{padding:4px 10px;border:2px solid #e2e8f0;border-radius:6px;font-size:.82rem;outline:none;width:180px;transition:border-color .2s;margin-bottom:8px}
+        .beats-filter:focus{border-color:var(--primary)}
+        .beats-filter::placeholder{color:#b0b8c4}
+        .beat-card{background:var(--card);border:1px solid var(--tblr-border-color);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;cursor:pointer;transition:all .2s ease-in-out}
+        .beat-card:hover{transform:scale(1.02);box-shadow:0 1px 6px 0 rgba(0,0,0,.08)}
+        .beat-card.active{border-color:var(--tblr-primary);box-shadow:0 0 0 3px rgba(255,2,73,.15)}
+        .beat-card-header{font-weight:700;color:var(--primary);font-size:.92rem;margin-bottom:4px}
+        .beat-card-stats{font-size:.78rem;color:var(--tblr-secondary);margin-bottom:8px}
+        .beat-card-actions{display:flex;gap:4px}
+        .beat-card-btn{background:transparent;color:var(--tblr-secondary);border:1px solid var(--tblr-border-color);padding:4px 8px;font-size:.78rem;cursor:pointer;border-radius:4px;transition:all .15s}
+        .beat-card-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+        .beat-card-btn.danger:hover{background:#ef4444;color:#fff;border-color:#ef4444}
+    </style>
+</head>
+<body>
+<div class="page">
+  <!-- Primary navbar -->
+  <header class="main-navbar d-print-none">
+    <div class="navbar-brand">&#9670; TRACKS</div>
+    <div class="navbar-user">
+      <span>Demo User</span>
+      <div class="navbar-avatar">DU</div>
+    </div>
+  </header>
+
+  <!-- Secondary nav -->
+  <nav class="secondary-nav d-print-none">
+    <a href="#">Dashboard</a>
+    <a href="#">Attribution</a>
+    <a href="#" class="active">Tools</a>
+    <a href="#">FAQ</a>
+    <a href="#">Documentation</a>
+  </nav>
+
+  <div class="page-wrapper">
+    <!-- Page header -->
+    <div class="page-header d-print-none">
+      <div class="container-xl">
+        <div class="page-pretitle"><a href="#">Enshrouded</a> / <a href="#">Tools</a></div>
+        <h2 class="page-title">Naming Conventions</h2>
+      </div>
+    </div>
+
+    <!-- Page body -->
+    <div class="page-body">
+      <div class="container-xl">
+        <div class="card constrained">
+          <div class="card-img-top-hero">
+            <button class="hero-devguide-btn" onclick="switchMode('devguide')">Dev Guide</button>
+            <div class="hero-overlay">
+              <h1>Naming Conventions: Enshrouded</h1>
+              <p>Build, validate, and export structured ad names for your campaigns</p>
+            </div>
+          </div>
+          <div class="card-body-main">
+            <div class="tool-inner">
+              <div class="mode-toggle" style="max-width:460px">
+                  <button class="mode-btn active" data-mode="guide">Guide</button>
+                  <button class="mode-btn" data-mode="reference">Helper</button>
+                  <button class="mode-btn" data-mode="generator">Builder</button>
+              </div>
+              <div id="mode-guide" class="mode-panel active"></div>
+              <div id="mode-reference" class="mode-panel"></div>
+              <div id="mode-generator" class="mode-panel"><div id="gen-setup"></div><div id="saved-beats-container"></div><div id="gen-root"></div><div id="gen-output"></div></div>
+              <div id="mode-devguide" class="mode-panel"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer d-print-none">
+      &copy; 2026 <a href="#">Second Stage GmbH</a>. All rights reserved.
+    </footer>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════
+const C={project:'#6366f1',platform:'#0ea5e9',geo:'#10b981',beat:'#f59e0b',date:'#d97706',strategy:'#8b5cf6',objective:'#ec4899',audience:'#14b8a6',type:'#f97316',format:'#ef4444',dims:'#64748b',lp:'#06b6d4',version:'#a855f7',length:'#84cc16',suffix:'#9ca3af'};
+const KNOWN={geo:['US','UK','DE','FR','ES','IT','NL','JP','KR','AU','CA','BR','CN','MX','IN','SE','PL','TW','TR','SA','ID','AR'],platform:['GoogleSearch','YouTube','PerformanceMax','Meta','Reddit','TikTok','GoogleDemandGen','DisplayVideo360','X'],strategy:['Awareness','Consideration','Conversion','Retention'],objective:['Traffic','Reach','Views','AppInstall','Purchase','Wishlists'],audience:['Core','Secondary','Aspirational','Broad','Mainstream','Lookalike','Retargeting','Growth','Reach'],type:['Prospecting','Retargeting','Retention'],format:['Video','Static','Carousel','Collection','HTML5'],lp:['Website','Steam','EGS','PSStore','MSStore','eShop'],version:['v1','v2','v3']};
+const LIMITS={GoogleSearch:128,YouTube:128,PerformanceMax:128,Meta:400,Reddit:400,TikTok:512,GoogleDemandGen:128,DisplayVideo360:240,X:255};
+
+function buildCampaignName(v){const a=[v.project];a.push([v.beat,v.date].filter(Boolean).join('_'));a.push(v.platform);a.push(v.geo);a.push([v.strategy,v.objective,v.suffix].filter(Boolean).join('_'));return a.filter(Boolean).join('-')}
+function buildAgName(v){const s=[v.audience,v.type,v.suffix].filter(Boolean).join('_');return[v.geo,s].filter(Boolean).join('-')}
+function buildCrName(v){const a=[v.geo,v.format,v.dims,v.beat,v.lp,v.version,v.length,v.suffix];while(a.length&&!a[a.length-1])a.pop();return a.filter(Boolean).join('-')}
+
+const LEVELS={
+    campaign:{label:'Campaign',desc:'The top level of your ad structure. Each campaign targets one platform, geography, and funnel strategy. Project and beat are set once in the Builder setup. Spaces are not allowed \u2014 groups are separated by hyphens (-) and compound segments within a group by underscores (_). Expand the Field Reference below for allowed and custom values.',fields:[{key:'project',label:'Project',ph:'ENS',help:'Auto-generated 3-letter code based on the game name. Must be unique per game (e.g. Enshrouded = ENS, Outlast Trials = OLT).',examples:['ENS','OLT','ABX']},{key:'beat',label:'Beat',ph:'Launch',help:'Campaign beat or content phase \u2014 a themed period like a product launch, seasonal event, or content drop. Can be set in the Builder setup. Free text \u2014 the examples shown are just common patterns.',examples:['Launch','Holiday','Announcement','Update','Season1']},{key:'date',label:'Start Date',ph:'',isDate:true,help:'Campaign start date in YYMMDD format'},{key:'platform',label:'Platform',ph:'Meta',vals:KNOWN.platform,help:'Ad platform this campaign runs on'},{key:'geo',label:'Geo',ph:'UK',vals:KNOWN.geo,help:'Primary market or country code'},{key:'strategy',label:'Strategy',ph:'Awareness',vals:KNOWN.strategy,help:'Funnel stage: where in the customer journey'},{key:'objective',label:'Objective',ph:'Reach',vals:KNOWN.objective,help:'Platform optimization objective'},{key:'suffix',label:'Suffix',ph:'',opt:true,help:'Optional extra identifier for variants'}],pattern:[{k:'project'},{d:'-'},{k:'beat'},{d:'_'},{k:'date'},{d:'-'},{k:'platform'},{d:'-'},{k:'geo'},{d:'-'},{k:'strategy'},{d:'_'},{k:'objective'},{d:'_',opt:true},{k:'suffix',opt:true}],build:buildCampaignName,examples:[{project:'ENS',beat:'Launch',date:'260219',platform:'Meta',geo:'UK',strategy:'Awareness',objective:'Reach'},{project:'ENS',beat:'Holiday',date:'261115',platform:'GoogleSearch',geo:'DE',strategy:'Conversion',objective:'Traffic'},{project:'OLT',beat:'Announcement',date:'260612',platform:'TikTok',geo:'US',strategy:'Awareness',objective:'Views',suffix:'GameplayTrailer'}]},
+    adgroup:{label:'Ad Group',desc:'Sits inside a campaign and defines who sees your ads. Geo is inherited from the campaign. Spaces are not allowed \u2014 audience and targeting type are separated by underscores (_), with hyphens (-) between groups. Expand the Field Reference below for allowed and custom values.',fields:[{key:'geo',label:'Geo',ph:'UK',vals:KNOWN.geo,help:'Geography code \u2014 should match the parent campaign'},{key:'audience',label:'Audience',ph:'Core',vals:KNOWN.audience,help:'Target audience segment you are reaching'},{key:'type',label:'Type',ph:'Prospecting',vals:KNOWN.type,help:'Targeting approach: new users, returning, or retained'},{key:'suffix',label:'Suffix',ph:'',opt:true,help:'Optional qualifier like age range or interest'}],pattern:[{k:'geo'},{d:'-'},{k:'audience'},{d:'_'},{k:'type'},{d:'_',opt:true},{k:'suffix',opt:true}],build:buildAgName,examples:[{geo:'UK',audience:'Core',type:'Prospecting'},{geo:'DE',audience:'Lookalike',type:'Retargeting'},{geo:'US',audience:'Broad',type:'Prospecting',suffix:'18-34'}]},
+    creative:{label:'Creative',desc:'The actual ad asset inside an ad group. Geo and beat are inherited from the campaign. Spaces are not allowed \u2014 all segments are separated by hyphens (-). Describes exactly what the user sees. Expand the Field Reference below for allowed and custom values.',fields:[{key:'geo',label:'Geo',ph:'UK',vals:KNOWN.geo,help:'Geography code \u2014 inherited from the campaign'},{key:'format',label:'Format',ph:'Video',vals:KNOWN.format,help:'Creative format or ad type'},{key:'dims',label:'Dimensions',ph:'1920x1080',help:'Asset dimensions as WIDTHxHEIGHT in pixels'},{key:'beat',label:'Beat',ph:'Launch',help:'Campaign beat \u2014 inherited from the Builder setup'},{key:'lp',label:'Landing Page',ph:'Website',vals:KNOWN.lp,help:'Where the ad links to when clicked'},{key:'version',label:'Version',ph:'v1',vals:KNOWN.version,help:'Creative iteration (v1, v2, v3...)'},{key:'length',label:'Length',ph:'30s',help:'Duration for video ads (e.g. 15s, 30s). Use 0s for static.'},{key:'suffix',label:'Suffix',ph:'',opt:true,help:'Optional variant label like "dark" or "alt"'}],pattern:[{k:'geo'},{d:'-'},{k:'format'},{d:'-'},{k:'dims'},{d:'-'},{k:'beat'},{d:'-'},{k:'lp'},{d:'-'},{k:'version'},{d:'-'},{k:'length'},{d:'-',opt:true},{k:'suffix',opt:true}],build:buildCrName,examples:[{geo:'UK',format:'Video',dims:'1920x1080',beat:'Launch',lp:'Website',version:'v1',length:'30s'},{geo:'DE',format:'Static',dims:'1080x1080',beat:'Holiday',lp:'Steam',version:'v2',length:'0s'},{geo:'US',format:'Carousel',dims:'1080x1080',beat:'Announcement',lp:'EGS',version:'v1',length:'0s',suffix:'dark'}]}
+};
+
+const CHK_EXAMPLES={valid:{campaign:'ENS-Launch_260219-Meta-UK-Awareness_Reach',adgroup:'UK-Core_Prospecting',creative:'UK-Video-1920x1080-Launch-Website-v1-30s'},invalid:{campaign:'ENS-Launch_2602-Facebok-UK-awareness_Traffic',adgroup:'UK-core_prospekting',creative:'UK-Vido-1920x1080-Launch-website-v1-thirty'}};
+
+// ══════════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════════
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2000)}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function formatDate(v){if(!v)return '';const d=new Date(v);return String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')}
+function fuzzy(v,list){const l=v.toLowerCase();return list.find(i=>i.toLowerCase()===l)}
+function findClose(v,list){const l=v.toLowerCase();let b=null,bd=9;for(const i of list){const d=lev(l,i.toLowerCase());if(d<bd&&d<=3){bd=d;b=i}}return b}
+function lev(a,b){const m=a.length,n=b.length,d=Array.from({length:m+1},()=>Array(n+1).fill(0));for(let i=0;i<=m;i++)d[i][0]=i;for(let j=0;j<=n;j++)d[0][j]=j;for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=a[i-1]===b[j-1]?d[i-1][j-1]:1+Math.min(d[i-1][j],d[i][j-1],d[i-1][j-1]);return d[m][n]}
+function copyText(s){return navigator.clipboard.writeText(s)}
+function makeDl(id,vals){const dl=document.createElement('datalist');dl.id=id;vals.forEach(v=>{const o=document.createElement('option');o.value=v;dl.appendChild(o)});return dl}
+
+// Editable known values
+const CUSTOM={};
+
+function renderValsList(container,key){
+    container.innerHTML='';
+    const w=document.createElement('div');w.className='values-list';
+    KNOWN[key].forEach(x=>{
+        const t=document.createElement('span');
+        const isCustom=CUSTOM[key]&&CUSTOM[key].has(x);
+        t.className='val-tag'+(isCustom?' custom':'');
+        t.textContent=x;
+        if(isCustom){const rm=document.createElement('span');rm.className='val-rm';rm.textContent='\u00d7';rm.addEventListener('click',()=>{removeKnownValue(key,x);renderValsList(container,key)});t.appendChild(rm)}
+        w.appendChild(t);
+    });
+    container.appendChild(w);
+    const note=document.createElement('div');
+    note.style.cssText='font-size:.7rem;color:#10b981;margin-top:4px;font-style:italic';
+    note.textContent='\u270e custom values auto-saved from Builder';
+    container.appendChild(note);
+}
+
+function addKnownValue(key,val){
+    KNOWN[key].push(val);
+    if(!CUSTOM[key])CUSTOM[key]=new Set();
+    CUSTOM[key].add(val);
+    refreshDataLists(key);
+    buildGuide();
+}
+
+function removeKnownValue(key,val){
+    const idx=KNOWN[key].indexOf(val);
+    if(idx>-1)KNOWN[key].splice(idx,1);
+    if(CUSTOM[key])CUSTOM[key].delete(val);
+    refreshDataLists(key);
+    buildGuide();
+}
+
+function refreshDataLists(key){
+    const vals=KNOWN[key];if(!vals)return;
+    document.querySelectorAll(`datalist[id$="-${key}"]`).forEach(dl=>{
+        dl.innerHTML='';vals.forEach(v=>{const o=document.createElement('option');o.value=v;dl.appendChild(o)});
+    });
+}
+
+function switchMode(mode){
+    document.querySelectorAll('.mode-btn').forEach(x=>x.classList.remove('active'));
+    const modeBtn=document.querySelector(`.mode-btn[data-mode="${mode}"]`);
+    if(modeBtn) modeBtn.classList.add('active');
+    document.querySelectorAll('.mode-panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('mode-'+mode).classList.add('active');
+    if(mode==='devguide') buildDevGuide();
+}
+
+function clickCopy(el,getText){
+    el.addEventListener('click',()=>{const t=typeof getText==='function'?getText():el.textContent;if(t)copyText(t).then(()=>toast('Copied'))});
+}
+
+function parseDateSeg(v){if(!/^\d{6}$/.test(v))return '';return '20'+v.slice(0,2)+'-'+v.slice(2,4)+'-'+v.slice(4,6)}
+
+// ══════════════════════════════════════════
+// GUIDE
+// ══════════════════════════════════════════
+function buildGuide(){
+    const root=document.getElementById('mode-guide');root.innerHTML='';
+
+    // Section 1: Naming Convention
+    const s1=document.createElement('div');s1.className='gc';
+    s1.innerHTML='<h2>Naming Convention</h2>'+
+    '<p>Ad names are structured so the TRACKS database can immediately parse and identify the creative assets, platform, and target demographic. Three levels mirror the ad platform hierarchy:</p>'+
+    '<ul>'+
+    '<li><strong>Campaign</strong> \u2014 project code (from game), beat, platform, market, and funnel strategy</li>'+
+    '<li><strong>Ad Group</strong> \u2014 audience segment and targeting approach (geo inherited from campaign)</li>'+
+    '<li><strong>Creative</strong> \u2014 format, dimensions, landing page, and version (geo + beat inherited)</li>'+
+    '</ul>'+
+    '<p>Segments are joined by <code>-</code> (hyphens) between groups and <code>_</code> (underscores) within compound groups. For example:</p>'+
+    '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 14px;margin-bottom:8px;font-family:\'SF Mono\',\'Fira Code\',monospace;font-size:.85rem;line-height:1.8">'+
+    '<span style="color:#6366f1;font-weight:600">ENS</span><span style="color:#94a3b8;font-weight:700">-</span>'+
+    '<span style="color:#f59e0b;font-weight:600">Launch</span><span style="color:#d97706;font-weight:700">_</span><span style="color:#d97706;font-weight:600">260219</span><span style="color:#94a3b8;font-weight:700">-</span>'+
+    '<span style="color:#0ea5e9;font-weight:600">Meta</span><span style="color:#94a3b8;font-weight:700">-</span>'+
+    '<span style="color:#10b981;font-weight:600">UK</span><span style="color:#94a3b8;font-weight:700">-</span>'+
+    '<span style="color:#8b5cf6;font-weight:600">Awareness</span><span style="color:#ec4899;font-weight:700">_</span><span style="color:#ec4899;font-weight:600">Reach</span>'+
+    '<div style="margin-top:6px;font-family:-apple-system,sans-serif;font-size:.78rem;color:#64748b"><code style="background:#f1f5f9;padding:1px 5px;border-radius:3px;font-size:.78rem;color:var(--primary)">-</code> separates independent groups &nbsp;\u2022&nbsp; <code style="background:#f1f5f9;padding:1px 5px;border-radius:3px;font-size:.78rem;color:var(--primary)">_</code> joins related parts (beat+date, strategy+objective)</div>'+
+    '</div>'+
+    '<div class="callout callout-blue" style="flex-direction:column;gap:6px">'+
+    '<div style="display:flex;align-items:flex-start;gap:10px"><span>\u2139\ufe0f</span><span><strong>No spaces allowed.</strong> Names must not contain any spaces. Hyphens (<code>-</code>) and underscores (<code>_</code>) are the only separators \u2014 everything else should be continuous text with no whitespace.</span></div>'+
+    '<div style="display:flex;align-items:flex-start;gap:10px"><span>\u26a0\ufe0f</span><span><strong>Only use letters and numbers in field values.</strong> Because <code>-</code> and <code>_</code> are used as separators in the naming convention, special characters in values would break parsing. For example, use <code>PSStore</code> instead of <code>PS-Store</code>.</span></div>'+
+    '<div style="display:flex;align-items:flex-start;gap:10px"><span>\u2705</span><span><strong>Custom values are supported.</strong> Fields like Platform, Geo, Strategy, and others come with predefined values, but you can add your own. Simply type a new value into any dropdown field in the <strong>Builder</strong> tab and it will be auto-saved as a custom value. Custom values appear <span style="background:#e0f2fe;border:1px solid #7dd3fc;padding:1px 6px;border-radius:4px;font-size:.78rem;font-family:\'SF Mono\',\'Fira Code\',monospace">highlighted in blue</span> in the field tables below, in the Helper tab, and in all dropdowns. You can remove a custom value from the Helper tab\u2019s Field Reference by clicking the \u00d7 next to it.</span></div>'+
+    '</div>';
+    // Collapsible field overview per level — wrapped in inner card
+    const fieldCard=document.createElement('div');fieldCard.style.cssText='background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-top:16px';
+    const fieldToggle=document.createElement('div');
+    fieldToggle.style.cssText='display:flex;align-items:center;cursor:pointer;user-select:none';
+    fieldToggle.innerHTML='<span style="font-size:.88rem;font-weight:700;color:var(--primary)">Available Fields</span><span class="ref-chev" style="margin-left:auto;font-size:.7rem;color:#94a3b8;transition:transform .2s;transform:rotate(-90deg)">&#9660;</span>';
+    const fieldDetail=document.createElement('div');fieldDetail.style.display='none';
+    fieldToggle.addEventListener('click',()=>{const open=fieldDetail.style.display!=='none';fieldDetail.style.display=open?'none':'block';fieldToggle.querySelector('.ref-chev').style.transform=open?'rotate(-90deg)':'rotate(0)'});
+    fieldCard.appendChild(fieldToggle);
+    for(const[lk,lv]of Object.entries(LEVELS)){
+        const lvH=document.createElement('div');lvH.style.cssText='font-size:.82rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.3px;margin:12px 0 6px';lvH.textContent=lv.label;
+        fieldDetail.appendChild(lvH);
+        const pat=document.createElement('div');pat.style.cssText='display:flex;flex-wrap:wrap;align-items:center;gap:4px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px;margin-bottom:6px';
+        lv.pattern.forEach(p=>{if(p.d){const s=document.createElement('span');s.className='delim';s.textContent=p.d;if(p.opt)s.style.opacity='.4';pat.appendChild(s)}else{const s=document.createElement('span');s.className='seg';s.style.background=C[p.k];s.textContent='{'+p.k+'}';if(p.opt)s.style.opacity='.6';pat.appendChild(s)}});
+        fieldDetail.appendChild(pat);
+        const tbl=document.createElement('table');tbl.className='ref-fields-table';tbl.style.cssText='margin-bottom:4px;table-layout:fixed';tbl.innerHTML='<colgroup><col style="width:18%"><col style="width:46%"><col style="width:36%"></colgroup><thead><tr><th>Field</th><th>Description</th><th>Examples</th></tr></thead>';
+        const tb=document.createElement('tbody');
+        lv.fields.forEach(f=>{const tr=document.createElement('tr');const n=document.createElement('td');n.innerHTML='<span class="field-dot" style="background:'+C[f.key]+'"></span><strong>'+f.label+'</strong>'+(f.opt?' <span style="color:#94a3b8">(opt)</span>':'');tr.appendChild(n);const d=document.createElement('td');d.style.fontSize='.82rem';d.textContent=f.help||'';tr.appendChild(d);const ex=document.createElement('td');const vals=f.vals&&KNOWN[f.key]?KNOWN[f.key]:f.examples?f.examples:f.isDate?['YYMMDD']:[];if(vals.length){const w=document.createElement('div');w.className='values-list';vals.forEach(v=>{const isCustom=CUSTOM[f.key]&&CUSTOM[f.key].has(v);const t=document.createElement('span');t.className='val-tag'+(isCustom?' custom':'');t.textContent=v;w.appendChild(t)});ex.appendChild(w)}else{ex.innerHTML='<span style="color:#94a3b8">Free text</span>'}tr.appendChild(ex);tb.appendChild(tr)});
+        tbl.appendChild(tb);fieldDetail.appendChild(tbl);
+    }
+    fieldCard.appendChild(fieldDetail);
+    s1.appendChild(fieldCard);
+    root.appendChild(s1);
+
+    // Section 2: Using the Helper
+    const s2=document.createElement('div');s2.className='gc';
+    s2.innerHTML='<h2>Helper Tab</h2>'+
+    '<p><strong>Check existing names and look up field values.</strong> The <strong>Helper</strong> tab has three sections \u2014 one for each level (Campaign, Ad Group, Creative). Each includes:</p>'+
+    '<ul>'+
+    '<li><strong>Name Checker</strong> \u2014 paste one or multiple names (one per line) to validate them. Errors and warnings are shown inline with suggestions for how to correct them.</li>'+
+    '<li><strong>Field Reference</strong> \u2014 expand to see every field, its description, and the allowed/custom values. Custom values you enter in the Builder are automatically added here.</li>'+
+    '</ul>';
+    root.appendChild(s2);
+
+    // Section 3: Using the Builder
+    const s3=document.createElement('div');s3.className='gc';
+    s3.innerHTML='<h2>Builder Tab</h2>'+
+    '<p><strong>Build and manage your ad naming structures.</strong> Select an existing beat or create a new one, add campaigns, ad groups, and creatives, then export the generated names. Everything autosaves as you work.</p>'+
+    '<p>Use the <strong>Beat</strong> dropdown in the setup bar to select an existing beat (shared across Naming Conventions and Tracking Links) or choose <strong>+ Create new beat</strong> to start a fresh workspace. The game\u2019s project code (e.g. ENS) is inherited automatically.</p>'+
+    '<ul>'+
+    '<li><strong>Saved beats</strong> appear as cards below the setup bar. Click a card to switch to that beat. Each card shows campaign/ad group/creative counts, platforms used, and when it was last edited. Beat names must be unique per game. Use <strong>Duplicate</strong> to copy a beat\u2019s structure for a new content drop.</li>'+
+    '<li><strong>Autosave:</strong> every change you make is automatically saved to the active beat. No manual save needed.</li>'+
+    '<li><strong>Click</strong> any colored segment to edit it. Fields with known options show a dropdown. Press <strong>Tab</strong> to jump to the next field in the row.</li>'+
+    '<li><strong>Row actions:</strong> <strong>Dupe</strong> duplicates a row and its children. <strong>Del</strong> removes it (with confirmation). <strong>Copy</strong> copies the row\u2019s name to the clipboard.</li>'+
+    '<li><strong>Collapse campaigns</strong> using the <strong>\u25BC</strong> chevron. A colored dot next to it shows validation status: <span style="color:#10b981;font-weight:600">green</span> = valid, <span style="color:#f59e0b;font-weight:600">yellow</span> = warnings, <span style="color:#ef4444;font-weight:600">red</span> = errors, <span style="color:#94a3b8;font-weight:600">gray</span> = incomplete.</li>'+
+    '<li><strong>Faded/dotted segments</strong> are inherited and can\u2019t be edited directly:<br>'+
+    '<span style="color:var(--primary);font-weight:600">project</span> (from the game) and <span style="color:#f59e0b;font-weight:600">beat</span> (from the selected beat) \u2022 '+
+    '<span style="color:#10b981;font-weight:600">geo</span> flows from the campaign to its ad groups and creatives \u2022 '+
+    '<span style="color:#f59e0b;font-weight:600">beat</span> also flows to creatives. Change them at the source and all children update.</li>'+
+    '<li><strong>Required fields:</strong> project code (auto), beat, platform, geo, strategy, and objective for campaigns. Audience and type for ad groups. Format, dims, lp, version, and length for creatives. Date and suffix are always optional.</li>'+
+    '<li><strong>Date picker:</strong> the calendar automatically converts your selection to <code>YYMMDD</code> format (e.g. Feb 19, 2026 \u2192 <code>260219</code>).</li>'+
+    '<li><strong>Character limits:</strong> each platform has a max name length (e.g. Google: 128, Meta: 400). The number next to each name in the output shows current/limit.</li>'+
+    '</ul>';
+    root.appendChild(s3);
+
+    // Section 4: Consistency callout
+    const s4=document.createElement('div');s4.className='gc';
+    s4.innerHTML='<h2>Why Consistency Matters</h2>'+
+    '<p>Tracks dashboards group and aggregate data based on these naming segments. If field values don\u2019t match exactly \u2014 different spelling, casing, or abbreviations \u2014 your reporting will be split across entries instead of rolling up cleanly.</p>'+
+    '<p>Use the <strong>dropdown suggestions</strong> in the Builder whenever possible. Custom values you type are auto-saved so they\u2019re available next time. Check the <strong>Field Reference</strong> in the Helper tab to see all allowed and custom values for each field.</p>';
+    root.appendChild(s4);
+
+    root.insertAdjacentHTML('beforeend','<div class="ref-print-hint">Tip: Ctrl/Cmd+P to print as cheat sheet</div>');
+}
+buildGuide();
+
+// ══════════════════════════════════════════
+// SPEC
+// ══════════════════════════════════════════
+function buildDevGuide(){
+    const root=document.getElementById('mode-devguide');root.innerHTML='';
+
+    // Card 1: High-level POC overview
+    const c1=document.createElement('div');c1.className='dg';
+    c1.innerHTML='<h2>POC Overview</h2>'+
+    '<p>This proof-of-concept validates the <strong>UI patterns and data model</strong> for a naming convention tool that will be integrated into the TRACKS platform. It is a single self-contained HTML file with no external dependencies.</p>'+
+    '<h3>Purpose</h3>'+
+    '<p>Give media teams a way to <strong>build</strong>, <strong>validate</strong>, and <strong>export</strong> structured ad names that the TRACKS database can parse automatically. Consistent naming eliminates broken reporting caused by typos, casing mismatches, or ad-hoc abbreviations.</p>'+
+    '<h3>Core Concepts</h3>'+
+    '<ul>'+
+    '<li><strong>Three-level hierarchy</strong> \u2014 Campaign \u2192 Ad Group \u2192 Creative, mirroring ad platform structures.</li>'+
+    '<li><strong>Naming pattern</strong> \u2014 no spaces allowed. Groups separated by <code>-</code>, compound segments within a group by <code>_</code>. Only alphanumeric values allowed in fields.</li>'+
+    '<li><strong>Field inheritance</strong> \u2014 project code comes from <code>@game.project_code</code> (read-only) and beat comes from the selected <code>Game::NamingBeat</code> (shared across tools); both flow into campaigns. Geo flows from campaign into ad groups and creatives; beat also flows into creatives.</li>'+
+    '<li><strong>Beats</strong> \u2014 a beat is a themed campaign period (launch, holiday, etc.). Each beat is a saved workspace containing one or more campaigns with their full ad group/creative trees.</li>'+
+    '</ul>'+
+    '<h3>Features Validated</h3>'+
+    '<table class="ref-fields-table" style="margin-bottom:0"><thead><tr><th>Feature</th><th>What it proves</th></tr></thead><tbody>'+
+    '<tr><td><strong>Builder</strong></td><td>Inline editing of hierarchical name structures with inherited fields, autosave, and per-platform character limit tracking.</td></tr>'+
+    '<tr><td><strong>Project code</strong></td><td>Unique uppercase code from the Game model (e.g. <code>ENS</code> for Enshrouded). Read-only in the builder, used as the first segment in every campaign name. Implemented as a standalone prerequisite on the Game model before Tracking Links.</td></tr>'+
+    '<tr><td><strong>Beat management</strong></td><td>Create, switch, duplicate, delete, and filter saved beats. Beats are stored in <code>Game::NamingBeat</code> (shared with Tracking Links, created by that tool). LocalStorage persistence in the POC as a stand-in for the database.</td></tr>'+
+    '<tr><td><strong>Name checker</strong></td><td>Paste one or multiple names to validate structure, known values (fuzzy + Levenshtein), and format constraints. Batch checking with summary.</td></tr>'+
+    '<tr><td><strong>Field reference</strong></td><td>Collapsible per-level field tables with known + custom values. Custom values auto-sync from Builder across all tabs (Guide, Helper, Builder dropdowns). Custom values highlighted in blue with remove option.</td></tr>'+
+    '<tr><td><strong>CSV export</strong></td><td>Per-platform and all-platforms export of Campaign / Ad Group / Creative name trees.</td></tr>'+
+    '<tr><td><strong>Undo</strong></td><td>30-step undo stack for field edits, deletes, and structural changes (Ctrl+Z or button).</td></tr>'+
+    '</tbody></table>';
+    root.appendChild(c1);
+
+    // Card 2: Implementation plan for Claude Code
+    const c2=document.createElement('div');c2.className='dg';
+    c2.innerHTML='<h2>Implementation Plan \u2014 TRACKS App</h2>'+
+    '<p>Step-by-step plan for integrating the naming convention tool into the <strong>TRACKS</strong> application. TRACKS is a <strong>Rails 8.1 / Hotwire (Turbo + Stimulus) / PostgreSQL</strong> app using <strong>Tabler Core</strong> UI, <strong>Vite</strong> for asset bundling, and <strong>I18n</strong> for all user-facing strings.</p>'+
+    '<div class="warn"><strong>POC reference file:</strong> The single-file HTML proof-of-concept at <code>Desktop/TRACKS Tools/adopswizardnewest.html</code> is the behavioral source of truth. All naming logic, field definitions, known values, build/parse functions, validation rules, and UI interactions are implemented there. Extract and port to Ruby/Stimulus as described below.</div>'+
+    '<div class="info"><strong>Implementation order:</strong> This tool is implemented <strong>after</strong> the <strong>Tracking Links</strong> tool. Tracking Links creates the shared <code>Game::NamingBeat</code> model/table, establishes the Turbo Stream and Stimulus controller patterns, and implements beat management (add, select, duplicate, delete). The Naming Conventions tool extends this foundation by adding campaign/ad group/creative associations to beats. Refer to the Tracking Links Dev Guide for patterns already established in the codebase.</div>'+
+
+    '<h3>0. TRACKS Codebase Conventions</h3>'+
+    '<p>Refer to the <strong>Tracking Links Dev Guide</strong> Section 0 for the full conventions table. Key conventions that apply here:</p>'+
+    '<table class="ref-fields-table" style="margin-bottom:6px"><thead><tr><th style="width:30%">Convention</th><th>Detail</th></tr></thead><tbody>'+
+    '<tr><td><strong>UUID primary keys</strong></td><td>All tables use <code>id: :uuid</code>. All <code>t.references</code> need <code>type: :uuid</code>.</td></tr>'+
+    '<tr><td><strong>Table naming</strong></td><td><code>Game::*</code> models use <code>game_</code>-prefixed tables. Each model sets <code>self.table_name</code> explicitly.</td></tr>'+
+    '<tr><td><strong>Model pattern</strong></td><td><code>belongs_to :game, inverse_of:</code>. Use <code>acts_as_list</code> for sortable models. <code>frozen_string_literal: true</code> in all Ruby files.</td></tr>'+
+    '<tr><td><strong>Controller pattern</strong></td><td><code>include Controller::GameLookup</code> + <code>before_action :find_game, :reject_demo</code>. Inherit from <code>ApplicationController</code>.</td></tr>'+
+    '<tr><td><strong>Views</strong></td><td>Tabler CSS classes. <code>content_for :pretitle, :title</code>. <code>render "games/subpage_wrapper"</code>.</td></tr>'+
+    '<tr><td><strong>Turbo &amp; Stimulus</strong></td><td>The Tracking Links tool establishes Turbo Stream and Stimulus autosave patterns. This tool follows those same patterns and extends them for the hierarchical builder.</td></tr>'+
+    '<tr><td><strong>Testing</strong></td><td>RSpec with fixtures (not FactoryBot). Feature specs for wiring. Unit specs with mocks. Max 1 expectation per example.</td></tr>'+
+    '<tr><td><strong>Known values</strong></td><td>Like Tracking Links, this tool uses DB-backed known values (<code>Game::NamingKnownValue</code>) for custom per-game values, plus YAML-defined defaults. This departs from the simpler static YAML pattern used by UTM Links.</td></tr>'+
+    '</tbody></table>'+
+
+    '<h3>1. Naming Patterns (exact specification)</h3>'+
+    '<p>Three levels. <strong>Spaces are not allowed</strong> anywhere in a name. Groups are separated by <code>-</code> (hyphen), compound segments within a group by <code>_</code> (underscore) \u2014 these are the only separators. Only alphanumeric characters are allowed in field values; hyphens and underscores are reserved as structural delimiters.</p>'+
+
+    '<p style="font-weight:600;margin:10px 0 4px">Campaign</p>'+
+    '<pre>{project}-{beat}_{date}-{platform}-{geo}-{strategy}_{objective}[_{suffix}]</pre>'+
+    '<p style="font-size:.8rem;color:#64748b;margin:0 0 6px">Example: <code>ENS-Launch_260219-Meta-UK-Awareness_Reach</code></p>'+
+
+    '<p style="font-weight:600;margin:10px 0 4px">Ad Group</p>'+
+    '<pre>{geo}-{audience}_{type}[_{suffix}]</pre>'+
+    '<p style="font-size:.8rem;color:#64748b;margin:0 0 6px">Example: <code>UK-Core_Prospecting</code></p>'+
+
+    '<p style="font-weight:600;margin:10px 0 4px">Creative</p>'+
+    '<pre>{geo}-{format}-{dims}-{beat}-{lp}-{version}-{length}[-{suffix}]</pre>'+
+    '<p style="font-size:.8rem;color:#64748b;margin:0 0 6px">Example: <code>UK-Video-1920x1080-Launch-Website-v1-30s</code></p>'+
+
+    '<p style="font-size:.82rem;margin-top:8px"><strong>Build functions</strong> (see POC\u2019s <code>buildCampaignName</code>, <code>buildAgName</code>, <code>buildCrName</code>): concatenate non-empty field values with the delimiters shown above. <strong>Empty groups are skipped entirely</strong> \u2014 if all fields within a <code>-</code>-delimited group are blank, that group is omitted (not rendered as an empty segment). Trailing optional fields on creatives are trimmed from the right.</p>'+
+
+    '<h3>2. Field Definitions &amp; Inheritance</h3>'+
+
+    '<table class="ref-fields-table" style="margin-bottom:6px"><thead><tr><th style="width:14%">Field</th><th style="width:10%">Level</th><th style="width:44%">Description</th><th style="width:14%">Source</th><th style="width:18%">Type</th></tr></thead><tbody>'+
+    '<tr><td>project</td><td>Campaign</td><td>3-letter game code</td><td>Game model (read-only)</td><td>Inherited</td></tr>'+
+    '<tr><td>beat</td><td>Campaign, Creative</td><td>Themed campaign period</td><td>Beat setup bar</td><td>Inherited</td></tr>'+
+    '<tr><td>date</td><td>Campaign</td><td>Start date (YYMMDD). Validate: <code>/^\\d{6}$/</code></td><td>User input (date picker)</td><td>Optional</td></tr>'+
+    '<tr><td>platform</td><td>Campaign</td><td>Ad platform</td><td>User input (known values)</td><td>Required</td></tr>'+
+    '<tr><td>geo</td><td>Campaign, AG, Creative</td><td>Market / country code</td><td>Campaign \u2192 AG, Creative</td><td>Required, inherited down</td></tr>'+
+    '<tr><td>strategy</td><td>Campaign</td><td>Funnel stage</td><td>User input (known values)</td><td>Required</td></tr>'+
+    '<tr><td>objective</td><td>Campaign</td><td>Platform optimization goal</td><td>User input (known values)</td><td>Required</td></tr>'+
+    '<tr><td>audience</td><td>Ad Group</td><td>Target audience segment</td><td>User input (known values)</td><td>Required</td></tr>'+
+    '<tr><td>type</td><td>Ad Group</td><td>Targeting approach</td><td>User input (known values)</td><td>Required</td></tr>'+
+    '<tr><td>format</td><td>Creative</td><td>Creative format / ad type</td><td>User input (known values)</td><td>Required</td></tr>'+
+    '<tr><td>dims</td><td>Creative</td><td>WIDTHxHEIGHT pixels. Validate: <code>/^\\d+x\\d+$/</code></td><td>User input (free text)</td><td>Required</td></tr>'+
+    '<tr><td>lp</td><td>Creative</td><td>Landing page destination</td><td>User input (known values)</td><td>Required</td></tr>'+
+    '<tr><td>version</td><td>Creative</td><td>Creative iteration. Validate: <code>/^v\\d+$/i</code></td><td>User input (known values)</td><td>Required</td></tr>'+
+    '<tr><td>length</td><td>Creative</td><td>Duration (e.g. 30s, 0s for static). Validate: <code>/^\\d+s$/</code></td><td>User input (free text)</td><td>Required</td></tr>'+
+    '<tr><td>suffix</td><td>All</td><td>Optional variant label</td><td>User input (free text)</td><td>Optional</td></tr>'+
+    '</tbody></table>'+
+
+    '<p style="font-size:.82rem"><strong>Inheritance rules:</strong> <code>project</code> comes from <code>@game.project_code</code> (never editable). <code>beat</code> is set once on the beat and flows into all campaign and creative names. <code>geo</code> is set on the campaign and auto-fills into its ad groups and creatives (shown as read-only inherited segments). Users edit inherited fields at the source level only.</p>'+
+
+    '<h3>3. Known Values &amp; Character Limits</h3>'+
+    '<p>Default known values (seed via YAML, extendable per-game through custom values). Any game member can add custom values per field without approval \u2014 custom values are scoped to the game via <code>Game::NamingKnownValue</code> and immediately available in dropdowns, validation, and all tabs (Guide, Helper, Builder). When a user types an unknown value into a dropdown field in the Builder, it is automatically saved as a custom known value. Custom values appear highlighted (blue background) in the Guide\u2019s Available Fields tables, the Helper\u2019s Field Reference tables, and all Builder dropdowns. Custom values can be removed from the Helper tab\u2019s Field Reference via a \u00d7 button, which deletes the <code>Game::NamingKnownValue</code> record:</p>'+
+    '<table class="ref-fields-table" style="margin-bottom:6px"><thead><tr><th style="width:18%">Field</th><th>Default Known Values</th></tr></thead><tbody>'+
+    '<tr><td>platform</td><td><code>GoogleSearch</code>, <code>YouTube</code>, <code>PerformanceMax</code>, <code>Meta</code>, <code>Reddit</code>, <code>TikTok</code>, <code>GoogleDemandGen</code>, <code>DisplayVideo360</code>, <code>X</code></td></tr>'+
+    '<tr><td>geo</td><td><code>US</code>, <code>UK</code>, <code>DE</code>, <code>FR</code>, <code>ES</code>, <code>IT</code>, <code>NL</code>, <code>JP</code>, <code>KR</code>, <code>AU</code>, <code>CA</code>, <code>BR</code>, <code>CN</code>, <code>MX</code>, <code>IN</code>, <code>SE</code>, <code>PL</code>, <code>TW</code>, <code>TR</code>, <code>SA</code>, <code>ID</code>, <code>AR</code></td></tr>'+
+    '<tr><td>strategy</td><td><code>Awareness</code>, <code>Consideration</code>, <code>Conversion</code>, <code>Retention</code></td></tr>'+
+    '<tr><td>objective</td><td><code>Traffic</code>, <code>Reach</code>, <code>Views</code>, <code>AppInstall</code>, <code>Purchase</code>, <code>Wishlists</code></td></tr>'+
+    '<tr><td>audience</td><td><code>Core</code>, <code>Secondary</code>, <code>Aspirational</code>, <code>Broad</code>, <code>Mainstream</code>, <code>Lookalike</code>, <code>Retargeting</code>, <code>Growth</code>, <code>Reach</code></td></tr>'+
+    '<tr><td>type</td><td><code>Prospecting</code>, <code>Retargeting</code>, <code>Retention</code></td></tr>'+
+    '<tr><td>format</td><td><code>Video</code>, <code>Static</code>, <code>Carousel</code>, <code>Collection</code>, <code>HTML5</code></td></tr>'+
+    '<tr><td>lp</td><td><code>Website</code>, <code>Steam</code>, <code>EGS</code>, <code>PSStore</code>, <code>MSStore</code>, <code>eShop</code></td></tr>'+
+    '<tr><td>version</td><td><code>v1</code>, <code>v2</code>, <code>v3</code></td></tr>'+
+    '</tbody></table>'+
+
+    '<p><strong>Platform character limits</strong> (max length per generated name):</p>'+
+    '<table class="ref-fields-table" style="margin-bottom:6px"><thead><tr><th>Platform</th><th>Max Characters</th></tr></thead><tbody>'+
+    '<tr><td>GoogleSearch</td><td>128</td></tr>'+
+    '<tr><td>YouTube</td><td>128</td></tr>'+
+    '<tr><td>PerformanceMax</td><td>128</td></tr>'+
+    '<tr><td>Meta</td><td>400</td></tr>'+
+    '<tr><td>Reddit</td><td>400</td></tr>'+
+    '<tr><td>TikTok</td><td>512</td></tr>'+
+    '<tr><td>GoogleDemandGen</td><td>128</td></tr>'+
+    '<tr><td>DisplayVideo360</td><td>240</td></tr>'+
+    '<tr><td>X</td><td>255</td></tr>'+
+    '</tbody></table>'+
+    '<p style="font-size:.82rem">Character limits apply to <strong>all three name levels</strong> (campaign, ad group, creative). The limit is determined by the campaign\u2019s <code>platform</code> field and inherited downward. The builder shows <code>current/limit</code> next to each generated name. Names exceeding the limit are flagged as errors.</p>'+
+
+    '<h3>4. Project Code (Prerequisite)</h3>'+
+    '<div class="info"><strong>Already implemented:</strong> The <code>project_code</code> field on the <code>Game</code> model is a <strong>prerequisite</strong> implemented before the Tracking Links tool. It already exists by the time this tool is built. See the <strong>Prerequisite</strong> panel in the <strong>Tracking Links</strong> POC (<code>tracking_links.html</code>) for full implementation details including the Claude Code prompt.</div>'+
+    '<p>Each game has a <strong>unique uppercase alphanumeric code</strong> (2\u201310 characters, typically 2\u20134) stored as <code>Game#project_code</code>. Examples: <code>ENS</code> (Enshrouded), <code>SWB</code> (Snowbreak). The code is the first segment in every campaign name and is <strong>read-only</strong> in the Naming Conventions builder \u2014 it is inherited from <code>@game.project_code</code>.</p>'+
+    '<p><strong>Usage in this tool:</strong> The builder auto-populates <code>{project}</code> in campaign names from <code>@game.project_code</code>. If the game has no project code set, the tool should show a clear message directing the user to game settings. Admins can edit project codes via the Avo admin interface (<code>/manage</code>).</p>'+
+
+    '<h3>5. YAML Config Structure</h3>'+
+    '<p>Follow the <code>utm_channels.yml</code> pattern. Create <code>app/models/naming_convention.yml</code>:</p>'+
+    '<pre>'+
+    'levels:\n'+
+    '  campaign:\n'+
+    '    label: Campaign\n'+
+    '    pattern: "{project}-{beat}_{date}-{platform}-{geo}-{strategy}_{objective}[_{suffix}]"\n'+
+    '    fields:\n'+
+    '      - key: project\n'+
+    '        label: Project\n'+
+    '        inherited: true\n'+
+    '        source: game.project_code\n'+
+    '      - key: beat\n'+
+    '        label: Beat\n'+
+    '        inherited: true\n'+
+    '        source: naming_beat.beat\n'+
+    '      - key: date\n'+
+    '        label: Start Date\n'+
+    '        type: date\n'+
+    '        format: YYMMDD\n'+
+    '        optional: true\n'+
+    '        validation: "^\\\\d{6}$"\n'+
+    '      - key: platform\n'+
+    '        label: Platform\n'+
+    '        known_values_key: platform\n'+
+    '      - key: geo\n'+
+    '        label: Geo\n'+
+    '        known_values_key: geo\n'+
+    '      - key: strategy\n'+
+    '        label: Strategy\n'+
+    '        known_values_key: strategy\n'+
+    '      - key: objective\n'+
+    '        label: Objective\n'+
+    '        known_values_key: objective\n'+
+    '      - key: suffix\n'+
+    '        label: Suffix\n'+
+    '        optional: true\n'+
+    '        type: freetext\n'+
+    '  ad_group:\n'+
+    '    label: Ad Group\n'+
+    '    pattern: "{geo}-{audience}_{type}[_{suffix}]"\n'+
+    '    fields:\n'+
+    '      - key: geo\n'+
+    '        label: Geo\n'+
+    '        inherited: true\n'+
+    '        source: naming_campaign.geo\n'+
+    '      - key: audience\n'+
+    '        label: Audience\n'+
+    '        known_values_key: audience\n'+
+    '      - key: type\n'+
+    '        label: Type\n'+
+    '        known_values_key: type\n'+
+    '      - key: suffix\n'+
+    '        label: Suffix\n'+
+    '        optional: true\n'+
+    '        type: freetext\n'+
+    '  creative:\n'+
+    '    label: Creative\n'+
+    '    pattern: "{geo}-{format}-{dims}-{beat}-{lp}-{version}-{length}[-{suffix}]"\n'+
+    '    fields:\n'+
+    '      - key: geo\n'+
+    '        label: Geo\n'+
+    '        inherited: true\n'+
+    '        source: naming_campaign.geo\n'+
+    '      - key: format\n'+
+    '        label: Format\n'+
+    '        known_values_key: format\n'+
+    '      - key: dims\n'+
+    '        label: Dimensions\n'+
+    '        type: freetext\n'+
+    '        validation: "^\\\\d+x\\\\d+$"\n'+
+    '        placeholder: "1920x1080"\n'+
+    '      - key: beat\n'+
+    '        label: Beat\n'+
+    '        inherited: true\n'+
+    '        source: naming_beat.beat\n'+
+    '      - key: lp\n'+
+    '        label: Landing Page\n'+
+    '        known_values_key: lp\n'+
+    '      - key: version\n'+
+    '        label: Version\n'+
+    '        known_values_key: version\n'+
+    '        validation: "^v\\\\d+$"\n'+
+    '        case_insensitive: true\n'+
+    '      - key: length\n'+
+    '        label: Length\n'+
+    '        type: freetext\n'+
+    '        validation: "^\\\\d+s$"\n'+
+    '        placeholder: "30s"\n'+
+    '      - key: suffix\n'+
+    '        label: Suffix\n'+
+    '        optional: true\n'+
+    '        type: freetext\n'+
+    '\n'+
+    'known_values:\n'+
+    '  platform: [GoogleSearch, YouTube, PerformanceMax, Meta, Reddit, TikTok, GoogleDemandGen, DisplayVideo360, X]\n'+
+    '  geo: [US, UK, DE, FR, ES, IT, NL, JP, KR, AU, CA, BR, CN, MX, IN, SE, PL, TW, TR, SA, ID, AR]\n'+
+    '  strategy: [Awareness, Consideration, Conversion, Retention]\n'+
+    '  objective: [Traffic, Reach, Views, AppInstall, Purchase, Wishlists]\n'+
+    '  audience: [Core, Secondary, Aspirational, Broad, Mainstream, Lookalike, Retargeting, Growth, Reach]\n'+
+    '  type: [Prospecting, Retargeting, Retention]\n'+
+    '  format: [Video, Static, Carousel, Collection, HTML5]\n'+
+    '  lp: [Website, Steam, EGS, PSStore, MSStore, eShop]\n'+
+    '  version: [v1, v2, v3]\n'+
+    '\n'+
+    'character_limits:\n'+
+    '  GoogleSearch: 128\n'+
+    '  YouTube: 128\n'+
+    '  PerformanceMax: 128\n'+
+    '  Meta: 400\n'+
+    '  Reddit: 400\n'+
+    '  TikTok: 512\n'+
+    '  GoogleDemandGen: 128\n'+
+    '  DisplayVideo360: 240\n'+
+    '  X: 255\n'+
+    '\n'+
+    'colors:\n'+
+    '  project: "#6366f1"\n'+
+    '  platform: "#0ea5e9"\n'+
+    '  geo: "#10b981"\n'+
+    '  beat: "#f59e0b"\n'+
+    '  date: "#d97706"\n'+
+    '  strategy: "#8b5cf6"\n'+
+    '  objective: "#ec4899"\n'+
+    '  audience: "#14b8a6"\n'+
+    '  type: "#f97316"\n'+
+    '  format: "#ef4444"\n'+
+    '  dims: "#64748b"\n'+
+    '  lp: "#06b6d4"\n'+
+    '  version: "#a855f7"\n'+
+    '  length: "#84cc16"\n'+
+    '  suffix: "#9ca3af"\n'+
+    '</pre>'+
+    '<p>Create a <code>NamingConvention</code> service (co-located with its YAML like <code>UtmChannel</code>, loaded via <code>File.expand_path("naming_convention.yml", __dir__)</code>). Include <code># frozen_string_literal: true</code> at the top. Unlike the simpler <code>UtmChannel</code>, this service must expose multiple methods: (1) <code>.config</code> \u2014 loads and caches the full YAML, (2) <code>.build_name(level, fields)</code> \u2014 generates a name string per the level\u2019s pattern (never includes spaces), (3) <code>.parse_name(level, name_string)</code> \u2014 splits a name into labeled segments, (4) <code>.validate_name(level, name_string, game:)</code> \u2014 returns errors/warnings using known values + fuzzy matching (rejects names containing spaces as an immediate error), (5) <code>.known_values_for(field_key, game:)</code> \u2014 merges YAML defaults with game-specific <code>Game::NamingKnownValue</code> records, (6) <code>.character_limit(platform)</code> \u2014 returns the max length for a platform. This is the <strong>single source of truth</strong> \u2014 both server-side validation and client-side rendering read from it. The <code>colors</code> map is used by the builder UI to color-code each field\u2019s inline segment (small colored chips with the field value).</p>'+
+
+    '<h3>6. Database Migrations (PostgreSQL, UUID PKs)</h3>'+
+    '<p>Create Active Record migrations following TRACKS conventions (UUID primary keys, <code>belongs_to :game</code>):</p>'+
+    '<ul>'+
+    '<li><code>game_naming_beats</code> \u2014 <strong>Already exists</strong> (created by the Tracking Links). id (uuid), game_id (FK), beat (string), position (int), timestamps. <em>Project code is not stored here \u2014 it lives on the Game model.</em> No migration needed \u2014 just extend the existing <code>Game::NamingBeat</code> model with campaign associations.</li>'+
+    '<li><code>game_naming_campaigns</code> \u2014 id (uuid), game_naming_beat_id (FK), position, platform, geo, date (string, YYMMDD), strategy, objective, suffix, timestamps</li>'+
+    '<li><code>game_naming_ad_groups</code> \u2014 id (uuid), game_naming_campaign_id (FK), position, audience, type, suffix, timestamps</li>'+
+    '<li><code>game_naming_creatives</code> \u2014 id (uuid), game_naming_ad_group_id (FK), position, format, dims (string, WxH), lp, version, length (string, e.g. 30s), suffix, timestamps</li>'+
+    '<li><code>game_naming_known_values</code> \u2014 id (uuid), game_id (FK), field_key (string), value (string), timestamps. <em>At runtime, known values = YAML defaults merged with game-specific DB records. This table stores only custom additions for a specific game.</em></li>'+
+    '</ul>'+
+    '<p>Name strings are <strong>computed, not stored</strong> \u2014 always derived from field values using the <code>NamingConvention</code> service build methods.</p>'+
+
+    '<h3>7. Active Record Models</h3>'+
+    '<p>Follow existing model patterns (see <code>Game::LandingPage</code>, <code>Game::Entry</code>). All <code>Game::</code>-namespaced models must declare <code>self.table_name</code> explicitly (Rails does not auto-resolve the namespace to a table prefix). All associations must include <code>inverse_of</code>. All Ruby files must begin with <code># frozen_string_literal: true</code>.</p>'+
+    '<ul>'+
+    '<li><code>Game</code> (existing model) \u2014 <code>project_code</code>, <code>has_many :naming_beats</code>, and <code>has_many :influencer_links</code> <strong>already exist</strong> from the Tracking Links. Add the new naming-specific associations:<br><code>has_many :naming_known_values, class_name: "Game::NamingKnownValue", inverse_of: :game, dependent: :destroy</code></li>'+
+    '<li><code>Game::NamingBeat</code> \u2014 <strong>Already exists</strong> (created by the Tracking Links). Extend with: <code>has_many :naming_campaigns, class_name: "Game::NamingCampaign", inverse_of: :naming_beat, dependent: :destroy</code>. The model already has <code>belongs_to :game</code>, <code>has_many :influencer_links (dependent: :nullify)</code>, beat uniqueness validation, and <code>acts_as_list</code>. The project code comes from <code>game.project_code</code>.</li>'+
+    '<li><code>Game::NamingCampaign</code> \u2014 <code>self.table_name = :game_naming_campaigns</code>. <code>belongs_to :naming_beat, class_name: "Game::NamingBeat", inverse_of: :naming_campaigns</code>. <code>has_many :naming_ad_groups, class_name: "Game::NamingAdGroup", inverse_of: :naming_campaign, dependent: :destroy</code>. <code>acts_as_list scope: :naming_beat_id</code>. Accepts nested attributes for ad groups.</li>'+
+    '<li><code>Game::NamingAdGroup</code> \u2014 <code>self.table_name = :game_naming_ad_groups</code>. <code>belongs_to :naming_campaign, class_name: "Game::NamingCampaign", inverse_of: :naming_ad_groups</code>. <code>has_many :naming_creatives, class_name: "Game::NamingCreative", inverse_of: :naming_ad_group, dependent: :destroy</code>. <code>acts_as_list scope: :naming_campaign_id</code>. Accepts nested for creatives.</li>'+
+    '<li><code>Game::NamingCreative</code> \u2014 <code>self.table_name = :game_naming_creatives</code>. <code>belongs_to :naming_ad_group, class_name: "Game::NamingAdGroup", inverse_of: :naming_creatives</code>. <code>acts_as_list scope: :naming_ad_group_id</code>.</li>'+
+    '<li><code>Game::NamingKnownValue</code> \u2014 <code>self.table_name = :game_naming_known_values</code>. <code>belongs_to :game, inverse_of: :naming_known_values</code>. Validates uniqueness on [game_id, field_key, value] (case-insensitive).</li>'+
+    '</ul>'+
+    '<p>Use <code>accepts_nested_attributes_for</code> with <code>allow_destroy: true</code> on beat \u2192 campaigns \u2192 ad groups \u2192 creatives so the entire tree can be saved in a single form submission via Turbo. Use <code>acts_as_list</code> with the default <code>position</code> column to match the existing TRACKS convention and gem defaults. No drag-and-drop reordering in v1 \u2014 insertion order only.</p>'+
+    '<div class="info"><strong>Shared beats (already implemented):</strong> <code>Game::NamingBeat</code> was created by the <strong>Tracking Links</strong> (implemented first). It already has <code>has_many :influencer_links (dependent: :nullify)</code>. This tool extends it by adding <code>has_many :naming_campaigns (dependent: :destroy)</code>. When deleting a beat, the naming convention tool destroys the campaign/ad group/creative tree, but influencer links are nullified \u2014 the links remain but become unassociated. The delete confirmation UI should warn the user if the beat has associated influencer links.</div>'+
+
+    '<h3>8. Controller &amp; Routes</h3>'+
+    '<p>Add <code>Tools::NamingConventionsController</code> inheriting from <code>ApplicationController</code> with <code>Controller::GameLookup</code> (same pattern as Tracking Links):</p>'+
+    '<ul>'+
+    '<li>Include <code>Controller::GameLookup</code> concern for game scoping. Auth and permissions are inherited from game-level access \u2014 no additional role checks needed.</li>'+
+    '<li>Actions: <code>index</code> (list beats + builder workspace), <code>show</code> (load a beat into the workspace via Turbo Frame), <code>create</code> / <code>update</code> / <code>destroy</code> for beats, <code>duplicate</code> for deep-clone, <code>validate</code> for name checking.</li>'+
+    '<li>Use <code>params.expect()</code> (Rails 8 pattern) for strong parameters with nested attributes.</li>'+
+    '<li>Respond with <strong>Turbo Stream</strong> for create/delete/duplicate actions (appends, removes, replaces chips and campaign cards) and <strong>Turbo Frame</strong> for <code>show</code> (loads beat workspace). <code>update</code> responds with <code>turbo_stream</code> for autosave \u2014 debounced 400ms from the Stimulus controller.</li>'+
+    '</ul>'+
+
+    '<h4 style="font-size:.88rem;color:var(--primary);margin:14px 0 6px">Autosave Strategy: Per-Campaign Granular Updates</h4>'+
+    '<p>Sending the entire beat tree on every keystroke creates two problems: (1) the payload grows large with many campaigns (10 campaigns \u00d7 5 ad groups \u00d7 3 creatives = 150 nested records per PATCH), and (2) overlapping requests risk stale-write conflicts when the user edits across campaigns faster than the server responds.</p>'+
+    '<p><strong>Solution: scope each autosave to the campaign subtree that changed.</strong> Instead of a single <code>PATCH /naming_conventions/:beat_id</code> with the full tree, use per-level update endpoints:</p>'+
+    '<ul>'+
+    '<li><code>PATCH /naming_conventions/:beat_id/campaigns/:id</code> \u2014 sends only the changed campaign + its nested ad groups and creatives. This is the primary autosave target \u2014 most field edits happen inside a single campaign.</li>'+
+    '<li><code>PATCH /naming_conventions/:beat_id</code> \u2014 reserved for beat-level changes only (renaming the beat). Does not send nested campaign data.</li>'+
+    '</ul>'+
+    '<p><strong>Nested params for per-campaign autosave:</strong></p>'+
+    '<pre>'+
+    'params.expect(\n'+
+    '  naming_campaign: [\n'+
+    '    :id, :platform, :geo, :date, :strategy, :objective, :suffix, :position,\n'+
+    '    naming_ad_groups_attributes: [[\n'+
+    '      :id, :audience, :type, :suffix, :position, :_destroy,\n'+
+    '      naming_creatives_attributes: [[\n'+
+    '        :id, :format, :dims, :lp, :version, :length, :suffix, :position, :_destroy\n'+
+    '      ]]\n'+
+    '    ]]\n'+
+    '  ]\n'+
+    ')\n'+
+    '</pre>'+
+    '<p>This keeps payloads small (one campaign subtree) and eliminates cross-campaign conflicts \u2014 edits to Campaign 1 never overwrite Campaign 2.</p>'+
+
+    '<h4 style="font-size:.88rem;color:var(--primary);margin:14px 0 6px">Save Queue (Client-Side)</h4>'+
+    '<p>The Stimulus builder controller must implement a <strong>save queue</strong> to prevent overlapping in-flight requests for the same campaign:</p>'+
+    '<ul>'+
+    '<li>Maintain a <code>Map&lt;campaignId, { pending, inflight }&gt;</code>. Each entry tracks whether there\u2019s a pending save and whether one is currently in-flight.</li>'+
+    '<li>On field commit: mark the campaign as <code>pending</code>. Start a 400ms debounce timer scoped to that campaign ID.</li>'+
+    '<li>When the timer fires: if a request is already in-flight for this campaign, do nothing (it will re-fire after the in-flight completes). Otherwise, send the PATCH and mark as <code>inflight</code>.</li>'+
+    '<li>On response: clear <code>inflight</code>. If <code>pending</code> was set again while the request was in-flight (the user edited again), immediately fire a new save.</li>'+
+    '<li>On failure: keep <code>pending</code> set, show a non-intrusive error indicator (toast or red dot on the campaign row), and retry on the next edit or after a 5-second backoff.</li>'+
+    '</ul>'+
+    '<p>This ensures at most <strong>one in-flight request per campaign</strong>, no lost edits, and no blocking the user.</p>'+
+
+    '<div class="warn"><strong>Note:</strong> Like the Tracking Links tool, the naming conventions tool uses <strong>Turbo Stream</strong> responses for inline updates. This pattern was established by Tracking Links and is now standard for tools with complex interactive UIs. The simpler UTM Links tool uses full-page redirects instead.</div>'+
+    '<p>Routes (in <code>config/routes.rb</code>, nested inside the <code>resources :games</code> block alongside existing tools). The <code>naming_conventions</code> resource maps to <code>Game::NamingBeat</code> records \u2014 each \u201cnaming convention\u201d is a beat with its nested campaign/ad group/creative tree:</p>'+
+    '<pre>resources :games, only: %i[new create show edit update] do\n  # ... existing routes ...\n  namespace :tools do\n    # ... existing utm_links ...\n    resources :naming_conventions, only: [:index, :show, :create, :update, :destroy] do\n      collection do\n        post :validate\n      end\n      member do\n        post :duplicate\n      end\n      resources :naming_campaigns, only: [:create, :update, :destroy]\n    end\n    resources :naming_known_values, only: [:create, :destroy]\n  end\nend</pre>'+
+    '<p>URL pattern: <code>/games/:game_id/tools/naming_conventions</code>. The <code>validate</code> action is a collection route (accepts <code>{ level: "campaign", names: ["..."] }</code> and returns validation results as Turbo Stream \u2014 enables server-side validation with access to game-specific custom known values). <code>naming_campaigns</code> is nested under a beat for per-campaign autosave (<code>PATCH /naming_conventions/:beat_id/naming_campaigns/:id</code>) \u2014 this is the primary autosave endpoint. <code>naming_known_values</code> is a separate resource for adding/removing custom known values per game. The <code>duplicate</code> action deep-clones the beat and its entire nested tree; the cloned beat name is <code>"#{original.beat} Copy"</code>, incrementing the suffix number if that name already exists.</p>'+
+
+    '<h3>9. Nav Integration</h3>'+
+    '<p>Add the tool to the tools index page (<code>app/views/tools/index.html.erb</code>) following the UTM Links card pattern:</p>'+
+    '<pre>'+
+    '&lt;div class="col-sm-6 col-lg-4"&gt;\n'+
+    '  &lt;%= link_to game_tools_naming_conventions_path(@game), class: "card card-link" do %&gt;\n'+
+    '    &lt;div class="card-body"&gt;\n'+
+    '      &lt;div class="d-flex align-items-center mb-3"&gt;\n'+
+    '        &lt;span class="me-2"&gt;&lt;%= i :file_text %&gt;&lt;/span&gt;\n'+
+    '        &lt;h3 class="card-title mb-0"&gt;&lt;%= t("tools.naming_conventions.title") %&gt;&lt;/h3&gt;\n'+
+    '      &lt;/div&gt;\n'+
+    '      &lt;p class="text-secondary"&gt;&lt;%= t("tools.naming_conventions.description") %&gt;&lt;/p&gt;\n'+
+    '    &lt;/div&gt;\n'+
+    '  &lt;% end %&gt;\n'+
+    '&lt;/div&gt;\n'+
+    '</pre>'+
+    '<p>Add I18n strings to <code>config/locales/en.yml</code>:</p>'+
+    '<pre>'+
+    'tools:\n'+
+    '  naming_conventions:\n'+
+    '    title: Naming Conventions\n'+
+    '    description: Build, validate, and export structured ad names for your campaigns.\n'+
+    '    tabs:\n'+
+    '      guide: Guide\n'+
+    '      helper: Helper\n'+
+    '      builder: Builder\n'+
+    '    beat_setup:\n'+
+    '      title: Beat Setup\n'+
+    '      game_label: Game\n'+
+    '      code_label: Code\n'+
+    '      beat_label: Beat\n'+
+    '      new_beat: New Beat\n'+
+    '      beat_created: "New beat created \u2014 code: %{code}"\n'+
+    '      beat_deleted: Beat deleted.\n'+
+    '      beat_loaded: "Loaded: %{name}"\n'+
+    '    saved_beats:\n'+
+    '      title: Saved Beats\n'+
+    '      filter_placeholder: "Filter beats\u2026"\n'+
+    '      campaigns_count:\n'+
+    '        one: "%{count} campaign"\n'+
+    '        other: "%{count} campaigns"\n'+
+    '      beat_duplicated: "Beat duplicated: %{name}"\n'+
+    '      confirm_delete: "Delete beat \\"%{name}\\" and all its campaigns? This cannot be undone."\n'+
+    '    builder:\n'+
+    '      empty: Enter a Beat name above and click New Beat to get started.\n'+
+    '      duplicate: Duplicate\n'+
+    '      delete: Delete\n'+
+    '      copy: Copy\n'+
+    '      add_campaign: "+ Campaign"\n'+
+    '      add_ad_group: "+ Ad Group"\n'+
+    '      add_creative: "+ Creative"\n'+
+    '      confirm_delete_campaign: "Delete campaign %{name} and all its ad groups/creatives?"\n'+
+    '      confirm_delete_ad_group: "Delete ad group %{name} and all its creatives?"\n'+
+    '      confirm_delete_creative: "Delete creative %{name}?"\n'+
+    '      autosave_error: "Changes could not be saved. Will retry on next edit."\n'+
+    '      beat_name_exists: "A beat named \\"%{name}\\" already exists for this game."\n'+
+    '    output:\n'+
+    '      title: Full Output\n'+
+    '      valid: Valid\n'+
+    '      warnings: Warnings\n'+
+    '      errors: Errors\n'+
+    '    checker:\n'+
+    '      title: Name Checker\n'+
+    '      campaign_section: Campaign Names\n'+
+    '      ad_group_section: Ad Group Names\n'+
+    '      creative_section: Creative Names\n'+
+    '      check: Check\n'+
+    '      try_valid: Try valid example\n'+
+    '      try_invalid: Try broken example\n'+
+    '    field_reference:\n'+
+    '      title: Field Reference\n'+
+    '      add_custom_value: Add\n'+
+    '      custom_note: "Custom values auto-saved from Builder"\n'+
+    '      remove_value: Remove\n'+
+    '    guide:\n'+
+    '      no_spaces: "No spaces allowed. Names must not contain any spaces. Hyphens (-) and underscores (_) are the only separators."\n'+
+    '      alphanumeric_only: "Only use letters and numbers in field values. Hyphens and underscores are reserved as structural delimiters."\n'+
+    '      custom_values: "Custom values are supported. Type a new value into any dropdown field in the Builder and it will be auto-saved. Custom values appear highlighted in blue across all tabs. Remove them from the Helper tab\\\'s Field Reference."\n'+
+    '    export:\n'+
+    '      csv: Export CSV\n'+
+    '      all_platforms: All Platforms\n'+
+    '      download: Download\n'+
+    '</pre>'+
+
+    '<h3>10. Views (ERB + Tabler UI)</h3>'+
+    '<p>Use <code>render "games/subpage_wrapper"</code> for consistent layout. Every tool page must set these <code>content_for</code> blocks:</p>'+
+    '<pre>'+
+    '&lt;% content_for :pretitle do %&gt;\n'+
+    '  &lt;%= link_to @game.name, game_path(@game) %&gt; / &lt;%= link_to t("games.tools"), game_tools_path(@game) %&gt;\n'+
+    '&lt;% end %&gt;\n'+
+    '&lt;% content_for :title, t("tools.naming_conventions.title") %&gt;\n'+
+    '&lt;% content_for :image_title, "#{t(\'tools.naming_conventions.title\')}: #{@game.name}" %&gt;\n'+
+    '&lt;% content_for :image_subtitle, t("tools.naming_conventions.description") %&gt;\n'+
+    '&lt;%= render "games/title_actions" %&gt;\n'+
+    '</pre>'+
+    '<p>Build views with Tabler card/table classes:</p>'+
+    '<ul>'+
+    '<li><code>index.html.erb</code> \u2014 main layout with tab navigation (Guide, Helper, Builder). Tab switching via Stimulus (show/hide panels) rather than Turbo Frames \u2014 this keeps all three panels in the DOM so cross-tab updates work without extra requests. Use a <code>naming_tabs_controller.js</code> that toggles <code>.active</code> on the panels. When <code>@game.naming_beats.empty?</code>, show the empty state message (<code>t("tools.naming_conventions.builder.empty")</code>). Include the beat setup bar and the workspace Turbo Frame target.</li>'+
+    '<li><code>show.html.erb</code> \u2014 beat workspace loaded via Turbo Frame. <strong>Must wrap content in <code>turbo_frame_tag</code></strong> matching the frame ID in <code>index.html.erb</code>. Contains the builder rows for the loaded beat.</li>'+
+    '<li><code>_beat_setup.html.erb</code> \u2014 beat selector shared across tools. Two side-by-side controls: (1) a <code>&lt;select&gt;</code> dropdown (\u201cSelect Beat\u201d) populated from <code>@game.naming_beats</code> (beats are shared between Naming Conventions and Tracking Links) \u2014 selecting a beat loads its workspace via Turbo; (2) a text input + \u201cCreate\u201d button (\u201cNew Beat\u201d) for creating a new beat. After creation the dropdown updates with the new beat selected and the input clears. Below the setup bar, saved beat cards show stats and allow duplicate/delete. Game title + project code are inherited from <code>@game</code> (not editable here).</li>'+
+    '<li><code>_builder_rows.html.erb</code> \u2014 <strong>spreadsheet-style row layout</strong> (not cards). Campaigns, ad groups, and creatives are displayed as indented rows with level-specific background colors (campaigns: blue tint, ad groups: green tint, creatives: pink tint). Each row contains: collapse chevron (campaigns only), status dot (green=complete, yellow=warnings, red=errors, gray=empty), hierarchical row ID label (<code>C1</code>, <code>AG1.1</code>, <code>CR1.1.1</code>), inline colored field segments (clickable to edit), spacer, generated name with char count, and action buttons (duplicate, delete, copy). Delete buttons use <code>data-turbo-confirm</code> with a confirmation message.</li>'+
+    '<li><code>_segment_cell.html.erb</code> \u2014 reusable partial for an inline-editable field with color indicator, datalist for known values, tooltip, and inherited state (dotted border, read-only). The <code>date</code> field uses <code>&lt;input type="date"&gt;</code> \u2014 on change, convert the value to YYMMDD format.</li>'+
+    '<li><code>_generated_name.html.erb</code> \u2014 renders the computed name string with <code>current/limit</code> character count badge. Flagged red when exceeding the platform\u2019s character limit.</li>'+
+    '<li><code>_full_output.html.erb</code> \u2014 flat list of all generated names across the current beat\u2019s tree, grouped by level (Campaigns, Ad Groups, Creatives) with count labels. Each line: status dot, row number, generated name string, character count badge, issue count. Clicking a valid name copies it to clipboard; clicking a name with issues expands the detail panel. Summary bar at the top with total valid/warning/error counts. Action bar with \u201cCopy All\u201d button (copies all names to clipboard) and the Export CSV dropdown.</li>'+
+    '<li><code>_name_checker.html.erb</code> \u2014 <strong>three separate checker sections</strong>, one per level (campaign, ad group, creative). Each section has: a <code>&lt;textarea&gt;</code>, \u201cCheck\u201d / \u201cTry valid example\u201d / \u201cTry broken example\u201d buttons, and a results panel showing per-segment validation with color-coded chips and verdicts.</li>'+
+    '<li><code>_field_reference.html.erb</code> \u2014 collapsible field table. Each field row shows all known values (YAML defaults + custom DB values). Custom values are highlighted with a blue background and have a remove button (\u00d7). Both add and remove actions post to <code>naming_known_values#create</code> / <code>#destroy</code> and return a <strong>Turbo Stream response that replaces the value lists in all three panels</strong> (Guide, Helper, Builder datalists) using targeted <code>turbo_stream.replace</code> actions. This works because all panels are in the DOM simultaneously (show/hide tabs, not Turbo Frame navigation). Give each values container a stable DOM ID like <code>known-values-{field_key}</code> so the Turbo Stream can target them across panels. Below the values list, an inline form to add a new custom value (text input + \u201cAdd\u201d button).</li>'+
+    '<li><code>_guide.html.erb</code> \u2014 four card sections matching the POC\u2019s Guide tab: (1) \u201cNaming Convention\u201d \u2014 three-level hierarchy, delimiter rules, color-coded example (no spaces between delimiters), three callout boxes (\u201cNo spaces allowed\u201d in blue, \u201cOnly letters and numbers\u201d in yellow, \u201cCustom values are supported\u201d in green explaining how to add custom values via the Builder and remove them via the Helper), collapsible \u201cAvailable Fields\u201d accordion with pattern visualizations and value tables per level \u2014 value tables show <strong>all</strong> known values including custom ones (highlighted in blue). Each value table container has a stable DOM ID (<code>guide-known-values-{field_key}</code>) so that Turbo Stream responses from <code>naming_known_values#create</code>/<code>#destroy</code> can replace them in-place; (2) \u201cHelper Tab\u201d \u2014 checker and field reference explanations; (3) \u201cBuilder Tab\u201d \u2014 detailed usage instructions (beats, autosave, inline editing, row actions, collapse/status dots, inherited fields, date picker, character limits); (4) \u201cWhy Consistency Matters\u201d \u2014 motivation for TRACKS dashboards.</li>'+
+    '</ul>'+
+    '<p>Use Tabler\u2019s <code>.card</code>, <code>.badge</code>, <code>.btn</code>, <code>.table</code> classes for consistent styling.</p>'+
+
+    '<h3>11. Stimulus Controllers (JavaScript)</h3>'+
+    '<p>Register in <code>app/javascript/controllers/</code> (auto-loaded via Vite). Place new controllers with the <code>_controller.js</code> suffix \u2014 they\u2019ll be auto-registered. The Tracking Links tool has already established Stimulus patterns for autosave, Turbo Stream integration, and debounced field changes. Follow those patterns and extend for the hierarchical builder.</p>'+
+    '<ul>'+
+    '<li><code>naming_builder_controller.js</code> \u2014 main orchestrator. Manages workspace state, inline editing, and autosave. Autosave is <strong>per-campaign</strong>: each field edit triggers a debounced 400ms PATCH scoped to the campaign that was modified (not the entire beat tree). Implements a <strong>save queue</strong> \u2014 at most one in-flight request per campaign. If the user edits the same campaign while a save is in-flight, the edit is queued and sent after the current request completes. On autosave failure (network error or validation error), show a non-intrusive error indicator (toast or red dot on the campaign row) and retry on next edit or after a 5-second backoff \u2014 do not block the user from continuing to edit. Beat-level changes (renaming the beat) use a separate <code>PATCH /naming_conventions/:id</code>. Add/remove campaigns/ad groups/creatives via Turbo Streams. Computes generated names dynamically \u2014 since names change as fields are edited, update <code>data-clipboard-text-value</code> on every field change (or compute the name on-the-fly in the copy action).<br><br>'+
+    '<strong>Auto-scaffolding:</strong> creating a new beat scaffolds one empty campaign with one AG and one CR. Adding a campaign auto-creates one AG + one CR inside it. Adding an AG auto-creates one CR inside it. This ensures the user always starts with an editable tree.<br><br>'+
+    '<strong>Inline editing lifecycle:</strong> click cell \u2192 creates <code>&lt;input&gt;</code> (text or date depending on field type) \u2192 binds datalist for known-value fields \u2192 commit on <code>blur</code> or <code>Enter</code> \u2192 strips spaces and non-alphanumeric characters (toast: \u201cOnly letters and numbers are allowed\u201d \u2014 spaces are never permitted in any field value) \u2192 if the value is not in known values, posts to <code>naming_known_values#create</code> (the Turbo Stream response replaces all value lists across Guide, Helper, and Builder datalists in one response) and shows toast: \u201cSaved X as custom FieldLabel\u201d \u2192 triggers the per-campaign autosave for the field change. <code>Escape</code> cancels editing without saving. <code>Tab</code> / <code>Shift+Tab</code> commits and opens the next/previous editable field in the row.<br><br>'+
+    '<strong>Empty field visual:</strong> when a field has no value, the cell shows the field key name (e.g. \u201cplatform\u201d, \u201cgeo\u201d) in italic gray with a dashed border. Inherited fields show at 50% opacity with a dotted border and are not clickable.<br><br>'+
+    '<strong>Pick/Paste clipboard:</strong> ad group and creative rows have a \u201cPick\u201d (pushpin) action that stores the row into a clipboard variable. A \u201cPaste\u201d button then appears on the <code>+ Ad Group</code> / <code>+ Creative</code> add-rows, allowing users to move or copy rows between campaigns (for AGs) or between ad groups (for CRs).<br><br>'+
+    '<strong>Status dot computation:</strong> validate all campaign + AG + CR names in the tree and check character limits. If any name has errors or exceeds the platform limit \u2192 red dot. If any warnings \u2192 yellow. If no names generated (all fields empty) \u2192 gray. Otherwise \u2192 green.</li>'+
+    '<li><code>naming_checker_controller.js</code> \u2014 name validation. Posts to the <code>validate</code> collection endpoint for server-side validation (enables access to game-specific custom known values). Debounce live validation on input (400ms) to avoid excessive server requests. Deduplicate identical issue messages before display. <strong>First check:</strong> reject names containing spaces with an error (\u201cSpaces are not allowed in names\u201d) before parsing. <strong>Parse logic per level:</strong><br>'+
+    '\u2022 Campaign: split on <code>-</code>. Groups: [0]=project, [1]=split on <code>_</code> for beat+date, [2]=platform, [3]=geo, [4..]=rejoin remaining with <code>-</code> then split on <code>_</code> for strategy/objective/suffix.<br>'+
+    '\u2022 Ad Group: split on <code>-</code>. [0]=geo, [1..]=rejoin remaining with <code>-</code> then split on <code>_</code> for audience/type/suffix.<br>'+
+    '\u2022 Creative: split on <code>-</code>. Map positionally: [geo, format, dims, beat, lp, version, length, suffix\u2026].<br>'+
+    'Then check each segment: (1) exact case-insensitive match against known values \u2192 valid, (2) Levenshtein distance \u2264 3 \u2192 warning with suggestion, (3) no close match \u2192 <strong>warning</strong> (\u201cnot in known values (custom?)\u201d) since users can add custom values. Per-field format validation: <code>date</code> matches <code>/^\\d{6}$/</code> + month 01\u201312 + day 01\u201331, <code>dims</code> matches <code>/^\\d+x\\d+$/</code>, <code>version</code> matches <code>/^v\\d+$/i</code>, <code>length</code> matches <code>/^\\d+s$/</code>.</li>'+
+    '<li><code>naming_beats_controller.js</code> \u2014 beat selector and card management. Two side-by-side controls in the setup bar: a <code>&lt;select&gt;</code> dropdown for choosing existing beats (populated from <code>@game.naming_beats</code>, shared between Naming Conventions and Tracking Links), and a text input + Create button for adding new beats. Selecting a beat loads its workspace via Turbo Frame navigation; creating a beat POSTs to the server, updates the dropdown, and clears the input. Below the setup bar, beat cards show stats (campaign/ag/cr counts, platforms) and offer duplicate/delete actions. Filter input appears when 3+ beats exist. When the active beat is deleted, clear the workspace and show the empty state. Communicates with builder controller via Stimulus outlets or custom events.</li>'+
+    '<li><code>naming_export_controller.js</code> \u2014 CSV export. Dropdown button with per-platform options + \u201cAll platforms\u201d option. Per-platform CSV columns: [Campaign, Ad Group, Creative]. All-platforms columns: [Platform, Campaign, Ad Group, Creative]. Rows with empty/incomplete names are skipped. Triggers browser download via Blob URL.</li>'+
+    '<li><code>naming_tabs_controller.js</code> \u2014 simple show/hide tab controller. All three panels (Guide, Helper, Builder) stay in the DOM at all times \u2014 switching tabs toggles an <code>.active</code> class on the corresponding panel. This is critical for cross-tab Turbo Stream updates: when a custom value is added from the Builder, the <code>naming_known_values#create</code> response can replace value list elements in all three panels in a single Turbo Stream response, because they\u2019re all in the DOM.</li>'+
+    '</ul>'+
+    '<p>Reuse existing app controllers where possible: <code>clipboard_controller</code> for copy buttons, <code>collapse_controller</code> for collapsible sections.</p>'+
+    '<p><strong>Additional server-side controller:</strong> <code>Tools::NamingCampaignsController</code> \u2014 handles per-campaign CRUD nested under a beat. Actions: <code>create</code> (adds campaign with auto-scaffolded AG + CR, responds with Turbo Stream append), <code>update</code> (primary autosave endpoint \u2014 accepts campaign + nested ad groups/creatives), <code>destroy</code> (removes campaign and children, responds with Turbo Stream remove). Include <code>Controller::GameLookup</code> for game scoping. Loads the parent beat via <code>@beat = @game.naming_beats.find(params[:naming_convention_id])</code>.</p>'+
+
+    '<h3>12. Testing (RSpec + Capybara)</h3>'+
+    '<p>Follow TRACKS testing conventions (see CLAUDE.md). Layered approach: mock-based unit tests for individual objects, feature specs for wiring. Tracking Links specs establish the pattern for tool specs:</p>'+
+    '<ul>'+
+    '<li><strong>Model specs</strong> (<code>spec/models/game/naming_beat_spec.rb</code>, etc.) \u2014 validations, associations, nested attribute acceptance, project code generation + uniqueness on Game, name build/parse methods on the <code>NamingConvention</code> service. Use <code>:aggregate_failures</code> metadata or compound matchers to respect the <code>RSpec/MultipleExpectations</code> cop (max 1 expectation per example).</li>'+
+    '<li><strong>Request specs</strong> (<code>spec/requests/tools/naming_conventions_spec.rb</code>) \u2014 controller actions (create/update/destroy/duplicate/validate) with proper game scoping and Turbo responses.</li>'+
+    '<li><strong>Feature specs (Capybara)</strong> (<code>spec/features/tools/naming_conventions_spec.rb</code>) \u2014 full user flows: create beat \u2192 add campaigns \u2192 inline edit fields \u2192 verify generated names \u2192 export CSV. Beat switching, name checker validation.</li>'+
+    '<li><strong>Service spec</strong> (<code>spec/models/naming_convention_spec.rb</code>) \u2014 build/parse/validate methods, YAML loading, known values resolution.</li>'+
+    '</ul>'+
+    '<p style="font-size:.82rem">Follow project rubocop rules: double quotes, 120 char line max, trailing commas in multiline arrays/hashes. Run <code>bundle exec rubocop</code> before committing. See CLAUDE.md for full conventions. <strong>Use fixtures for test data</strong> (TRACKS uses Faker for data generation in fixtures, not FactoryBot). Use <code>fixtures :all</code> in specs. Every code file must have a corresponding spec file.</p>'+
+
+    '<h3>13. Implementation Order</h3>'+
+    '<div class="info"><strong>Implementation order note:</strong> The <strong>project_code</strong> prerequisite and <strong>Tracking Links</strong> tool are implemented <strong>before</strong> this tool. Tracking Links creates the shared <code>Game::NamingBeat</code> model/table, establishes Turbo Stream and Stimulus autosave patterns, and implements beat management. The project_code on <code>Game</code> is a standalone prerequisite (see Prerequisite panel). Steps below reference what already exists and what is new.</div>'+
+    '<ol style="padding-left:20px">'+
+    '<li><strong>Prerequisite: Project code + NamingBeat + Tracking Links</strong> \u2014 <em>Already completed.</em> The <code>project_code</code> column on Game (with Avo admin editing), the <code>Game::NamingBeat</code> model/table, beat management, and Turbo Stream/Stimulus patterns are already in place from the Tracking Links implementation.</li>'+
+    '<li><strong>YAML config + <code>NamingConvention</code> service</strong> \u2014 define levels, fields, patterns, known values, character limits. Extract build/parse/validate logic from POC into Ruby methods. Write unit tests.<br><em>Done when:</em> <code>NamingConvention.build_name(:campaign, fields)</code> returns the same string as the POC\u2019s <code>buildCampaignName()</code> for the same inputs (and likewise for ad_group and creative). Parse + validate round-trip works. All tests green.</li>'+
+    '<li><strong>Database migrations</strong> \u2014 The <code>game_naming_beats</code> table <strong>already exists</strong> (created by the Tracking Links). Create the four remaining naming tables (<code>game_naming_campaigns</code>, <code>game_naming_ad_groups</code>, <code>game_naming_creatives</code>, <code>game_naming_known_values</code>) with UUID PKs and foreign keys. Run <code>rails db:migrate</code>.<br><em>Done when:</em> <code>db/structure.sql</code> has the new tables. Schema loads cleanly.</li>'+
+    '<li><strong>Active Record models</strong> \u2014 Extend the existing <code>Game::NamingBeat</code> model with <code>has_many :naming_campaigns, dependent: :destroy</code> and nested attributes. Create <code>Game::NamingCampaign</code>, <code>Game::NamingAdGroup</code>, <code>Game::NamingCreative</code>, <code>Game::NamingKnownValue</code>. Associations, validations, <code>acts_as_list</code> for position. Model specs.<br><em>Done when:</em> creating a beat with nested campaigns/ad groups/creatives saves the full tree. Validation rejects missing required fields. All model specs green.</li>'+
+    '<li><strong>Controllers + routes</strong> \u2014 <code>Tools::NamingConventionsController</code> (beat-level CRUD + duplicate + validate), <code>Tools::NamingCampaignsController</code> (per-campaign autosave + create/destroy), <code>Tools::NamingKnownValuesController</code> (custom value add/remove with multi-target Turbo Stream response). Strong params with nested attributes. Request specs for all three controllers.<br><em>Done when:</em> <code>/games/:id/tools/naming_conventions</code> renders. Beat CRUD + duplicate + validate work. Per-campaign PATCH saves a campaign subtree. Known value create/destroy returns Turbo Streams that update all panels. All request specs green.</li>'+
+    '<li><strong>Nav integration</strong> \u2014 add tool card to <code>app/views/tools/index.html.erb</code>. Add I18n strings.<br><em>Done when:</em> the naming conventions card appears on the tools index page and links to the tool.</li>'+
+    '<li><strong>Views: Builder tab</strong> \u2014 <code>_beat_setup</code>, <code>_builder_rows</code>, <code>_segment_cell</code>, <code>_full_output</code> partials. Turbo Frames for beat loading + Turbo Stream templates. Stimulus controllers for inline editing, autosave, pick/paste.<br><em>Done when:</em> can create a beat (auto-scaffolds one campaign + AG + CR), add campaigns/ad groups/creatives (auto-scaffolding children), edit field values inline with Tab navigation, see generated names with character counts and full output panel. Behavior matches the POC.</li>'+
+    '<li><strong>Views: Helper tab</strong> \u2014 <code>_name_checker</code> with batch validation. <code>_field_reference</code> with collapsible tables and custom value additions.<br><em>Done when:</em> pasting a name shows per-segment validation with fuzzy matching. Field reference tables show known + custom values.</li>'+
+    '<li><strong>Views: Guide tab</strong> \u2014 guide content with three callout boxes (no spaces, alphanumeric only, custom values), collapsible field overview showing all known + custom values (highlighted in blue), auto-refreshes when custom values change.<br><em>Done when:</em> guide content matches the POC\u2019s Guide tab, including callouts and dynamic value tables that update on custom value add/remove.</li>'+
+    '<li><strong>Beat management</strong> \u2014 saved beats chip row, filter, duplicate, delete. Turbo Stream updates.<br><em>Done when:</em> can switch between beats, duplicate, delete, and filter. Active beat is highlighted.</li>'+
+    '<li><strong>CSV export</strong> \u2014 Stimulus controller to build and download CSV per platform.<br><em>Done when:</em> clicking export downloads a CSV with correct campaign/ad group/creative name columns per platform.</li>'+
+    '<li><strong>Feature specs</strong> \u2014 end-to-end Capybara tests for all major flows.<br><em>Done when:</em> all feature specs pass covering create beat, edit fields, validate names, export CSV, switch beats, pick/paste, delete with confirmations.</li>'+
+    '</ol>'+
+
+    '<h3>14. File Map</h3>'+
+    '<pre>'+
+    'db/migrate/\n'+
+    '  # XXXXXX_add_project_code_to_games.rb  (already exists — prerequisite)\n'+
+    '  # XXXXXX_create_game_naming_beats.rb   (already exists — Tracking Links)\n'+
+    '  XXXXXX_create_game_naming_campaigns.rb\n'+
+    '  XXXXXX_create_game_naming_ad_groups.rb\n'+
+    '  XXXXXX_create_game_naming_creatives.rb\n'+
+    '  XXXXXX_create_game_naming_known_values.rb\n'+
+    '\n'+
+    'app/models/game.rb                       # add naming-specific has_many associations\n'+
+    'app/models/game/\n'+
+    '  naming_beat.rb\n'+
+    '  naming_campaign.rb\n'+
+    '  naming_ad_group.rb\n'+
+    '  naming_creative.rb\n'+
+    '  naming_known_value.rb\n'+
+    '\n'+
+    'app/models/naming_convention.rb          # YAML service (like UtmChannel)\n'+
+    'app/models/naming_convention.yml         # field definitions + known values\n'+
+    '\n'+
+    'app/controllers/tools/naming_conventions_controller.rb\n'+
+    'app/controllers/tools/naming_campaigns_controller.rb  # per-campaign autosave\n'+
+    'app/controllers/tools/naming_known_values_controller.rb\n'+
+    '\n'+
+    'app/views/tools/index.html.erb           # add tool card\n'+
+    'app/views/tools/naming_conventions/\n'+
+    '  index.html.erb\n'+
+    '  show.html.erb                          # beat workspace (Turbo Frame)\n'+
+    '  create.turbo_stream.erb                # append beat chip + workspace\n'+
+    '  destroy.turbo_stream.erb               # remove beat chip + clear workspace\n'+
+    '  duplicate.turbo_stream.erb             # append cloned beat chip\n'+
+    '  update.turbo_stream.erb                # beat-level autosave response\n'+
+    '\n'+
+    'app/views/tools/naming_campaigns/\n'+
+    '  create.turbo_stream.erb                # append campaign row + scaffolded children\n'+
+    '  update.turbo_stream.erb                # per-campaign autosave response\n'+
+    '  destroy.turbo_stream.erb               # remove campaign row\n'+
+    '\n'+
+    'app/views/tools/naming_known_values/\n'+
+    '  create.turbo_stream.erb                # replace value lists across all tabs\n'+
+    '  destroy.turbo_stream.erb               # replace value lists across all tabs\n'+
+    '  _beat_setup.html.erb\n'+
+    '  _builder_rows.html.erb                 # spreadsheet-style row layout\n'+
+    '  _segment_cell.html.erb\n'+
+    '  _generated_name.html.erb\n'+
+    '  _full_output.html.erb                  # flat name list + status summary\n'+
+    '  _name_checker.html.erb                 # 3 per-level checker sections\n'+
+    '  _field_reference.html.erb\n'+
+    '  _guide.html.erb\n'+
+    '\n'+
+    'app/javascript/controllers/\n'+
+    '  naming_builder_controller.js\n'+
+    '  naming_checker_controller.js\n'+
+    '  naming_beats_controller.js\n'+
+    '  naming_export_controller.js\n'+
+    '  naming_tabs_controller.js          # show/hide tab panels\n'+
+    '\n'+
+    'config/locales/en.yml                    # add tools.naming_conventions.*\n'+
+    'config/routes.rb                         # add under namespace :tools\n'+
+    '\n'+
+    'spec/models/game/naming_beat_spec.rb\n'+
+    'spec/models/game/naming_campaign_spec.rb\n'+
+    'spec/models/game/naming_ad_group_spec.rb\n'+
+    'spec/models/game/naming_creative_spec.rb\n'+
+    'spec/models/game/naming_known_value_spec.rb\n'+
+    'spec/models/naming_convention_spec.rb\n'+
+    'spec/requests/tools/naming_conventions_spec.rb\n'+
+    'spec/requests/tools/naming_campaigns_spec.rb\n'+
+    'spec/requests/tools/naming_known_values_spec.rb\n'+
+    'spec/features/tools/naming_conventions_spec.rb\n'+
+    '</pre>'+
+
+    '<h3>15. Out of Scope (v1)</h3>'+
+    '<ul>'+
+    '<li><strong>Undo</strong> \u2014 client-side undo stack deferred from v1. Delete confirmations at all levels mitigate accidental data loss. Can be added later as a Stimulus controller.</li>'+
+    '<li><strong>Send to Builder</strong> \u2014 parsing a validated name from the checker into structured fields and populating the builder. Deferred from v1; the checker validates names but does not bridge them into the builder workspace.</li>'+
+    '<li><strong>Bulk CSV import</strong> \u2014 parsing a list of existing ad names (e.g. from an ad platform export) into the beat/campaign/ad group/creative hierarchy. Can be added as a future enhancement.</li>'+
+    '<li><strong>Real-time multi-user sync</strong> \u2014 concurrent editing of the same beat uses last-write-wins autosave for v1. Turbo Streams over ActionCable can be considered if this becomes a pain point.</li>'+
+    '</ul>';
+    root.appendChild(c2);
+}
+
+// ══════════════════════════════════════════
+// REFERENCE
+// ══════════════════════════════════════════
+function buildReference(){
+    const root=document.getElementById('mode-reference');root.innerHTML='';
+    // Purpose intro
+    const intro=document.createElement('div');intro.className='ref-intro';intro.style.cssText='margin-bottom:20px;font-size:.88rem;color:#475569;line-height:1.6';
+    intro.innerHTML='<strong style="color:var(--primary)">Check existing names and look up field values.</strong> Paste any campaign, ad group, or creative name into the checker to validate it. Paste multiple names (one per line) to batch-check them. Expand the Field Reference under each level to see allowed values and add your own.';
+    root.appendChild(intro);
+    // Level sections — each with checker + collapsible field reference
+    for(const[lk,lv]of Object.entries(LEVELS)){
+        const sec=document.createElement('div');sec.className='ref-section';
+        const h2=document.createElement('h2');
+        h2.innerHTML=`${lv.label} <span class="ref-level-badge">${lk}</span>`;
+        h2.style.cursor='default';
+        sec.appendChild(h2);
+        if(lv.desc){const d=document.createElement('div');d.className='ref-desc';d.textContent=lv.desc;sec.appendChild(d)}
+        // Pattern
+        const pat=document.createElement('div');pat.className='ref-pattern';
+        lv.pattern.forEach(p=>{if(p.d){const s=document.createElement('span');s.className='delim';s.textContent=p.d;if(p.opt)s.style.opacity='.4';pat.appendChild(s)}else{const s=document.createElement('span');s.className='seg';s.style.background=C[p.k];s.textContent=`{${p.k}}`;if(p.opt)s.style.opacity='.6';pat.appendChild(s)}});
+        sec.appendChild(pat);
+        // Checker
+        const chk=document.createElement('div');chk.style.marginBottom='12px';
+        chk.innerHTML='<div style="font-size:.78rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px">Name Checker</div>'+
+        '<textarea class="chk-input" id="chk-input-'+lk+'" rows="2" placeholder="Paste one or more '+lv.label.toLowerCase()+' names (one per line)\u2026"></textarea>'+
+        '<div style="font-size:.72rem;color:#94a3b8;margin:-8px 0 8px;line-height:1.4">Paste multiple names on separate lines to batch-check and fix them all at once.</div>'+
+        '<div class="chk-actions">'+
+        '<button class="btn btn-primary" data-chk-btn="'+lk+'">Check</button>'+
+        '<button class="try-link" data-try-valid="'+lk+'">Try valid example</button>'+
+        '<button class="try-link" data-try-invalid="'+lk+'">Try broken example</button>'+
+        '</div>'+
+        '<div class="results hidden" id="chk-results-'+lk+'"></div>';
+        sec.appendChild(chk);
+        // Collapsible field reference
+        const toggle=document.createElement('div');
+        toggle.style.cssText='display:flex;align-items:center;cursor:pointer;user-select:none;padding:10px 0;border-top:1px solid #e2e8f0';
+        toggle.innerHTML='<span style="font-size:.88rem;font-weight:700;color:var(--primary)">Field Reference</span><span class="ref-chev" style="margin-left:auto;font-size:.7rem;color:#94a3b8;transition:transform .2s;transform:rotate(-90deg)">&#9660;</span>';
+        const detail=document.createElement('div');detail.style.display='none';
+        toggle.addEventListener('click',()=>{
+            const open=detail.style.display!=='none';
+            detail.style.display=open?'none':'block';
+            toggle.querySelector('.ref-chev').style.transform=open?'rotate(-90deg)':'rotate(0)';
+        });
+        sec.appendChild(toggle);
+        // Table
+        const tbl=document.createElement('table');tbl.className='ref-fields-table';tbl.innerHTML='<thead><tr><th>Field</th><th>Description</th><th>Allowed Values</th></tr></thead>';
+        const tb=document.createElement('tbody');
+        lv.fields.forEach(f=>{const tr=document.createElement('tr');const n=document.createElement('td');n.innerHTML=`<span class="field-dot" style="background:${C[f.key]}"></span><strong>${f.label}</strong>${f.opt?' <span style="color:#94a3b8">(opt)</span>':''}`;tr.appendChild(n);const d=document.createElement('td');d.textContent=f.help||'';tr.appendChild(d);const v=document.createElement('td');if(f.vals&&KNOWN[f.key]){renderValsList(v,f.key)}else if(f.isDate)v.innerHTML='<span class="val-tag">YYMMDD</span>';else if(f.examples){const w=document.createElement('div');w.className='values-list';f.examples.forEach(x=>{const t=document.createElement('span');t.className='val-tag';t.textContent=x;w.appendChild(t)});v.appendChild(w)}else v.innerHTML='<span style="color:#94a3b8">Free text</span>';tr.appendChild(v);tb.appendChild(tr)});
+        tbl.appendChild(tb);detail.appendChild(tbl);
+        // Examples
+        const el=document.createElement('div');el.className='gen-common-label';el.textContent='Examples';el.style.marginTop='8px';detail.appendChild(el);
+        lv.examples.forEach(ex=>{const w=document.createElement('div');w.className='ref-example';const bd=document.createElement('div');bd.className='ref-example-breakdown';let first=true;lv.pattern.forEach(p=>{if(p.d)return;const val=ex[p.k];if(!val)return;if(!first){const pi=lv.pattern.indexOf(p);for(let j=pi-1;j>=0;j--)if(lv.pattern[j].d){const dd=document.createElement('span');dd.className='chip-delim';dd.textContent=lv.pattern[j].d;bd.appendChild(dd);break}}const ch=document.createElement('div');ch.className='ref-chip';const lb=document.createElement('span');lb.className='ref-chip-label';lb.style.color=C[p.k];lb.textContent=p.k;ch.appendChild(lb);const vl=document.createElement('span');vl.className='ref-chip-val';vl.style.background=C[p.k]+'18';vl.style.color=C[p.k];vl.style.border=`1.5px solid ${C[p.k]}40`;vl.textContent=val;ch.appendChild(vl);bd.appendChild(ch);first=false});w.appendChild(bd);detail.appendChild(w)});
+        sec.appendChild(detail);
+        root.appendChild(sec);
+    }
+    root.insertAdjacentHTML('beforeend','<div class="ref-print-hint">Tip: Ctrl/Cmd+P to print as cheat sheet</div>');
+    initCheckers();
+}
+buildReference();
+
+// ══════════════════════════════════════════
+// BUILDER — Spreadsheet Rows
+// ══════════════════════════════════════════
+let _rid=0;
+const DATA=[];
+let PROJ='ENS';
+let GAME_NAME='Enshrouded';
+let BEAT='';
+let CLIP=null;
+const COLLAPSED=new Set(); // campaign IDs that are collapsed
+function rid(){return ++_rid}
+
+// ═══ MULTI-BEAT STATE ═══
+let BEATS=[];
+let ACTIVE_BEAT_ID=null;
+const LS_KEY='adopswizard_beats';
+
+function genId(){return Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6)}
+
+// Generate a unique 3-letter project code from a game name
+function generateProjectCode(gameName){
+    if(!gameName)return '';
+    const words=gameName.trim().split(/\s+/).filter(Boolean);
+    let code='';
+    if(words.length>=3){
+        // 3+ words: first letter of each (Outlast Trials Remastered = OTR)
+        code=words.slice(0,3).map(w=>w[0]).join('');
+    } else if(words.length===2){
+        // 2 words: first letter of first + first 2 letters of second (Outlast Trials = OLT)
+        code=words[0][0]+words[1].slice(0,2);
+    } else {
+        // 1 word: first 3 letters (Enshrouded = ENS)
+        code=words[0].slice(0,3);
+    }
+    code=code.toUpperCase().replace(/[^A-Z]/g,'');
+    if(code.length<3)code=(code+'XXX').slice(0,3);
+    // If the same game name already has a code assigned, reuse it
+    const sameGame=BEATS.find(b=>(b.gameName||'').toLowerCase()===gameName.trim().toLowerCase());
+    if(sameGame)return sameGame.project;
+    // Ensure uniqueness across all saved beats (different games)
+    const existing=new Set(BEATS.map(b=>b.project.toUpperCase()));
+    if(!existing.has(code))return code;
+    // Try suffix variations: ENS→EN2→EN3, etc.
+    for(let i=2;i<=99;i++){
+        const alt=code.slice(0,2)+i;
+        if(!existing.has(alt.toUpperCase()))return alt.toUpperCase();
+    }
+    return code;
+}
+
+function serializeWorkspace(){
+    return JSON.stringify({proj:PROJ,gameName:GAME_NAME,beat:BEAT,rid:_rid,data:DATA.map(camp=>({
+        id:camp.id,v:{...camp.v},
+        ags:camp.ags.map(ag=>({id:ag.id,v:{...ag.v},crs:ag.crs.map(cr=>({id:cr.id,v:{...cr.v}}))}))
+    }))});
+}
+
+function deserializeWorkspace(json){
+    const s=JSON.parse(json);
+    PROJ='ENS';GAME_NAME='Enshrouded';BEAT=s.beat||'';_rid=s.rid||0;
+    DATA.length=0;
+    (s.data||[]).forEach(cd=>{
+        const camp={id:cd.id,v:cd.v,ags:[]};
+        (cd.ags||[]).forEach(ad=>{
+            const ag={id:ad.id,v:ad.v,crs:[]};
+            (ad.crs||[]).forEach(crd=>{ag.crs.push({id:crd.id,v:crd.v})});
+            camp.ags.push(ag);
+        });
+        DATA.push(camp);
+    });
+}
+
+function persistBeats(){
+    try{localStorage.setItem(LS_KEY,JSON.stringify(BEATS))}catch(e){}
+}
+
+function loadBeatsFromStorage(){
+    try{const raw=localStorage.getItem(LS_KEY);if(raw)BEATS=JSON.parse(raw);else BEATS=[]}catch(e){BEATS=[]}
+}
+
+function beatStats(){
+    let ags=0,crs=0;const plats=new Set();
+    DATA.forEach(c=>{if(c.v.platform)plats.add(c.v.platform);c.ags.forEach(a=>{ags++;a.crs.forEach(()=>crs++)})});
+    return{campaigns:DATA.length,adgroups:ags,creatives:crs,platforms:[...plats].sort()};
+}
+
+function beatNameExists(proj,beat,excludeId){
+    const p=proj.toLowerCase(),b=beat.toLowerCase();
+    return BEATS.some(e=>e.id!==excludeId&&e.project.toLowerCase()===p&&e.beat.toLowerCase()===b);
+}
+
+function generateBeat(){
+    const beat=(document.getElementById('setup-beat-new')||{}).value||'';
+    if(!beat.trim()){toast('Enter a beat name first');return}
+    const b=beat.trim();
+    if(beatNameExists(PROJ,b,null)){toast('A beat named "'+b+'" already exists');return}
+    BEAT=b;
+    DATA.length=0;_rid=0;CLIP=null;
+    const c=addCampD();const a=addAgD(c);addCrD(a);
+    // Auto-create a saved beat entry
+    const stats=beatStats();
+    const entry={id:genId(),project:PROJ,gameName:GAME_NAME,beat:BEAT,data:serializeWorkspace(),campaigns:stats.campaigns,adgroups:stats.adgroups,creatives:stats.creatives,platforms:stats.platforms,updated:Date.now()};
+    BEATS.push(entry);
+    ACTIVE_BEAT_ID=entry.id;
+    persistBeats();
+    updateSetupInputs();
+    renderBuilder();
+    renderSavedBeats();
+    toast('New beat created: '+BEAT);
+}
+
+function loadBeat(id){
+    const entry=BEATS.find(b=>b.id===id);
+    if(!entry)return;
+    deserializeWorkspace(entry.data);
+    ACTIVE_BEAT_ID=id;
+    CLIP=null;
+    updateSetupInputs();
+    renderBuilder();
+    renderSavedBeats();
+    toast('Loaded: '+[entry.gameName||entry.project,entry.beat].filter(Boolean).join(' \u00b7 '));
+}
+
+function deleteBeat(id){
+    const entry=BEATS.find(b=>b.id===id);
+    const label=entry?[entry.gameName||entry.project,entry.beat].filter(Boolean).join(' \u00b7 '):'this beat';
+    if(!confirm('Delete "'+label+'"? This cannot be undone.'))return;
+    BEATS=BEATS.filter(b=>b.id!==id);
+    if(ACTIVE_BEAT_ID===id){
+        ACTIVE_BEAT_ID=null;
+        DATA.length=0;_rid=0;CLIP=null;BEAT='';
+        updateSetupInputs();
+        renderBuilder();
+    }
+    persistBeats();
+    renderSavedBeats();
+    toast('Beat deleted');
+}
+
+function duplicateBeat(id){
+    const src=BEATS.find(b=>b.id===id);
+    if(!src)return;
+    // Find a unique name
+    let copyBeat=src.beat+' Copy',n=2;
+    while(beatNameExists(src.project,copyBeat,null)){copyBeat=src.beat+' Copy '+n;n++}
+    const entry={id:genId(),project:src.project,gameName:src.gameName||'',beat:copyBeat,data:src.data,campaigns:src.campaigns,adgroups:src.adgroups,creatives:src.creatives,platforms:src.platforms?[...src.platforms]:[],updated:Date.now()};
+    // Rewrite IDs inside the data so the copy is independent
+    const parsed=JSON.parse(entry.data);
+    let nextRid=(parsed.rid||0)+1000;
+    parsed.beat=copyBeat;
+    (parsed.data||[]).forEach(c=>{c.id=++nextRid;(c.ags||[]).forEach(a=>{a.id=++nextRid;(a.crs||[]).forEach(cr=>{cr.id=++nextRid})})});
+    parsed.rid=nextRid;
+    entry.data=JSON.stringify(parsed);
+    BEATS.push(entry);
+    persistBeats();
+    loadBeat(entry.id);
+    toast('Beat duplicated as "'+copyBeat+'"');
+}
+
+// ═══ UNDO ═══
+const UNDO_STACK=[];
+const MAX_UNDO=30;
+function pushUndo(){
+    UNDO_STACK.push({proj:PROJ,gameName:GAME_NAME,beat:BEAT,rid:_rid,data:serializeWorkspace(),activeId:ACTIVE_BEAT_ID});
+    if(UNDO_STACK.length>MAX_UNDO)UNDO_STACK.shift();
+}
+function popUndo(){
+    if(!UNDO_STACK.length){toast('Nothing to undo');return}
+    const s=UNDO_STACK.pop();
+    deserializeWorkspace(s.data);
+    PROJ='ENS';GAME_NAME='Enshrouded';BEAT=s.beat;_rid=s.rid;ACTIVE_BEAT_ID=s.activeId;
+    updateSetupInputs();renderBuilder();renderSavedBeats();
+    toast('Undo');
+}
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!e.shiftKey){const tag=(e.target.tagName||'').toLowerCase();if(tag==='input'||tag==='textarea')return;e.preventDefault();popUndo()}});
+
+let _autoSaveTimer=null;
+function scheduleAutoSave(){
+    clearTimeout(_autoSaveTimer);
+    _autoSaveTimer=setTimeout(()=>{
+        if(!ACTIVE_BEAT_ID||!DATA.length)return;
+        const entry=BEATS.find(b=>b.id===ACTIVE_BEAT_ID);
+        if(!entry)return;
+        if((PROJ!==entry.project||BEAT!==entry.beat)&&beatNameExists(PROJ,BEAT,ACTIVE_BEAT_ID)){
+            toast('Beat name "'+BEAT+'" is already taken');return;
+        }
+        const stats=beatStats();
+        entry.project=PROJ;entry.gameName=GAME_NAME;entry.beat=BEAT;
+        entry.data=serializeWorkspace();entry.campaigns=stats.campaigns;entry.adgroups=stats.adgroups;entry.creatives=stats.creatives;entry.platforms=stats.platforms;entry.updated=Date.now();
+        persistBeats();
+        renderSavedBeats();
+    },400);
+}
+
+function formatTimeAgo(ts){
+    if(!ts)return '';
+    const s=Math.floor((Date.now()-ts)/1000);
+    if(s<60)return 'just now';
+    const m=Math.floor(s/60);if(m<60)return m+'m ago';
+    const h=Math.floor(m/60);if(h<24)return h+'h ago';
+    const d=Math.floor(h/24);if(d<7)return d+'d ago';
+    return new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+}
+
+let _beatFilter='';
+function renderSavedBeats(){
+    const container=document.getElementById('saved-beats-container');
+    if(!container)return;
+    container.innerHTML='';
+    if(!BEATS.length)return;
+    // Filter input (show when 3+ beats)
+    if(BEATS.length>=3){
+        const fi=document.createElement('input');fi.className='beats-filter';fi.type='text';fi.placeholder='Filter beats\u2026';fi.value=_beatFilter;
+        fi.addEventListener('input',()=>{_beatFilter=fi.value;renderSavedBeats();const nf=container.querySelector('.beats-filter');if(nf){nf.focus();nf.selectionStart=nf.selectionEnd=nf.value.length}});
+        container.appendChild(fi);
+    }
+    const q=_beatFilter.toLowerCase();
+    const filtered=q?BEATS.filter(b=>(b.beat||'').toLowerCase().includes(q)||(b.project||'').toLowerCase().includes(q)||(b.gameName||'').toLowerCase().includes(q)):BEATS;
+    const row=document.createElement('div');row.className='saved-beats';
+    filtered.forEach(b=>{
+        const card=document.createElement('div');
+        card.className='beat-card'+(b.id===ACTIVE_BEAT_ID?' active':'');
+        card.addEventListener('click',e=>{if(e.target.closest('.beat-card-actions'))return;loadBeat(b.id)});
+        // Header: beat name
+        const hdr=document.createElement('div');hdr.className='beat-card-header';
+        hdr.textContent=b.beat||'Untitled';
+        card.appendChild(hdr);
+        // Stats line
+        const camps=b.campaigns||0,ags=b.adgroups||0,crs=b.creatives||0;
+        const stats=document.createElement('div');stats.className='beat-card-stats';
+        stats.textContent=camps+' camp \u00b7 '+ags+' ag \u00b7 '+crs+' cr';
+        card.appendChild(stats);
+        // Actions
+        const acts=document.createElement('div');acts.className='beat-card-actions';
+        const dup=document.createElement('button');dup.className='beat-card-btn';dup.textContent='Dupe';
+        dup.addEventListener('click',e=>{e.stopPropagation();duplicateBeat(b.id)});
+        acts.appendChild(dup);
+        const del=document.createElement('button');del.className='beat-card-btn danger';del.textContent='Del';
+        del.addEventListener('click',e=>{e.stopPropagation();deleteBeat(b.id)});
+        acts.appendChild(del);
+        card.appendChild(acts);
+        row.appendChild(card);
+    });
+    container.appendChild(row);
+}
+
+// --- Data helpers ---
+function addCampD(v){const c={id:rid(),v:{platform:'',geo:'',date:'',strategy:'',objective:'',suffix:'',...v},ags:[]};DATA.push(c);return c}
+function addAgD(camp,v){const a={id:rid(),v:{audience:'',type:'',suffix:'',...v},crs:[]};camp.ags.push(a);return a}
+function addCrD(ag,v){const c={id:rid(),v:{format:'',dims:'',lp:'',version:'',length:'',suffix:'',...v}};ag.crs.push(c);return c}
+function dupCampD(camp){const c=addCampD({...camp.v});camp.ags.forEach(ag=>{const na=addAgD(c,{...ag.v});ag.crs.forEach(cr=>addCrD(na,{...cr.v}))});return c}
+function dupAgD(camp,ag){const na=addAgD(camp,{...ag.v});ag.crs.forEach(cr=>addCrD(na,{...cr.v}));return na}
+function dupCrD(ag,cr){return addCrD(ag,{...cr.v})}
+function rmCampD(c){const i=DATA.indexOf(c);if(i>-1)DATA.splice(i,1)}
+function rmAgD(camp,ag){const i=camp.ags.indexOf(ag);if(i>-1)camp.ags.splice(i,1)}
+function rmCrD(ag,cr){const i=ag.crs.indexOf(cr);if(i>-1)ag.crs.splice(i,1)}
+
+// --- Field lookup ---
+function fieldDef(key){for(const lv of Object.values(LEVELS)){const f=lv.fields.find(f=>f.key===key);if(f)return f}return null}
+function fieldLabel(key){const f=fieldDef(key);return f?f.label:key}
+
+// --- DOM helpers ---
+function mkRid(t){const e=document.createElement('span');e.className='bld-rid';e.textContent=t;return e}
+function mkDelim(ch){const e=document.createElement('span');e.className='bd';e.textContent=ch;return e}
+function mkSpacer(){return Object.assign(document.createElement('span'),{className:'bsp'})}
+function mkIcon(icon,tip,cls,fn){
+    const b=document.createElement('button');b.className='ri'+(cls?' '+cls:'');b.textContent=icon;b.setAttribute('data-tip',tip);
+    b.addEventListener('click',ev=>{ev.stopPropagation();fn()});return b;
+}
+function mkAddRow(text,lvCls,fn){const r=document.createElement('div');r.className='bld-add-row'+(lvCls?' '+lvCls:'');const b=document.createElement('button');b.className='bld-add';b.textContent=text;b.addEventListener('click',fn);r.appendChild(b);return r}
+
+// --- Segment cell ---
+const FW={project:38,beat:60,platform:110,geo:32,date:62,strategy:90,objective:72,suffix:42,audience:88,type:82,format:62,dims:86,lp:68,version:32,length:32};
+function mkSeg(obj,key,val,inherited){
+    const cell=document.createElement('span');
+    const color=C[key]||C.suffix;
+    const mw=FW[key]||40;
+    if(inherited){
+        cell.className='sc inh';
+        if(val){cell.style.cssText=`background:${color}18;color:${color};border-color:${color}40;min-width:${mw}px`;cell.textContent=val}
+        else{cell.className='sc inh mt';cell.style.minWidth=mw+'px';cell.textContent=key}
+        cell.title=fieldLabel(key)+': '+(val||'(from campaign)')+(key==='project'&&GAME_NAME?' \u2014 '+GAME_NAME:'');
+        return cell;
+    }
+    if(val){
+        cell.className='sc';
+        cell.style.cssText=`background:${color}18;color:${color};border-color:${color}40;min-width:${mw}px`;
+        cell.textContent=val;
+    } else {
+        cell.className='sc mt';
+        cell.style.minWidth=mw+'px';
+        cell.textContent=key;
+    }
+    cell.title=fieldLabel(key)+(val?' (click to edit)':' (click to add)');
+    cell.addEventListener('click',()=>startEdit(cell,obj,key));
+    return cell;
+}
+
+// --- Inline editing ---
+function startEdit(cell,obj,key){
+    if(cell.classList.contains('ed'))return;
+    const fd=fieldDef(key);
+    const cur=obj.v[key]||'';
+    const w=cell.offsetWidth;
+    cell.className='sc ed';cell.style.cssText='min-width:'+w+'px';cell.innerHTML='';
+    const inp=document.createElement('input');
+    if(fd&&fd.isDate){
+        inp.type='date';
+        if(cur)inp.value=parseDateSeg(cur);
+    } else {
+        inp.type='text';
+        if(fd&&fd.vals){
+            inp.value='';inp.placeholder=cur||fd.ph||key;
+            const dlId='dl-bld-'+key;
+            if(!document.getElementById(dlId))document.body.appendChild(makeDl(dlId,fd.vals));
+            inp.setAttribute('list',dlId);
+        } else {
+            inp.value=cur;inp.placeholder=fd?fd.ph:key;
+        }
+    }
+    inp.style.width=Math.max(w,fd&&fd.vals?130:w)+'px';
+    cell.appendChild(inp);inp.focus();
+    if(!fd||!fd.vals)inp.select();
+    const commit=()=>{
+        let v;
+        if(fd&&fd.isDate)v=formatDate(inp.value);
+        else v=inp.value.trim();
+        if(v&&/[^a-zA-Z0-9]/.test(v)&&!(fd&&fd.vals&&KNOWN[key]&&KNOWN[key].includes(v))){v=v.replace(/[^a-zA-Z0-9]/g,'');toast('Only letters and numbers are allowed in field values')}
+        if(!v&&fd&&fd.vals)v=cur;
+        if(v!==cur)pushUndo();
+        // Auto-save unknown values as custom
+        if(v&&fd&&fd.vals&&KNOWN[key]&&!KNOWN[key].includes(v)){
+            addKnownValue(key,v);
+            toast('Saved \u201c'+v+'\u201d as custom '+fd.label);
+        }
+        obj.v[key]=v;
+        renderBuilder();
+    };
+    let committed=false;
+    const doCommit=()=>{if(!committed){committed=true;commit()}};
+    inp.addEventListener('blur',doCommit);
+    inp.addEventListener('keydown',e=>{
+        if(e.key==='Enter'){e.preventDefault();doCommit()}
+        if(e.key==='Escape'){committed=true;renderBuilder()}
+        if(e.key==='Tab'){
+            e.preventDefault();
+            const nextKey=findNextKey(obj,key,e.shiftKey);
+            doCommit();
+            if(nextKey)setTimeout(()=>{const row=document.querySelector(`.bld-row[data-id="${obj.id}"]`);if(row){const c=row.querySelector(`.sc[data-k="${nextKey}"]`);if(c)c.click()}},30);
+        }
+    });
+    inp.addEventListener('input',()=>{inp.style.width=Math.max(50,(inp.value.length+2)*8.5)+'px'});
+}
+
+function findNextKey(obj,key,reverse){
+    const camp=DATA.find(c=>c===obj);
+    let keys;
+    if(camp)keys=['date','platform','geo','strategy','objective','suffix'];
+    else{
+        const isAg=DATA.some(c=>c.ags.includes(obj));
+        if(isAg)keys=['audience','type','suffix'];
+        else keys=['format','dims','lp','version','length','suffix'];
+    }
+    const i=keys.indexOf(key);if(i<0)return null;
+    return reverse?keys[i-1]:keys[i+1];
+}
+
+// --- Setup bar (rendered once) ---
+function initSetup(){
+    const root=document.getElementById('gen-setup');root.innerHTML='';
+    // Purpose intro
+    const intro=document.createElement('div');intro.style.cssText='margin-bottom:12px;font-size:.88rem;color:#475569;line-height:1.6';
+    intro.innerHTML='<strong style="color:var(--primary)">Build and manage your ad naming structures.</strong> Select an existing beat or create a new one, then add campaigns, ad groups, and creatives. Everything autosaves as you work.';
+    root.appendChild(intro);
+    const setup=document.createElement('div');setup.className='bld-setup';
+    // --- Select existing beat ---
+    const selLabel=document.createElement('label');selLabel.className='bld-setup-lbl';
+    selLabel.innerHTML='<span style="color:'+C.beat+'">&#9679;</span> Select Beat';
+    const sel=document.createElement('select');sel.id='setup-beat-select';
+    sel.style.cssText='padding:5px 8px;border:2px solid #e2e8f0;border-radius:4px;font-size:.88rem;font-weight:600;outline:none;min-width:160px;transition:border-color .2s;cursor:pointer';
+    sel.addEventListener('change',()=>{if(sel.value)loadBeat(sel.value)});
+    selLabel.appendChild(sel);
+    setup.appendChild(selLabel);
+    // --- Divider ---
+    const divider=document.createElement('span');divider.style.cssText='color:#cbd5e1;font-size:.82rem;font-weight:600';divider.textContent='or';
+    setup.appendChild(divider);
+    // --- Create new beat ---
+    const newLabel=document.createElement('label');newLabel.className='bld-setup-lbl';
+    newLabel.innerHTML='<span style="color:'+C.beat+'">&#9679;</span> New Beat';
+    const ni=document.createElement('input');ni.id='setup-beat-new';ni.placeholder='e.g. Launch';
+    ni.style.cssText='padding:5px 8px;border:2px solid #e2e8f0;border-radius:4px;font-size:.88rem;font-family:\'SF Mono\',\'Fira Code\',monospace;font-weight:600;outline:none;width:120px;transition:border-color .2s';
+    ni.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();generateBeat()}});
+    newLabel.appendChild(ni);
+    setup.appendChild(newLabel);
+    const createBtn=document.createElement('button');createBtn.className='btn-gen';createBtn.textContent='Create';
+    createBtn.addEventListener('click',generateBeat);
+    setup.appendChild(createBtn);
+    root.appendChild(setup);
+    populateBeatSelect()
+}
+function populateBeatSelect(){
+    const sel=document.getElementById('setup-beat-select');if(!sel)return;
+    sel.innerHTML='';
+    const ph=document.createElement('option');ph.value='';ph.textContent='Select a beat\u2026';ph.disabled=true;
+    if(!ACTIVE_BEAT_ID||!BEATS.find(b=>b.id===ACTIVE_BEAT_ID))ph.selected=true;
+    sel.appendChild(ph);
+    BEATS.forEach(b=>{const opt=document.createElement('option');opt.value=b.id;opt.textContent=b.beat||'Untitled';if(b.id===ACTIVE_BEAT_ID)opt.selected=true;sel.appendChild(opt)});
+}
+function updateSetupInputs(){
+    populateBeatSelect();
+    const ni=document.getElementById('setup-beat-new');if(ni)ni.value='';
+}
+
+// --- Render full builder ---
+function renderBuilder(){
+    const root=document.getElementById('gen-root');root.innerHTML='';
+    const outRoot=document.getElementById('gen-output');if(outRoot)outRoot.innerHTML='';
+    if(!DATA.length){
+        root.innerHTML='<div class="bld-empty">Select an existing beat or create a new one above to start building.</div>';
+        scheduleAutoSave();
+        return;
+    }
+    // Undo button top-right
+    const undoWrap=document.createElement('div');undoWrap.style.cssText='display:flex;justify-content:flex-end;margin-bottom:6px';
+    const undoBtn=document.createElement('button');undoBtn.className='btn-undo';undoBtn.textContent='\u21A9 Undo';
+    undoBtn.title='Undo last change (Ctrl+Z)';
+    undoBtn.addEventListener('click',popUndo);
+    undoWrap.appendChild(undoBtn);
+    root.appendChild(undoWrap);
+    let ci=0,ai=0,cri=0;
+    DATA.forEach(camp=>{
+        ci++;
+        const card=document.createElement('div');card.className='bld-rows'+(COLLAPSED.has(camp.id)?' collapsed':'');
+        card.appendChild(mkCampRow(camp,ci));
+        const children=document.createElement('div');children.className='bld-children';
+        camp.ags.forEach(ag=>{
+            ai++;
+            children.appendChild(mkAgRow(ag,camp,ai));
+            ag.crs.forEach(cr=>{cri++;children.appendChild(mkCrRow(cr,ag,camp,cri))});
+            const crAdd=mkAddRow('+ Creative','lv-cr',()=>{addCrD(ag);renderBuilder();updateFullOutput()});
+            if(CLIP&&CLIP.type==='cr'){const pb=document.createElement('button');pb.className='bld-paste';pb.textContent='Paste Creative';pb.addEventListener('click',()=>{addCrD(ag,{...CLIP.v});CLIP=null;renderBuilder();updateFullOutput();toast('Creative pasted')});crAdd.appendChild(pb)}
+            children.appendChild(crAdd);
+        });
+        const agAdd=mkAddRow('+ Ad Group','lv-ag',()=>{const a=addAgD(camp);addCrD(a);renderBuilder();updateFullOutput()});
+        if(CLIP&&CLIP.type==='ag'){const pb=document.createElement('button');pb.className='bld-paste';pb.textContent='Paste Ad Group';pb.addEventListener('click',()=>{const na=addAgD(camp,{...CLIP.v});CLIP.crs.forEach(c=>addCrD(na,{...c}));CLIP=null;renderBuilder();updateFullOutput();toast('Ad Group pasted')});agAdd.appendChild(pb)}
+        children.appendChild(agAdd);
+        card.appendChild(children);
+        root.appendChild(card);
+    });
+    const addCampCard=document.createElement('div');addCampCard.className='bld-rows';
+    addCampCard.appendChild(mkAddRow('+ Campaign','',()=>{const c=addCampD();const a=addAgD(c);addCrD(a);renderBuilder();updateFullOutput()}));
+    root.appendChild(addCampCard);
+    // Full output panel
+    const fo=document.createElement('div');fo.className='fo';fo.id='gen-fo';fo.style.display='none';
+    fo.innerHTML='<h2 style="font-size:1.1rem;color:var(--primary);margin-bottom:2px">Generated Names</h2><p style="font-size:.85rem;color:#64748b;margin-bottom:12px">Live preview with validation \u2014 click a valid name to copy, click an issue to expand details.</p><div id="fo-body"></div><div class="fo-actions"><button class="btn btn-primary" id="fo-copy">Copy All</button><div id="fo-csv-wrap" style="position:relative;display:inline-block"></div><span class="fo-count" id="fo-count"></span></div>';
+    root.appendChild(fo);
+    document.getElementById('fo-copy').addEventListener('click',copyFullSet);
+    buildCsvMenu();
+    updateFullOutput();
+    scheduleAutoSave();
+}
+
+// --- Campaign health check ---
+function campStatus(camp){
+    let hasErr=false,hasWrn=false,hasName=false;
+    const cn=buildCampaignName({project:PROJ,beat:BEAT,...camp.v});
+    if(cn){hasName=true;const r=validateName(cn,'campaign');const limit=LIMITS[camp.v.platform]||128;if(cn.length>limit)hasErr=true;r.issues.forEach(i=>{if(i.t==='e')hasErr=true;else hasWrn=true})}
+    camp.ags.forEach(ag=>{
+        const an=buildAgName({geo:camp.v.geo,...ag.v});
+        if(an){hasName=true;const r=validateName(an,'adgroup');r.issues.forEach(i=>{if(i.t==='e')hasErr=true;else hasWrn=true})}
+        ag.crs.forEach(cr=>{
+            const crn=buildCrName({geo:camp.v.geo,...cr.v,beat:BEAT});
+            if(crn){hasName=true;const r=validateName(crn,'creative');r.issues.forEach(i=>{if(i.t==='e')hasErr=true;else hasWrn=true})}
+        });
+    });
+    if(!hasName)return 'empty';
+    if(hasErr)return 'err';
+    if(hasWrn)return 'wrn';
+    return 'ok';
+}
+
+// --- Row builders ---
+function mkCampRow(camp,idx){
+    const r=document.createElement('div');r.className='bld-row lv-camp';r.dataset.id=camp.id;
+    const chev=document.createElement('span');chev.className='camp-chev';chev.textContent='\u25BC';
+    chev.addEventListener('click',e=>{e.stopPropagation();const card=r.closest('.bld-rows');if(COLLAPSED.has(camp.id)){COLLAPSED.delete(camp.id);card.classList.remove('collapsed')}else{COLLAPSED.add(camp.id);card.classList.add('collapsed')}});
+    r.appendChild(chev);
+    const dot=document.createElement('span');const st=campStatus(camp);dot.className='camp-status st-'+st;
+    dot.title=st==='ok'?'All names valid':st==='wrn'?'Has warnings':st==='err'?'Has errors':'Incomplete';
+    r.appendChild(dot);
+    r.appendChild(mkRid('Campaign '+idx));
+    // project(inh) - beat(inh) _ date - platform - geo - strategy _ objective [_ suffix]
+    const v=camp.v;
+    r.appendChild(mkSeg(null,'project',PROJ,true));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(null,'beat',BEAT,true));r.appendChild(mkDelim('_'));
+    r.appendChild(mkSeg(camp,'date',v.date));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(camp,'platform',v.platform));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(camp,'geo',v.geo));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(camp,'strategy',v.strategy));r.appendChild(mkDelim('_'));
+    r.appendChild(mkSeg(camp,'objective',v.objective));
+    if(v.suffix){r.appendChild(mkDelim('_'));r.appendChild(mkSeg(camp,'suffix',v.suffix))}
+    else{const d=mkDelim('_');d.style.opacity='.3';r.appendChild(d);r.appendChild(mkSeg(camp,'suffix',''))}
+    r.appendChild(mkSpacer());
+    r.appendChild(mkIcon('\u29c9','Duplicate','',()=>{dupCampD(camp);renderBuilder();updateFullOutput()}));
+    r.appendChild(mkIcon('\u2715','Delete','danger',()=>{if(!confirm('Delete Campaign '+idx+' and all its ad groups/creatives?'))return;pushUndo();rmCampD(camp);renderBuilder();updateFullOutput()}));
+    r.appendChild(mkIcon('\ud83d\udccb','Copy name','',()=>{const n=buildCampaignName({project:PROJ,beat:BEAT,...v});if(n)copyText(n).then(()=>toast('Copied'))}));
+    r.querySelectorAll('.sc').forEach(c=>{const k=cellKey(c);if(k)c.dataset.k=k});
+    return r;
+}
+
+function mkAgRow(ag,camp,idx){
+    const r=document.createElement('div');r.className='bld-row lv-ag';r.dataset.id=ag.id;
+    r.appendChild(mkRid('Ad Group '+idx));
+    // geo(inherited) - audience _ type [_ suffix]
+    r.appendChild(mkSeg(null,'geo',camp.v.geo,true));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(ag,'audience',ag.v.audience));r.appendChild(mkDelim('_'));
+    r.appendChild(mkSeg(ag,'type',ag.v.type));
+    if(ag.v.suffix){r.appendChild(mkDelim('_'));r.appendChild(mkSeg(ag,'suffix',ag.v.suffix))}
+    else{const d=mkDelim('_');d.style.opacity='.3';r.appendChild(d);r.appendChild(mkSeg(ag,'suffix',''))}
+    r.appendChild(mkSpacer());
+    const agPicked=CLIP&&CLIP.type==='ag'&&CLIP.id===ag.id;
+    r.appendChild(mkIcon('\u29c9','Duplicate','',()=>{dupAgD(camp,ag);renderBuilder();updateFullOutput()}));
+    r.appendChild(mkIcon('\u2715','Delete','danger',()=>{pushUndo();rmAgD(camp,ag);renderBuilder();updateFullOutput()}));
+    r.appendChild(mkIcon(agPicked?'\u2714':'\ud83d\udccc',agPicked?'Cancel pick':'Pick to paste elsewhere',agPicked?'picked':'',()=>{if(agPicked){CLIP=null}else{CLIP={type:'ag',id:ag.id,v:{...ag.v},crs:ag.crs.map(c=>({...c.v}))};toast('Ad Group picked \u2014 paste into any campaign')}renderBuilder()}));
+    r.appendChild(mkIcon('\ud83d\udccb','Copy name','',()=>{const n=buildAgName({geo:camp.v.geo,...ag.v});if(n)copyText(n).then(()=>toast('Copied'))}));
+    r.querySelectorAll('.sc:not(.inh)').forEach(c=>{const k=cellKey(c);if(k)c.dataset.k=k});
+    return r;
+}
+
+function mkCrRow(cr,ag,camp,idx){
+    const r=document.createElement('div');r.className='bld-row lv-cr';r.dataset.id=cr.id;
+    r.appendChild(mkRid('Creative '+idx));
+    // geo(inh) - format - dims - beat(inh) - lp - version - length [- suffix]
+    r.appendChild(mkSeg(null,'geo',camp.v.geo,true));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(cr,'format',cr.v.format));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(cr,'dims',cr.v.dims));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(null,'beat',BEAT,true));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(cr,'lp',cr.v.lp));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(cr,'version',cr.v.version));r.appendChild(mkDelim('-'));
+    r.appendChild(mkSeg(cr,'length',cr.v.length));
+    if(cr.v.suffix){r.appendChild(mkDelim('-'));r.appendChild(mkSeg(cr,'suffix',cr.v.suffix))}
+    else{const d=mkDelim('-');d.style.opacity='.3';r.appendChild(d);r.appendChild(mkSeg(cr,'suffix',''))}
+    r.appendChild(mkSpacer());
+    const crPicked=CLIP&&CLIP.type==='cr'&&CLIP.id===cr.id;
+    r.appendChild(mkIcon('\u29c9','Duplicate','',()=>{dupCrD(ag,cr);renderBuilder();updateFullOutput()}));
+    r.appendChild(mkIcon('\u2715','Delete','danger',()=>{pushUndo();rmCrD(ag,cr);renderBuilder();updateFullOutput()}));
+    r.appendChild(mkIcon(crPicked?'\u2714':'\ud83d\udccc',crPicked?'Cancel pick':'Pick to paste elsewhere',crPicked?'picked':'',()=>{if(crPicked){CLIP=null}else{CLIP={type:'cr',id:cr.id,v:{...cr.v}};toast('Creative picked \u2014 paste into any ad group')}renderBuilder()}));
+    r.appendChild(mkIcon('\ud83d\udccb','Copy name','',()=>{const n=buildCrName({geo:camp.v.geo,...cr.v,beat:BEAT});if(n)copyText(n).then(()=>toast('Copied'))}));
+    r.querySelectorAll('.sc:not(.inh)').forEach(c=>{const k=cellKey(c);if(k)c.dataset.k=k});
+    return r;
+}
+
+function cellKey(cell){
+    // Infer key from the cell's text content or title
+    const t=cell.title||'';const m=t.match(/^(\w[\w\s]*?)[\s:]/);
+    if(m){const label=m[1];for(const lv of Object.values(LEVELS)){const f=lv.fields.find(f=>f.label===label);if(f)return f.key}}
+    // Fallback: if it's an empty cell, text = key
+    if(cell.classList.contains('mt'))return cell.textContent;
+    return '';
+}
+
+// --- Collect names from DATA ---
+function collectAllNames(){
+    const names={campaign:[],adgroups:[],creatives:[]};
+    DATA.forEach(camp=>{
+        const cn=buildCampaignName({project:PROJ,beat:BEAT,...camp.v});
+        const limit=LIMITS[camp.v.platform]||128;
+        if(cn)names.campaign.push({name:cn,limit,level:'campaign'});
+        camp.ags.forEach(ag=>{
+            const an=buildAgName({geo:camp.v.geo,audience:ag.v.audience,type:ag.v.type,suffix:ag.v.suffix});
+            if(an)names.adgroups.push({name:an,limit,level:'adgroup'});
+            ag.crs.forEach(cr=>{
+                const crn=buildCrName({geo:camp.v.geo,format:cr.v.format,dims:cr.v.dims,beat:BEAT,lp:cr.v.lp,version:cr.v.version,length:cr.v.length,suffix:cr.v.suffix});
+                if(crn)names.creatives.push({name:crn,limit,level:'creative'});
+            });
+        });
+    });
+    return names;
+}
+
+function validateName(name,level){
+    if(level==='campaign')return parseCampaign(name);
+    if(level==='adgroup')return parseAdGroup(name);
+    return parseCreative(name);
+}
+
+function updateFullOutput(){
+    const names=collectAllNames();
+    const total=names.campaign.length+names.adgroups.length+names.creatives.length;
+    const fo=document.getElementById('gen-fo');
+    if(!fo)return;
+    if(total===0){fo.style.display='none';return}
+    fo.style.display='block';
+    const body=document.getElementById('fo-body');body.innerHTML='';
+    let num=0,totOk=0,totWrn=0,totErr=0;
+    [{label:'Campaigns',list:names.campaign},{label:'Ad Groups',list:names.adgroups},{label:'Creatives',list:names.creatives}].forEach(g=>{
+        if(!g.list.length)return;
+        const grp=document.createElement('div');grp.className='fo-group';
+        grp.innerHTML='<div class="fo-label">'+g.label+' ('+g.list.length+')</div>';
+        const ol=document.createElement('div');ol.className='fo-list';
+        g.list.forEach(n=>{
+            num++;
+            const res=validateName(n.name,n.level);
+            const dedup=new Set();res.issues=res.issues.filter(i=>{if(dedup.has(i.m))return false;dedup.add(i.m);return true});
+            const errs=res.issues.filter(i=>i.t==='e'),wrns=res.issues.filter(i=>i.t==='w');
+            const over=n.name.length>n.limit;
+            if(over)errs.push({t:'e',m:'Name exceeds '+n.limit+' character limit ('+n.name.length+' chars)'});
+            const status=errs.length?'err':wrns.length?'wrn':'ok';
+            if(status==='ok')totOk++;else if(status==='wrn')totWrn++;else totErr++;
+            const issCount=errs.length+wrns.length;
+            const line=document.createElement('div');line.className='fo-line';
+            line.innerHTML='<span class="fo-dot '+status+'"></span><span class="ln">'+num+'</span><span class="lt">'+esc(n.name)+'</span><span class="ll'+(over?' over':'')+'">'+n.name.length+'/'+n.limit+'</span>'+(issCount?'<span class="fo-iss has">'+issCount+' issue'+(issCount>1?'s':'')+'</span>':'');
+            const detail=document.createElement('div');detail.className='fo-detail';
+            if(issCount){
+                const ul=document.createElement('ul');ul.className='issue-list';
+                [...errs,...wrns].forEach(is=>{const li=document.createElement('li');li.className=is.t==='e'?'err':'wrn';li.textContent=is.m;ul.appendChild(li)});
+                detail.appendChild(ul);
+                line.addEventListener('click',()=>{detail.classList.toggle('open')});
+            } else {
+                line.addEventListener('click',()=>copyText(n.name).then(()=>toast('Copied')));
+                line.title='Click to copy';
+            }
+            ol.appendChild(line);ol.appendChild(detail);
+        });
+        grp.appendChild(ol);body.appendChild(grp);
+    });
+    // Summary
+    const summ=document.createElement('div');summ.className='fo-summary';
+    summ.innerHTML='<span class="fs-ok">'+totOk+' valid</span>'+(totWrn?'<span class="fs-wrn">'+totWrn+' warning'+(totWrn>1?'s':'')+'</span>':'')+(totErr?'<span class="fs-err">'+totErr+' error'+(totErr>1?'s':'')+'</span>':'');
+    body.insertBefore(summ,body.firstChild);
+    document.getElementById('fo-count').textContent=total+' name'+(total>1?'s':'')+' total';
+    buildCsvMenu();
+}
+
+function copyFullSet(){
+    const names=collectAllNames();
+    const lines=[...names.campaign,...names.adgroups,...names.creatives].map(n=>n.name);
+    if(lines.length){
+        copyText(lines.join('\n')).then(()=>{
+            const btn=document.getElementById('fo-copy');btn.textContent='Copied!';toast('All names copied');
+            setTimeout(()=>btn.textContent='Copy All',1500);
+        });
+    }
+}
+
+function collectTree(){
+    const rows=[];
+    DATA.forEach(camp=>{
+        const cn=buildCampaignName({project:PROJ,beat:BEAT,...camp.v});
+        if(!cn)return;
+        const plat=camp.v.platform||'Unknown';
+        camp.ags.forEach(ag=>{
+            const an=buildAgName({geo:camp.v.geo,...ag.v});
+            if(!an)return;
+            if(!ag.crs.length){rows.push({platform:plat,campaign:cn,adgroup:an,creative:''});return}
+            ag.crs.forEach(cr=>{
+                const crn=buildCrName({geo:camp.v.geo,...cr.v,beat:BEAT});
+                rows.push({platform:plat,campaign:cn,adgroup:an,creative:crn||''});
+            });
+        });
+    });
+    return rows;
+}
+
+function getUsedPlatforms(){
+    const p=new Set();DATA.forEach(c=>{if(c.v.platform)p.add(c.v.platform)});return[...p].sort();
+}
+
+function makeCsv(headers,rows){
+    const lines=[headers,...rows].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(','));
+    return lines.join('\n');
+}
+
+function triggerDownload(csv,filename){
+    const blob=new Blob([csv],{type:'text/csv'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=filename;a.click();
+    URL.revokeObjectURL(url);
+}
+
+function downloadCsvAll(){
+    const tree=collectTree();if(!tree.length)return;
+    const csv=makeCsv(['Platform','Campaign','Ad Group','Creative'],tree.map(r=>[r.platform,r.campaign,r.adgroup,r.creative]));
+    triggerDownload(csv,'naming_conventions_all.csv');
+    toast('CSV downloaded (all platforms)');
+}
+
+function downloadCsvPlatform(plat){
+    const tree=collectTree().filter(r=>r.platform===plat);if(!tree.length)return;
+    const csv=makeCsv(['Campaign','Ad Group','Creative'],tree.map(r=>[r.campaign,r.adgroup,r.creative]));
+    const safe=plat.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase();
+    triggerDownload(csv,'naming_conventions_'+safe+'.csv');
+    toast('CSV downloaded ('+plat+')');
+}
+
+function buildCsvMenu(){
+    const wrap=document.getElementById('fo-csv-wrap');if(!wrap)return;wrap.innerHTML='';
+    const btn=document.createElement('button');btn.className='btn';btn.style.cssText='background:#475569;color:#fff';btn.textContent='Export CSV \u25BE';
+    const menu=document.createElement('div');
+    menu.style.cssText='display:none;position:absolute;bottom:100%;left:0;margin-bottom:4px;background:#fff;border:1px solid #e2e8f0;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:200px;z-index:50;overflow:hidden';
+    // Per-platform options
+    const plats=getUsedPlatforms();
+    plats.forEach(p=>{
+        const opt=document.createElement('button');
+        opt.style.cssText='display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;cursor:pointer;font-size:.84rem;font-weight:600;color:#334155;transition:background .1s';
+        opt.textContent=p;
+        opt.addEventListener('mouseenter',()=>opt.style.background='#f1f5f9');
+        opt.addEventListener('mouseleave',()=>opt.style.background='none');
+        opt.addEventListener('click',()=>{downloadCsvPlatform(p);menu.style.display='none'});
+        menu.appendChild(opt);
+    });
+    // Separator + All
+    if(plats.length){const sep=document.createElement('div');sep.style.cssText='height:1px;background:#e2e8f0;margin:2px 0';menu.appendChild(sep)}
+    const all=document.createElement('button');
+    all.style.cssText='display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:none;cursor:pointer;font-size:.84rem;font-weight:600;color:#64748b;transition:background .1s';
+    all.textContent='All platforms';
+    all.addEventListener('mouseenter',()=>all.style.background='#f1f5f9');
+    all.addEventListener('mouseleave',()=>all.style.background='none');
+    all.addEventListener('click',()=>{downloadCsvAll();menu.style.display='none'});
+    menu.appendChild(all);
+    btn.addEventListener('click',()=>{menu.style.display=menu.style.display==='none'?'block':'none'});
+    document.addEventListener('click',e=>{if(!wrap.contains(e.target))menu.style.display='none'});
+    wrap.appendChild(menu);wrap.appendChild(btn);
+}
+
+// Init builder
+(function(){
+    loadBeatsFromStorage();
+    initSetup();
+    renderBuilder();
+    renderSavedBeats();
+})();
+
+// ══════════════════════════════════════════
+// BRIDGE: Checker → Builder
+// ══════════════════════════════════════════
+function sendToBuilder(segments,level){
+    switchMode('generator');
+    if(level==='campaign'){
+        const vals={};
+        segments.forEach(s=>{const v=s.value;if(s.label==='project'){}else if(s.label==='beat'){BEAT=v;updateSetupInputs()}else vals[s.label]=v});
+        const c=addCampD(vals);const a=addAgD(c);addCrD(a);
+    } else if(level==='adgroup'){
+        let camp=DATA[DATA.length-1];
+        if(!camp){camp=addCampD();addAgD(camp);addCrD(camp.ags[0])}
+        const vals={};
+        segments.forEach(s=>{const v=s.value;if(s.label==='geo'&&!camp.v.geo)camp.v.geo=v;else if(s.label!=='geo')vals[s.label]=v});
+        const a=addAgD(camp,vals);addCrD(a);
+    } else if(level==='creative'){
+        let camp=DATA[DATA.length-1];
+        if(!camp)camp=addCampD();
+        let ag=camp.ags[camp.ags.length-1];
+        if(!ag){ag=addAgD(camp)}
+        const vals={};
+        segments.forEach(s=>{const v=s.value;if(s.label==='geo'&&!camp.v.geo)camp.v.geo=v;else if(s.label==='beat'){BEAT=v;updateSetupInputs()}else if(s.label!=='geo'&&s.label!=='beat')vals[s.label]=v});
+        addCrD(ag,vals);
+    }
+    renderBuilder();
+    toast('Loaded in Builder');
+}
+
+// ══════════════════════════════════════════
+// CHECKER (embedded in Reference)
+// ══════════════════════════════════════════
+document.querySelectorAll('.mode-btn').forEach(b=>b.addEventListener('click',()=>switchMode(b.dataset.mode)));
+function initCheckers(){
+    for(const lk of Object.keys(LEVELS)){
+        const inp=document.getElementById('chk-input-'+lk);
+        if(!inp)continue;
+        const btn=document.querySelector('[data-chk-btn="'+lk+'"]');
+        const tv=document.querySelector('[data-try-valid="'+lk+'"]');
+        const ti=document.querySelector('[data-try-invalid="'+lk+'"]');
+        if(btn)btn.addEventListener('click',()=>runCheckerFor(lk));
+        if(tv)tv.addEventListener('click',()=>{inp.value=CHK_EXAMPLES.valid[lk];runCheckerFor(lk)});
+        if(ti)ti.addEventListener('click',()=>{inp.value=CHK_EXAMPLES.invalid[lk];runCheckerFor(lk)});
+        inp.addEventListener('input',()=>runCheckerFor(lk));
+    }
+}
+
+function parseCampaign(name){const segs=[],iss=[];const g=name.split('-');if(g.length<5)iss.push({t:'e',m:`Expected 5 groups by '-', found ${g.length}`});if(g[0])segs.push({label:'project',value:g[0],status:'neutral',color:C.project});if(g.length>=2){const p=g[1].split('_');if(p[0])segs.push({label:'beat',value:p[0],status:'neutral',color:C.beat,d:'-'});if(p[1])segs.push({label:'date',value:p[1],status:'neutral',color:C.date,d:'_'})}if(g.length>=3)segs.push({label:'platform',value:g[2],status:'neutral',color:C.platform,d:'-'});if(g.length>=4)segs.push({label:'geo',value:g[3],status:'neutral',color:C.geo,d:'-'});if(g.length>=5){const r=g.slice(4).join('-').split('_');if(r[0])segs.push({label:'strategy',value:r[0],status:'neutral',color:C.strategy,d:'-'});if(r[1])segs.push({label:'objective',value:r[1],status:'neutral',color:C.objective,d:'_'});if(r[2])segs.push({label:'suffix',value:r.slice(2).join('_'),status:'neutral',color:C.suffix,d:'_'})}segs.forEach(s=>valSeg(s,iss));return{segments:segs,issues:iss}}
+function parseAdGroup(name){const segs=[],iss=[];const g=name.split('-');if(g.length<2)iss.push({t:'e',m:`Expected 2 groups by '-', found ${g.length}`});if(g[0])segs.push({label:'geo',value:g[0],status:'neutral',color:C.geo});if(g.length>=2){const r=g.slice(1).join('-').split('_');if(r[0])segs.push({label:'audience',value:r[0],status:'neutral',color:C.audience,d:'-'});if(r[1])segs.push({label:'type',value:r[1],status:'neutral',color:C.type,d:'_'});if(r[2])segs.push({label:'suffix',value:r.slice(2).join('_'),status:'neutral',color:C.suffix,d:'_'})}segs.forEach(s=>valSeg(s,iss));return{segments:segs,issues:iss}}
+function parseCreative(name){const segs=[],iss=[];const p=name.split('-');const labels=['geo','format','dims','beat','lp','version','length','suffix'];if(p.length<7)iss.push({t:'e',m:`Expected 7 segments by '-', found ${p.length}`});p.forEach((v,i)=>{const l=labels[i]||'suffix';segs.push({label:l,value:v,status:'neutral',color:C[l]||C.suffix,d:i>0?'-':undefined})});segs.forEach(s=>valSeg(s,iss));return{segments:segs,issues:iss}}
+
+function valSeg(seg,iss){
+    const v=seg.value;if(!v){seg.status='error';return}
+    if(/[\s!@#$%^&*()+={}\[\]|\\:;"'<>,?/]/.test(v)){iss.push({t:'e',m:`'${v}' in ${seg.label} has forbidden characters`});seg.status='error';return}
+    const km={geo:'geo',platform:'platform',strategy:'strategy',objective:'objective',audience:'audience',type:'type',format:'format',lp:'lp'};
+    if(km[seg.label]){const list=KNOWN[km[seg.label]];const m=fuzzy(v,list);if(m&&m!==v){iss.push({t:'w',m:`${seg.label} '${v}' should be '${m}'`});seg.status='warning'}else if(!m){const cl=findClose(v,list);if(cl){iss.push({t:'w',m:`${seg.label} '${v}' not recognized — did you mean '${cl}'?`})}else iss.push({t:'w',m:`${seg.label} '${v}' not in known values (custom?)`});seg.status='warning'}else seg.status='valid';return}
+    if(seg.label==='date'){if(!/^\d{6}$/.test(v)){iss.push({t:'e',m:`Date '${v}' doesn't match YYMMDD`});seg.status='error'}else{const mm=+v.slice(2,4),dd=+v.slice(4,6);if(mm<1||mm>12||dd<1||dd>31){iss.push({t:'e',m:`Date '${v}' invalid month/day`});seg.status='error'}else seg.status='valid'}return}
+    if(seg.label==='dims'){if(!/^\d+x\d+$/.test(v)){iss.push({t:'e',m:`Dimensions '${v}' should be WIDTHxHEIGHT`});seg.status='error'}else seg.status='valid';return}
+    if(seg.label==='version'){if(!/^v\d+$/i.test(v)){iss.push({t:'e',m:`Version '${v}' should be v+number`});seg.status='error'}else seg.status='valid';return}
+    if(seg.label==='length'){if(!/^\d+s$/.test(v)){iss.push({t:'e',m:`Length '${v}' should be number+s`});seg.status='error'}else seg.status='valid';return}
+    if(v)seg.status='valid';
+}
+
+
+function renderResult(el,res,level,name){
+    const chips=document.createElement('div');chips.className='segment-chips';
+    res.segments.forEach((s,i)=>{if(i>0&&s.d){const d=document.createElement('span');d.className='chip-delim';d.textContent=s.d;chips.appendChild(d)}const ch=document.createElement('div');ch.className='seg-chip';const lb=document.createElement('span');lb.className='seg-chip-label';lb.style.color=s.color;lb.textContent=s.label;ch.appendChild(lb);const vl=document.createElement('span');vl.className='seg-chip-value '+s.status;vl.textContent=s.value;ch.appendChild(vl);chips.appendChild(ch)});
+    el.appendChild(chips);
+    const errs=res.issues.filter(i=>i.t==='e'),wrns=res.issues.filter(i=>i.t==='w');
+    const vd=document.createElement('div');
+    if(!errs.length&&!wrns.length){vd.className='verdict pass';vd.innerHTML='<span class="verdict-text">Valid</span>'}
+    else{vd.className='verdict fail';const parts=[];if(errs.length)parts.push(errs.length+' error'+(errs.length>1?'s':''));if(wrns.length)parts.push(wrns.length+' warning'+(wrns.length>1?'s':''));vd.innerHTML=`<span class="verdict-text">${parts.join(', ')}</span>`}
+    el.appendChild(vd);
+    if(res.issues.length){const ul=document.createElement('ul');ul.className='issue-list';res.issues.forEach(is=>{const li=document.createElement('li');li.className=is.t==='e'?'err':'wrn';li.textContent=is.m;ul.appendChild(li)});el.appendChild(ul)}
+}
+
+function runCheckerFor(lk){
+    const inp=document.getElementById('chk-input-'+lk);
+    const panel=document.getElementById('chk-results-'+lk);
+    if(!inp||!panel)return;
+    const raw=inp.value;
+    const lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);
+    if(!lines.length){panel.classList.add('hidden');return}
+    panel.innerHTML='';panel.classList.remove('hidden');
+    const parse=n=>lk==='campaign'?parseCampaign(n):lk==='adgroup'?parseAdGroup(n):parseCreative(n);
+    const dedup=r=>{const s=new Set();r.issues=r.issues.filter(i=>{if(s.has(i.m))return false;s.add(i.m);return true})};
+    if(lines.length===1){const r=parse(lines[0]);dedup(r);const w=document.createElement('div');renderResult(w,r,lk,lines[0]);panel.appendChild(w)}
+    else{
+        const results=lines.map(l=>{const r=parse(l);dedup(r);return{line:l,...r}});
+        let pc=0,wc=0,fc=0;results.forEach(r=>{const e=r.issues.filter(i=>i.t==='e').length;const w=r.issues.filter(i=>i.t==='w').length;if(e)fc++;else if(w)wc++;else pc++});
+        panel.insertAdjacentHTML('beforeend',`<div class="batch-summary"><span class="bp">${pc} valid</span><span class="bw">${wc} warnings</span><span class="bf">${fc} errors</span><span style="margin-left:auto;color:#64748b">${lines.length} checked</span></div>`);
+        results.forEach(r=>{const e=r.issues.filter(i=>i.t==='e').length,w=r.issues.filter(i=>i.t==='w').length;const sc=e?'fail':w?'warn':'pass';const st=e?e+' error'+(e>1?'s':''):w?w+' warning'+(w>1?'s':''):'Valid';const bl=document.createElement('div');bl.className='batch-line';const hd=document.createElement('div');hd.className='batch-hdr';hd.innerHTML=`<span class="batch-dot ${sc}"></span><span class="batch-name">${esc(r.line)}</span><span class="batch-info">${st}</span><span class="batch-chev">&#9654;</span>`;hd.addEventListener('click',()=>bl.classList.toggle('open'));const dt=document.createElement('div');dt.className='batch-detail';renderResult(dt,r,lk,r.line);bl.appendChild(hd);bl.appendChild(dt);panel.appendChild(bl)});
+    }
+}
+</script>
+</body>
+</html>
