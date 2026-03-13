@@ -1495,33 +1495,85 @@
 
   &lt;!-- Filter bar (border-top separator) --&gt;
   &lt;div class="card-body py-2" style="
-    border-top:1px solid rgba(4,32,69,0.1);
-    position:relative; z-index:1;"&gt;
-    &lt;div class="d-flex flex-nowrap align-items-center gap-2"&gt;
-      ...filters...
+    border-top:1px solid rgba(4,32,69,0.1);"&gt;
+    &lt;div class="d-flex flex-wrap align-items-center gap-2"&gt;
+      &lt;!-- Mobile: toggle + Paid/Organic/Total always visible --&gt;
+      &lt;button class="btn btn-sm btn-outline-secondary filter-toggle-btn"&gt;
+        &lt;svg&gt;...filter icon...&lt;/svg&gt; Filters
+        &lt;span class="filter-active-count has-filters"&gt;1&lt;/span&gt;
+        &lt;i class="ti ti-chevron-down"&gt;&lt;/i&gt;
+      &lt;/button&gt;
+      &lt;div class="btn-group"&gt;Total | Paid | Organic&lt;/div&gt;
+      &lt;button id="filterReset"&gt;...&lt;/button&gt;
+
+      &lt;!-- Collapsible drawer (display:contents on desktop) --&gt;
+      &lt;div class="filter-drawer" id="filterDrawer"&gt;
+        &lt;div class="filter-dates"&gt;...date dropdowns...&lt;/div&gt;
+        &lt;div class="filter-dim-sep"&gt;&lt;/div&gt;
+        &lt;div class="filter-dims"&gt;...5 selects...&lt;/div&gt;
+      &lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
 &lt;/div&gt;</code></pre>
 
             <strong>Filter Bar Components</strong>
+
+            <div class="alert alert-info mb-3" style="font-size:13px;">
+              <strong>Mobile responsive pattern:</strong> On screens &lt;768px, the filter bar collapses into a <strong>drawer</strong>. Only the "Filters" toggle button (with active-count badge), Paid/Organic/Total toggle, and Reset are visible. Tapping "Filters" reveals dates + dimension selects stacked vertically. On desktop (&ge;768px), the drawer uses <code>display: contents</code> so all filters render inline as before.
+            </div>
+
+            <strong>Mobile Drawer CSS</strong>
+            <pre class="bg-dark text-light p-3 rounded mb-3" style="font-size:12px; overflow-x:auto; white-space:pre;"><code>.filter-toggle-btn { display: none; }
+.filter-drawer { display: contents; }
+.filter-active-count {
+  display: none; font-size: 10px; font-weight: 700;
+  background: var(--tblr-primary); color: #fff;
+  border-radius: 50%; width: 18px; height: 18px;
+  line-height: 18px; text-align: center;
+}
+
+@media (max-width: 767.98px) {
+  .filter-toggle-btn { display: inline-flex; }
+  .filter-drawer {
+    display: none; flex-direction: column; gap: 10px;
+    width: 100%; padding-top: 10px;
+    border-top: 1px solid rgba(4,32,69,0.08);
+    margin-top: 6px;
+  }
+  .filter-drawer.show { display: flex; }
+  .filter-drawer .filter-dates { flex-direction: column; gap: 6px; }
+  .filter-drawer .filter-dims { flex-direction: column; gap: 6px; }
+  .filter-drawer .filter-dims select {
+    max-width: 100% !important; flex: 1 1 100% !important;
+  }
+  .filter-drawer .filter-dim-sep { display: none; }
+  .filter-active-count.has-filters { display: inline-block; }
+}</code></pre>
+
             <div class="row">
-              <div class="col-lg-6">
-                <strong class="d-block mb-1">Date Group (left side)</strong>
+              <div class="col-lg-4">
+                <strong class="d-block mb-1">Always Visible</strong>
+                <ul class="text-muted mb-2" style="font-size:13px;">
+                  <li><code>.filter-toggle-btn</code> — hidden on desktop, shown on mobile. Filter icon + "Filters" label + active count badge + chevron</li>
+                  <li>3-way toggle: <code>.btn-group</code> with Total (active) / Paid / Organic</li>
+                  <li>Reset button: <code>.btn-ghost-secondary</code> with rotate-ccw icon. Hidden (<code>d-none</code>) until a filter is non-default.</li>
+                </ul>
+              </div>
+              <div class="col-lg-4">
+                <strong class="d-block mb-1">Drawer: Date Group</strong>
                 <ul class="text-muted mb-2" style="font-size:13px;">
                   <li>Calendar SVG icon (16&times;16, text-muted)</li>
                   <li>Campaign date dropdown: <code>.btn.btn-sm.btn-outline-secondary.dropdown-toggle</code> + <code>.dropdown-menu.p-3</code> with two <code>input[type=date]</code> + Apply button</li>
                   <li>Install date dropdown: same pattern</li>
-                  <li>Vertical separator: <code>border-left:1.5px solid rgba(4,32,69,0.15); align-self:stretch; margin:2px 6px</code></li>
+                  <li>Vertical separator (<code>.filter-dim-sep</code>): hidden on mobile</li>
                 </ul>
               </div>
-              <div class="col-lg-6">
-                <strong class="d-block mb-1">Dimension Group (right side)</strong>
+              <div class="col-lg-4">
+                <strong class="d-block mb-1">Drawer: Dimension Group</strong>
                 <ul class="text-muted mb-2" style="font-size:13px;">
-                  <li>Filter SVG icon (16&times;16, text-muted)</li>
-                  <li>5 select dropdowns: <code>.form-select.form-select-sm</code> with <code>min-width:0</code> (Beat, Geo, Channel, Strategy, Objective)</li>
-                  <li>3-way toggle: <code>.btn-group</code> with Total (active) / Paid / Organic</li>
+                  <li>Filter SVG icon (16&times;16, text-muted) — hidden on mobile (redundant with toggle button)</li>
+                  <li>5 select dropdowns: <code>.form-select.form-select-sm</code> (Beat, Geo, Channel, Strategy, Objective). On mobile: full-width stacked. On desktop: <code>flex:1 1 90px; max-width:150px</code></li>
                   <li>Toggle JS: onclick swaps <code>btn-primary</code> ↔ <code>btn-outline</code> on all siblings</li>
-                  <li>Reset button: <code>.btn-ghost-secondary</code> with rotate-ccw icon. Hidden by default (<code>d-none</code>), shown when any filter is non-default. <code>resetFilters()</code> resets all selects to index 0, toggle to Total, dates to defaults.</li>
                 </ul>
               </div>
             </div>
@@ -1546,6 +1598,7 @@
               <li>Filter state should use React state or URL params (Next.js <code>useSearchParams</code>)</li>
               <li>Paid/Organic/Total toggle: single state variable, all charts re-render on change</li>
               <li>Date pickers: replace HTML5 inputs with a proper date range picker (e.g., react-datepicker or Tabler's built-in litepicker)</li>
+              <li><strong>Mobile filter drawer:</strong> The <code>.filter-drawer</code> uses <code>display: contents</code> on desktop (no wrapper behaviour) and collapses into a vertical panel on mobile (&lt;768px). The <code>.filter-toggle-btn</code> with active-count badge and Paid/Organic/Total toggle stay visible at all sizes. In the widget rebuild, manage drawer open/close state and active filter count reactively.</li>
             </ul>
           </div>
         </div>
@@ -1579,7 +1632,11 @@
 
             <hr class="my-3">
             <strong>Game Intelligence Card</strong>
-            <p class="text-muted mb-2">6 stats in a row. Each stat is clickable (<code>.lens-clickable</code>) and drives the trajectory chart below.</p>
+            <p class="text-muted mb-2">6 stats in a responsive grid. Each stat is clickable (<code>.lens-clickable</code>) and drives the trajectory chart below.</p>
+
+            <div class="alert alert-info mb-3" style="font-size:13px;">
+              <strong>Responsive grid:</strong> Each stat column uses <code>.col-6 .col-sm-4 .col-lg</code>. Mobile (&lt;576px): 2 per row (3 rows). Small (576&ndash;991px): 3 per row (2 rows). Large (&ge;992px): all 6 in one row.
+            </div>
 
             <pre class="bg-dark text-light p-3 rounded mb-3" style="font-size:12px; overflow-x:auto; white-space:pre;"><code>&lt;div class="steam-stat lens-clickable" data-lens="installs"&gt;
   &lt;div class="stat-label"&gt;Game Installs&lt;/div&gt;
@@ -2720,6 +2777,12 @@ const trendXConfig = {
                   <tr><td class="text-muted"><code>.no-caret</code></td><td>hides Bootstrap dropdown caret arrow</td></tr>
                   <tr><td class="text-muted"><code>.wt</code></td><td>widget-style table (Tabulator theme)</td></tr>
                   <tr><td class="text-muted"><code>.filter-active</code></td><td>active filter highlight (primary border + tint)</td></tr>
+                  <tr><td class="text-muted"><code>.filter-toggle-btn</code></td><td>mobile-only "Filters" button (hidden on desktop)</td></tr>
+                  <tr><td class="text-muted"><code>.filter-drawer</code></td><td>collapsible filter container (<code>display:contents</code> on desktop, vertical panel on mobile)</td></tr>
+                  <tr><td class="text-muted"><code>.filter-active-count</code></td><td>red badge showing number of active filters (mobile only)</td></tr>
+                  <tr><td class="text-muted"><code>.filter-dates</code></td><td>date picker group (stacks vertically on mobile)</td></tr>
+                  <tr><td class="text-muted"><code>.filter-dims</code></td><td>dimension select group (full-width stacked on mobile)</td></tr>
+                  <tr><td class="text-muted"><code>.filter-dim-sep</code></td><td>vertical separator between date and dimension groups (hidden on mobile)</td></tr>
                 </table>
               </div>
             </div>
@@ -2778,6 +2841,7 @@ const trendXConfig = {
                 <tr><td><code>.ai-insight</code> family</td><td>Kept custom</td><td>Design token for <code>Components::AiInsight</code>. Custom purple/orange accent colors, collapsible state, 3 variants.</td></tr>
                 <tr><td><code>.info-tip</code></td><td>Kept custom</td><td>Pure CSS tooltip with brand-tint hover. Tabler tooltips require JS + different positioning.</td></tr>
                 <tr><td><code>.filter-active</code></td><td>Kept custom</td><td>Active filter state with primary border + tinted bg &mdash; compound state, not a utility.</td></tr>
+                <tr><td><code>.filter-toggle-btn</code> / <code>.filter-drawer</code> / <code>.filter-active-count</code></td><td>Kept custom</td><td>Mobile filter drawer pattern. Toggle hidden on desktop, drawer uses <code>display:contents</code>. On &lt;768px: drawer becomes vertical panel with stacked selects. No Tabler equivalent for this responsive collapse pattern.</td></tr>
                 <tr><td><code>.section-label</code></td><td>Kept custom</td><td>Pill-shaped label (15px, 800 weight, no border, surface-secondary bg). Section dividers use 3.5rem top margin.</td></tr>
               </tbody>
             </table>
