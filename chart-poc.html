@@ -83,6 +83,23 @@
     .channel-link:hover { text-decoration: underline; }
     /* Filter bar: active filter state */
     .filter-active { border-color: var(--tblr-primary); color: var(--tblr-primary); font-weight: 600; background-color: rgba(var(--tblr-primary-rgb),0.06); }
+    /* Mobile filter drawer */
+    .filter-toggle-btn { display: none; }
+    .filter-drawer { display: contents; } /* on desktop: no wrapper behaviour */
+    .filter-active-count { display: none; font-size: 10px; font-weight: 700; background: var(--tblr-primary); color: #fff; border-radius: 50%; width: 18px; height: 18px; line-height: 18px; text-align: center; }
+    @media (max-width: 767.98px) {
+      .filter-toggle-btn { display: inline-flex; }
+      .filter-drawer {
+        display: none; flex-direction: column; gap: 10px;
+        width: 100%; padding-top: 10px; border-top: 1px solid rgba(4,32,69,0.08); margin-top: 6px;
+      }
+      .filter-drawer.show { display: flex; }
+      .filter-drawer .filter-dates { flex-direction: column; gap: 6px; }
+      .filter-drawer .filter-dims { flex-direction: column; gap: 6px; }
+      .filter-drawer .filter-dims select { max-width: 100% !important; min-width: 0 !important; flex: 1 1 100% !important; }
+      .filter-drawer .filter-dim-sep { display: none; }
+      .filter-active-count.has-filters { display: inline-block; }
+    }
     /* Section dividers — uses Tabler utilities: border-top border-2 border-primary */
     .section-label { font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--tblr-body-color, #1e293b); white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; padding: 5px 18px; background: var(--tblr-bg-surface-secondary, #f1f3f5); border-radius: 6px; }
     .section-subtitle { font-size: 12px; margin-top: -6px; }
@@ -388,84 +405,99 @@
           </div>
           <!-- Filters -->
           <div class="card-body py-2" style="border-top:1px solid rgba(4,32,69,0.1);">
-            <div class="d-flex flex-nowrap align-items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted flex-shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              <div class="dropdown flex-shrink-0">
-                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                  Campaign: 10 Nov – 26 Feb
-                </button>
-                <div class="dropdown-menu p-3" style="min-width:280px;">
-                  <label class="form-label mb-1">Start</label>
-                  <input type="date" class="form-control form-control-sm mb-2" value="2025-11-10">
-                  <label class="form-label mb-1">End</label>
-                  <input type="date" class="form-control form-control-sm mb-2" value="2026-02-26">
-                  <button class="btn btn-sm btn-primary w-100">Apply</button>
-                </div>
-              </div>
-              <div class="dropdown flex-shrink-0">
-                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                  Install: 10 Nov – 26 Feb
-                </button>
-                <div class="dropdown-menu p-3" style="min-width:280px;">
-                  <label class="form-label mb-1">Start</label>
-                  <input type="date" class="form-control form-control-sm mb-2" value="2025-11-10">
-                  <label class="form-label mb-1">End</label>
-                  <input type="date" class="form-control form-control-sm mb-2" value="2026-02-26">
-                  <button class="btn btn-sm btn-primary w-100">Apply</button>
-                </div>
-              </div>
-              <div style="border-left:1.5px solid rgba(4,32,69,0.15); align-self:stretch; margin:2px 6px;"></div>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted flex-shrink-0"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-              <select class="form-select form-select-sm filter-active" style="min-width:0;">
-                <option>Beat</option>
-                <option selected>Launch</option>
-                <option>Always On</option>
-                <option>Seasonal</option>
-              </select>
-              <select class="form-select form-select-sm" style="min-width:0;">
-                <option selected>Geo</option>
-                <option>DE</option>
-                <option>AT</option>
-                <option>CH</option>
-                <option>FR</option>
-                <option>UK</option>
-                <option>NL</option>
-                <option>IT</option>
-              </select>
-              <select class="form-select form-select-sm" style="min-width:0;">
-                <option selected>Channel</option>
-                <option>Meta</option>
-                <option>Google Search</option>
-                <option>YouTube</option>
-                <option>PMax</option>
-                <option>Reddit</option>
-                <option>X</option>
-                <option>Creator</option>
-                <option>Direct</option>
-                <option>MediaHouse</option>
-              </select>
-              <select class="form-select form-select-sm" style="min-width:0;">
-                <option selected>Strategy</option>
-                <option>Consideration</option>
-                <option>Conversion</option>
-              </select>
-              <select class="form-select form-select-sm" style="min-width:0;">
-                <option selected>Objective</option>
-                <option>Gameplay</option>
-                <option>High Impact</option>
-                <option>Leads</option>
-                <option>Purchase</option>
-                <option>Traffic</option>
-              </select>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+              <!-- Mobile: filter toggle + toggle group always visible -->
+              <button type="button" class="btn btn-sm btn-outline-secondary filter-toggle-btn align-items-center gap-1" onclick="var d=document.getElementById('filterDrawer');d.classList.toggle('show');this.querySelector('.ti').classList.toggle('ti-chevron-down');this.querySelector('.ti').classList.toggle('ti-chevron-up');">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                Filters
+                <span class="filter-active-count has-filters" id="filterCount">1</span>
+                <i class="ti ti-chevron-down" style="font-size:14px;"></i>
+              </button>
               <div class="btn-group flex-shrink-0" role="group">
                 <button type="button" class="btn btn-sm btn-primary" onclick="this.parentNode.querySelectorAll('.btn').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-outline')});this.classList.remove('btn-outline');this.classList.add('btn-primary')">Total</button>
                 <button type="button" class="btn btn-sm btn-outline" onclick="this.parentNode.querySelectorAll('.btn').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-outline')});this.classList.remove('btn-outline');this.classList.add('btn-primary')">Paid</button>
                 <button type="button" class="btn btn-sm btn-outline" onclick="this.parentNode.querySelectorAll('.btn').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-outline')});this.classList.remove('btn-outline');this.classList.add('btn-primary')">Organic</button>
               </div>
-              <div style="border-left:1.5px solid rgba(4,32,69,0.15); align-self:stretch; margin:2px 2px;"></div>
               <button type="button" class="btn btn-sm btn-ghost-secondary d-none align-items-center flex-shrink-0" id="filterReset" style="padding:4px 6px; line-height:1;" onclick="resetFilters()" title="Reset filters">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
               </button>
+              <!-- Collapsible filter drawer (always open on desktop via display:contents) -->
+              <div class="filter-drawer" id="filterDrawer">
+                <!-- Date filters -->
+                <div class="d-flex align-items-center gap-2 flex-shrink-0 filter-dates">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted flex-shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  <div class="dropdown flex-shrink-0">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                      Campaign: 10 Nov – 26 Feb
+                    </button>
+                    <div class="dropdown-menu p-3" style="min-width:280px;">
+                      <label class="form-label mb-1">Start</label>
+                      <input type="date" class="form-control form-control-sm mb-2" value="2025-11-10">
+                      <label class="form-label mb-1">End</label>
+                      <input type="date" class="form-control form-control-sm mb-2" value="2026-02-26">
+                      <button class="btn btn-sm btn-primary w-100">Apply</button>
+                    </div>
+                  </div>
+                  <div class="dropdown flex-shrink-0">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                      Install: 10 Nov – 26 Feb
+                    </button>
+                    <div class="dropdown-menu p-3" style="min-width:280px;">
+                      <label class="form-label mb-1">Start</label>
+                      <input type="date" class="form-control form-control-sm mb-2" value="2025-11-10">
+                      <label class="form-label mb-1">End</label>
+                      <input type="date" class="form-control form-control-sm mb-2" value="2026-02-26">
+                      <button class="btn btn-sm btn-primary w-100">Apply</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="filter-dim-sep d-none d-md-block" style="border-left:1.5px solid rgba(4,32,69,0.15); align-self:stretch; margin:2px 6px;"></div>
+                <!-- Dimension filters -->
+                <div class="d-flex align-items-center gap-2 flex-wrap flex-grow-1 filter-dims" style="min-width:0;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted flex-shrink-0 d-none d-md-block"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                  <select class="form-select form-select-sm filter-active" style="min-width:90px; flex:1 1 90px; max-width:150px;">
+                    <option>Beat</option>
+                    <option selected>Launch</option>
+                    <option>Always On</option>
+                    <option>Seasonal</option>
+                  </select>
+                  <select class="form-select form-select-sm" style="min-width:80px; flex:1 1 80px; max-width:130px;">
+                    <option selected>Geo</option>
+                    <option>DE</option>
+                    <option>AT</option>
+                    <option>CH</option>
+                    <option>FR</option>
+                    <option>UK</option>
+                    <option>NL</option>
+                    <option>IT</option>
+                  </select>
+                  <select class="form-select form-select-sm" style="min-width:90px; flex:1 1 90px; max-width:150px;">
+                    <option selected>Channel</option>
+                    <option>Meta</option>
+                    <option>Google Search</option>
+                    <option>YouTube</option>
+                    <option>PMax</option>
+                    <option>Reddit</option>
+                    <option>X</option>
+                    <option>Creator</option>
+                    <option>Direct</option>
+                    <option>MediaHouse</option>
+                  </select>
+                  <select class="form-select form-select-sm" style="min-width:90px; flex:1 1 90px; max-width:140px;">
+                    <option selected>Strategy</option>
+                    <option>Consideration</option>
+                    <option>Conversion</option>
+                  </select>
+                  <select class="form-select form-select-sm" style="min-width:90px; flex:1 1 90px; max-width:140px;">
+                    <option selected>Objective</option>
+                    <option>Gameplay</option>
+                    <option>High Impact</option>
+                    <option>Leads</option>
+                    <option>Purchase</option>
+                    <option>Traffic</option>
+                  </select>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -481,7 +513,7 @@
           </div>
           <div class="card-body">
             <div class="row g-3">
-              <div class="col">
+              <div class="col-6 col-sm-4 col-lg">
                 <div class="steam-stat lens-clickable" data-lens="players">
                   <div class="stat-label">Daily Active Players</div>
                   <div class="stat-value">4.285</div>
@@ -489,7 +521,7 @@
                   <div class="stat-delta" id="v2DeltaPlayers"></div>
                 </div>
               </div>
-              <div class="col">
+              <div class="col-6 col-sm-4 col-lg">
                 <div class="steam-stat lens-clickable" data-lens="wishlists">
                   <div class="stat-label">Steam Wishlists</div>
                   <div class="stat-value">224.525</div>
@@ -497,7 +529,7 @@
                   <div class="stat-delta" id="v2DeltaWishlists"></div>
                 </div>
               </div>
-              <div class="col">
+              <div class="col-6 col-sm-4 col-lg">
                 <div class="steam-stat lens-clickable lens-active" data-lens="installs">
                   <div class="stat-label">Game Installs</div>
                   <div class="stat-value">98.540</div>
@@ -505,7 +537,7 @@
                   <div class="stat-delta" id="v2DeltaInstalls"></div>
                 </div>
               </div>
-              <div class="col">
+              <div class="col-6 col-sm-4 col-lg">
                 <div class="steam-stat lens-clickable" data-lens="rating">
                   <div class="stat-label">Steam Rating</div>
                   <div class="stat-value" style="color:#2fb344;">Very Positive</div>
@@ -513,7 +545,7 @@
                   <div class="stat-delta" id="v2DeltaRating"></div>
                 </div>
               </div>
-              <div class="col">
+              <div class="col-6 col-sm-4 col-lg">
                 <div class="steam-stat lens-clickable" data-lens="mentions">
                   <div class="stat-label">Mentions</div>
                   <div class="stat-value">1.966</div>
@@ -521,7 +553,7 @@
                   <div class="stat-delta" id="v2DeltaMentions"></div>
                 </div>
               </div>
-              <div class="col">
+              <div class="col-6 col-sm-4 col-lg">
                 <div class="steam-stat lens-clickable" data-lens="sentiment">
                   <div class="stat-label">Sentiment Score</div>
                   <div class="stat-value" style="color:#2fb344;">78%</div>
