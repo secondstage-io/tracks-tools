@@ -253,11 +253,12 @@
     /* Filter bar card — sticky at top of viewport, subtle indicator label at the start */
     .brand-filter-card {
       border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(4,32,69,0.06);
       position: sticky;
       top: 8px;
       z-index: 100;
+      transition: box-shadow 0.15s ease;
     }
+    .brand-filter-card.is-stuck { box-shadow: 0 4px 14px rgba(4,32,69,0.10); }
     .brand-filter-card > .card-body { border-radius: inherit; }
     .filter-card-label {
       font-size: 11px; font-weight: 700; text-transform: uppercase;
@@ -441,16 +442,17 @@
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Growth</span></li>
               <li class="nav-item"><a class="nav-link" href="#" data-title="Game Installs & UA"><i class="ti ti-device-gamepad-2 me-2"></i><span>Game Installs & UA</span></a></li>
               <li class="nav-item"><a class="nav-link" href="#" data-title="Demo Installs & UA"><i class="ti ti-download me-2"></i><span>Demo Installs & UA</span></a></li>
-              <li class="nav-item"><a class="nav-link" href="#" data-title="Wishlist Insights"><i class="ti ti-heart me-2"></i><span>Wishlist Insights</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="wishlistinsights-v1.html" data-title="Wishlist Insights"><i class="ti ti-heart me-2"></i><span>Wishlist Insights</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="preorderinsights-v1.html" data-title="Preorder Insights"><i class="ti ti-shopping-cart me-2"></i><span>Preorder Insights</span></a></li>
               <li class="nav-item"><a class="nav-link" href="#" data-title="Player Lifecycle"><i class="ti ti-refresh me-2"></i><span>Player Lifecycle</span></a></li>
               <li class="nav-item"><a class="nav-link" href="#" data-title="Monetization & LTV"><i class="ti ti-coin me-2"></i><span>Monetization & LTV</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Brand</span></li>
               <li class="nav-item"><a class="nav-link" href="#" data-title="Brand Health"><i class="ti ti-star me-2"></i><span>Brand Health</span></a></li>
-              <li class="nav-item"><a class="nav-link" href="#" data-title="Awareness Tracker"><i class="ti ti-eye me-2"></i><span>Awareness Tracker</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="awarenesstracker-v1.html" data-title="Awareness Tracker"><i class="ti ti-eye me-2"></i><span>Awareness Tracker</span></a></li>
               <li class="nav-item"><a class="nav-link" href="#" data-title="Audience Insights"><i class="ti ti-users me-2"></i><span>Audience Insights</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Media & Web</span></li>
-              <li class="nav-item"><a class="nav-link" href="#" data-title="Performance Overview"><i class="ti ti-chart-bar me-2"></i><span>Performance Overview</span></a></li>
-              <li class="nav-item"><a class="nav-link" href="#" data-title="Creative Performance"><i class="ti ti-palette me-2"></i><span>Creative Performance</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="performancemedia-v1.html" data-title="Performance Overview"><i class="ti ti-chart-bar me-2"></i><span>Performance Overview</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="creativeinsights-v1.html" data-title="Creative Performance"><i class="ti ti-palette me-2"></i><span>Creative Performance</span></a></li>
               <li class="nav-item"><a class="nav-link" href="#" data-title="Influencer & Direct Buy"><i class="ti ti-speakerphone me-2"></i><span>Influencer & Direct Buy</span></a></li>
               <li class="nav-item"><a class="nav-link" href="#" data-title="Website Analytics"><i class="ti ti-world-www me-2"></i><span>Website Analytics</span></a></li>
             </nav>
@@ -467,7 +469,43 @@
       <!-- Dashboard Tab -->
       <div id="dashboardTab">
 
-        <!-- Filter bar (slim) -->
+        <!-- Game header strip: logo + developer/publisher (page chrome, deliberately not a card) -->
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div class="d-flex align-items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" aria-label="Urban Brawl" style="height:56px; width:auto; display:block;">
+              <defs>
+                <linearGradient id="urbanGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#1e293b"/>
+                  <stop offset="100%" stop-color="#3d3d5c"/>
+                </linearGradient>
+                <linearGradient id="brawlGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#FF0249"/>
+                  <stop offset="50%" stop-color="#ff2070"/>
+                  <stop offset="100%" stop-color="#FF0249"/>
+                </linearGradient>
+              </defs>
+              <rect x="20" y="12" width="360" height="2" fill="url(#brawlGrad)" opacity="0.7" rx="1"/>
+              <text x="200" y="52" text-anchor="middle" font-family="Impact, 'Arial Black', sans-serif" font-size="42" font-weight="900" letter-spacing="12" fill="url(#urbanGrad)">URBAN</text>
+              <text x="200" y="98" text-anchor="middle" font-family="Impact, 'Arial Black', sans-serif" font-size="52" font-weight="900" letter-spacing="8" fill="url(#brawlGrad)">BRAWL</text>
+              <rect x="20" y="106" width="360" height="2" fill="url(#brawlGrad)" opacity="0.7" rx="1"/>
+            </svg>
+            <div style="width:1px; height:38px; background:rgba(4,32,69,0.15); flex-shrink:0;"></div>
+            <div style="font-size:26px; font-weight:700; line-height:1.1; white-space:nowrap;"><span style="color: var(--tblr-body-color, #1e293b);">Urban Brawl</span> <span style="color: var(--tblr-primary, #FF0249);">Overview</span></div>
+          </div>
+          <div class="d-flex align-items-center gap-4 text-end">
+            <div>
+              <div style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary, #626976);">Developer</div>
+              <div style="font-size:13px; font-weight:600; color: var(--tblr-body-color, #1e293b); line-height:1.2;">Second Stage</div>
+            </div>
+            <div>
+              <div style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary, #626976);">Publisher</div>
+              <div style="font-size:13px; font-weight:600; color: var(--tblr-body-color, #1e293b); line-height:1.2;">Second Stage</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter bar (slim) — shadow appears only while stuck (see sentinel observer) -->
+        <div id="filterStickySentinel" style="height:1px;"></div>
         <div class="card mb-3 brand-filter-card">
           <div class="card-body py-2 px-3">
             <div class="d-flex flex-nowrap align-items-center gap-2 filter-row-compact">
@@ -587,34 +625,8 @@
         </div>
 
         <!-- ═══ GAME INTELLIGENCE ═══ -->
-        <div class="card mb-3" id="v2IntelCard" style="box-shadow: 0 6px 24px rgba(4,32,69,0.08);">
+        <div class="card mt-5 mb-3" id="v2IntelCard" style="box-shadow: 0 6px 24px rgba(4,32,69,0.08);">
           <div class="card-status-top bg-primary"></div>
-          <div class="card-header d-flex align-items-center px-3 py-3 gap-3 flex-wrap" style="min-height:auto; border-bottom: 1px solid rgba(4,32,69,0.08); background: linear-gradient(135deg, rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.10) 0%, rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.03) 55%, rgba(255,255,255,0.6) 100%);">
-            <!-- Game identity -->
-            <div class="d-flex align-items-center gap-2 flex-shrink-0">
-              <svg style="height:54px; width:auto; display:block;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" aria-label="Urban Brawl">
-                <defs>
-                  <linearGradient id="urbanGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#1e293b"/>
-                    <stop offset="100%" stop-color="#3d3d5c"/>
-                  </linearGradient>
-                  <linearGradient id="brawlGrad" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stop-color="#FF0249"/>
-                    <stop offset="50%" stop-color="#ff2070"/>
-                    <stop offset="100%" stop-color="#FF0249"/>
-                  </linearGradient>
-                </defs>
-                <text x="200" y="52" text-anchor="middle" font-family="Impact, 'Arial Black', sans-serif" font-size="42" font-weight="900" letter-spacing="12" fill="url(#urbanGrad)">URBAN</text>
-                <text x="200" y="98" text-anchor="middle" font-family="Impact, 'Arial Black', sans-serif" font-size="52" font-weight="900" letter-spacing="8" fill="url(#brawlGrad)">BRAWL</text>
-              </svg>
-              <span class="badge bg-secondary-lt" style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.4px;">Prelaunch</span>
-            </div>
-            <!-- Cost (right side) -->
-            <div class="text-end flex-shrink-0 ms-auto">
-              <div style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary, #626976);">Cost</div>
-              <div style="font-size:20px; font-weight:700; color: var(--tblr-body-color, #1e293b); font-variant-numeric: tabular-nums; line-height:1.1;">337.038&thinsp;&euro;</div>
-            </div>
-          </div>
           <div class="card-body">
             <div class="row g-3">
               <div class="col-6 col-sm-4 col-lg">
@@ -663,6 +675,12 @@
                   <div class="stat-value" style="color:#2fb344;">78%</div>
                   <div class="stat-sub" id="v2SubSentiment" style="font-size:12px; color:var(--tblr-body-color, #1e293b); font-weight:600; margin-top:3px;">&nbsp;</div>
                   <div class="stat-delta" id="v2DeltaSentiment" style="font-size:10px; font-weight:500; opacity:0.85;"></div>
+                </div>
+              </div>
+              <div class="col-6 col-sm-4 col-lg">
+                <div class="h-100 d-flex flex-column justify-content-center text-lg-end" style="border-left:1px solid rgba(4,32,69,0.12); padding-left:18px;">
+                  <div style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary, #626976);">Cost</div>
+                  <div style="font-size:20px; font-weight:700; color: var(--tblr-body-color, #1e293b); font-variant-numeric: tabular-nums; line-height:1.2; margin-top:2px;">337.038&thinsp;&euro;</div>
                 </div>
               </div>
             </div>
@@ -1022,7 +1040,7 @@
               <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabReachMarket" role="tab">by market</a></li>
               <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabReachChannel" role="tab">by channel</a></li>
             </ul>
-            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Unique reach, frequency &amp; engagement &mdash; switch dimension with the tabs</span></span>
+            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Reach, frequency &amp; engagement &mdash; switch dimension with the tabs</span></span>
             <div class="dropdown ms-1" id="reachColumnPicker">
               <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" aria-label="Columns" title="Show / hide columns">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
@@ -1030,7 +1048,7 @@
               <div class="dropdown-menu dropdown-menu-end p-2" style="min-width:200px;">
                 <h6 class="dropdown-header px-2">Columns</h6>
                 <label class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer;"><input type="checkbox" class="form-check-input m-0" data-col-idx="1" checked> Impressions</label>
-                <label class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer;"><input type="checkbox" class="form-check-input m-0" data-col-idx="2" checked> Unique Reach</label>
+                <label class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer;"><input type="checkbox" class="form-check-input m-0" data-col-idx="2" checked> Reach</label>
                 <label class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer;"><input type="checkbox" class="form-check-input m-0" data-col-idx="3" checked> Frequency</label>
                 <label class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer;"><input type="checkbox" class="form-check-input m-0" data-col-idx="4" checked> Engagements</label>
                 <label class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer;"><input type="checkbox" class="form-check-input m-0" data-col-idx="5" checked> Engagement Rate</label>
@@ -1054,7 +1072,7 @@
                       <tr>
                         <th class="col-geo-label">Market</th>
                         <th class="text-end sortable" data-key="imp">Impressions<span class="sort-icon">&#x25B2;</span></th>
-                        <th class="text-end sortable" data-key="reach">Unique Reach<span class="sort-icon">&#x25B2;</span></th>
+                        <th class="text-end sortable" data-key="reach">Reach<span class="sort-icon">&#x25B2;</span></th>
                         <th class="text-end sortable" data-key="freq">Frequency<span class="sort-icon">&#x25B2;</span></th>
                         <th class="text-end sortable" data-key="eng">Engagements<span class="sort-icon">&#x25B2;</span></th>
                         <th class="text-end sortable" data-key="engr">Engagement Rate<span class="sort-icon">&#x25B2;</span></th>
@@ -1081,7 +1099,7 @@
                       <tr>
                         <th class="col-geo-label">Channel</th>
                         <th class="text-end sortable" data-key="imp">Impressions<span class="sort-icon">&#x25B2;</span></th>
-                        <th class="text-end sortable" data-key="reach">Unique Reach<span class="sort-icon">&#x25B2;</span></th>
+                        <th class="text-end sortable" data-key="reach">Reach<span class="sort-icon">&#x25B2;</span></th>
                         <th class="text-end sortable" data-key="freq">Frequency<span class="sort-icon">&#x25B2;</span></th>
                         <th class="text-end sortable" data-key="eng">Engagements<span class="sort-icon">&#x25B2;</span></th>
                         <th class="text-end sortable" data-key="engr">Engagement Rate<span class="sort-icon">&#x25B2;</span></th>
@@ -1119,7 +1137,7 @@
               </button>
               <div class="dropdown-menu dropdown-menu-end p-2" style="min-width:200px;">
                 <h6 class="dropdown-header px-2">Columns</h6>
-                <label class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer;"><input type="checkbox" class="form-check-input m-0" data-col-idx="1" checked> Unique Reach</label>
+                <label class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer;"><input type="checkbox" class="form-check-input m-0" data-col-idx="1" checked> Reach</label>
                 <label class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer;"><input type="checkbox" class="form-check-input m-0" data-col-idx="2" checked> Frequency</label>
                 <label class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer;"><input type="checkbox" class="form-check-input m-0" data-col-idx="3" checked> Engagements</label>
                 <label class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer;"><input type="checkbox" class="form-check-input m-0" data-col-idx="4" checked> Eng. Rate</label>
@@ -1152,7 +1170,7 @@
                   <div class="col-lg-9">
                     <div class="table-responsive geo-scroll-5">
                       <table class="table wt mb-0 wt-sticky-head wt-freeze-first">
-                        <thead><tr><th class="col-geo-label">Audience</th><th class="text-end sortable" data-key="reach">Unique Reach<span class="sort-icon">&#x25B2;</span></th><th class="text-end sortable" data-key="freq">Frequency<span class="sort-icon">&#x25B2;</span></th><th class="text-end sortable" data-key="eng">Engagements<span class="sort-icon">&#x25B2;</span></th><th class="text-end sortable" data-key="engr">Eng. Rate<span class="sort-icon">&#x25B2;</span></th><th class="text-end">Top Age</th><th class="text-end">Gender (M/F/O)</th><th class="text-end">Top Geo</th><th class="text-end">Top Channel</th></tr></thead>
+                        <thead><tr><th class="col-geo-label">Audience</th><th class="text-end sortable" data-key="reach">Reach<span class="sort-icon">&#x25B2;</span></th><th class="text-end sortable" data-key="freq">Frequency<span class="sort-icon">&#x25B2;</span></th><th class="text-end sortable" data-key="eng">Engagements<span class="sort-icon">&#x25B2;</span></th><th class="text-end sortable" data-key="engr">Eng. Rate<span class="sort-icon">&#x25B2;</span></th><th class="text-end">Top Age</th><th class="text-end">Gender (M/F/O)</th><th class="text-end">Top Geo</th><th class="text-end">Top Channel</th></tr></thead>
                         <tbody>
                           <tr><td class="col-geo-label">Fighting Game Fans</td><td class="text-end">1.624.000</td><td class="text-end">3,2</td><td class="text-end">156.000</td><td class="text-end">9,6%</td><td class="text-end">25&ndash;34 (42%)</td><td class="text-end">68/29/3</td><td class="text-end">DE (38%)</td><td class="text-end">Meta (45%)</td></tr>
                           <tr><td class="col-geo-label">LAL: Past Buyers</td><td class="text-end">980.000</td><td class="text-end">2,8</td><td class="text-end">82.300</td><td class="text-end">8,4%</td><td class="text-end">25&ndash;34 (38%)</td><td class="text-end">64/33/3</td><td class="text-end">DE (35%)</td><td class="text-end">YouTube (52%)</td></tr>
@@ -1178,7 +1196,7 @@
                   <div class="col-lg-9">
                     <div class="table-responsive geo-scroll-5">
                       <table class="table wt mb-0 wt-sticky-head wt-freeze-first">
-                        <thead><tr><th class="col-geo-label">Targeting</th><th class="text-end sortable" data-key="reach">Unique Reach<span class="sort-icon">&#x25B2;</span></th><th class="text-end sortable" data-key="freq">Frequency<span class="sort-icon">&#x25B2;</span></th><th class="text-end sortable" data-key="eng">Engagements<span class="sort-icon">&#x25B2;</span></th><th class="text-end sortable" data-key="engr">Eng. Rate<span class="sort-icon">&#x25B2;</span></th><th class="text-end">Top Age</th><th class="text-end">Gender (M/F/O)</th><th class="text-end">Top Geo</th><th class="text-end">Top Channel</th></tr></thead>
+                        <thead><tr><th class="col-geo-label">Targeting</th><th class="text-end sortable" data-key="reach">Reach<span class="sort-icon">&#x25B2;</span></th><th class="text-end sortable" data-key="freq">Frequency<span class="sort-icon">&#x25B2;</span></th><th class="text-end sortable" data-key="eng">Engagements<span class="sort-icon">&#x25B2;</span></th><th class="text-end sortable" data-key="engr">Eng. Rate<span class="sort-icon">&#x25B2;</span></th><th class="text-end">Top Age</th><th class="text-end">Gender (M/F/O)</th><th class="text-end">Top Geo</th><th class="text-end">Top Channel</th></tr></thead>
                         <tbody>
                           <tr><td class="col-geo-label">Interest-based</td><td class="text-end">1.480.000</td><td class="text-end">3,0</td><td class="text-end">138.000</td><td class="text-end">9,3%</td><td class="text-end">25&ndash;34 (40%)</td><td class="text-end">67/30/3</td><td class="text-end">DE (37%)</td><td class="text-end">Meta (42%)</td></tr>
                           <tr><td class="col-geo-label">Lookalike</td><td class="text-end">1.120.000</td><td class="text-end">2,7</td><td class="text-end">94.500</td><td class="text-end">8,4%</td><td class="text-end">25&ndash;34 (39%)</td><td class="text-end">66/31/3</td><td class="text-end">DE (33%)</td><td class="text-end">YouTube (48%)</td></tr>
@@ -1359,12 +1377,24 @@
             </a>
           </div>
           <div class="col-md-6 col-lg-4 col-xl-3">
-            <a href="#" class="card h-100 card-link">
+            <a href="wishlistinsights-v1.html" class="card h-100 card-link">
               <div class="card-body d-flex align-items-start gap-3">
                 <span class="explore-icon"><i class="ti ti-heart"></i></span>
                 <div class="flex-fill">
                   <div class="fw-semibold">Wishlist Insights</div>
                   <div class="text-secondary small">Velocity, top regions, time to convert</div>
+                </div>
+                <i class="ti ti-chevron-right text-secondary"></i>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="preorderinsights-v1.html" class="card h-100 card-link">
+              <div class="card-body d-flex align-items-start gap-3">
+                <span class="explore-icon"><i class="ti ti-shopping-cart"></i></span>
+                <div class="flex-fill">
+                  <div class="fw-semibold">Preorder Insights</div>
+                  <div class="text-secondary small">Modelled preorders &amp; WL &rarr; PO conversion</div>
                 </div>
                 <i class="ti ti-chevron-right text-secondary"></i>
               </div>
@@ -1407,7 +1437,7 @@
             </a>
           </div>
           <div class="col-md-6 col-lg-4 col-xl-3">
-            <a href="#" class="card h-100 card-link">
+            <a href="awarenesstracker-v1.html" class="card h-100 card-link">
               <div class="card-body d-flex align-items-start gap-3">
                 <span class="explore-icon"><i class="ti ti-eye"></i></span>
                 <div class="flex-fill">
@@ -1431,7 +1461,7 @@
             </a>
           </div>
           <div class="col-md-6 col-lg-4 col-xl-3">
-            <a href="#" class="card h-100 card-link">
+            <a href="performancemedia-v1.html" class="card h-100 card-link">
               <div class="card-body d-flex align-items-start gap-3">
                 <span class="explore-icon"><i class="ti ti-chart-bar"></i></span>
                 <div class="flex-fill">
@@ -1443,7 +1473,7 @@
             </a>
           </div>
           <div class="col-md-6 col-lg-4 col-xl-3">
-            <a href="#" class="card h-100 card-link">
+            <a href="creativeinsights-v1.html" class="card h-100 card-link">
               <div class="card-body d-flex align-items-start gap-3">
                 <span class="explore-icon"><i class="ti ti-palette"></i></span>
                 <div class="flex-fill">
@@ -3314,7 +3344,7 @@
         audCharts[k] = new Chart(el, {
           type: 'doughnut',
           data: { labels: d.labels, datasets: [{ data: d.data, backgroundColor: d.colors, borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }] },
-          options: makePieOptions(d.tooltipEl, v => ({ metric: 'Unique Reach', val: v.toLocaleString('de-DE') }))
+          options: makePieOptions(d.tooltipEl, v => ({ metric: 'Reach', val: v.toLocaleString('de-DE') }))
         });
       });
       // Resize charts on tab switch (Chart.js needs a kick when its container becomes visible)
@@ -3405,6 +3435,17 @@
     // Initial check
     updateResetVisibility();
 
+  </script>
+  <script>
+    // Sticky-state shadow: elevation cue only while the filter bar is actually pinned
+    (function() {
+      const bar = document.querySelector('.brand-filter-card');
+      const sentinel = document.getElementById('filterStickySentinel');
+      if (!bar || !sentinel || !('IntersectionObserver' in window)) return;
+      new IntersectionObserver(([e]) => {
+        bar.classList.toggle('is-stuck', !e.isIntersecting);
+      }, { rootMargin: '-9px 0px 0px 0px' }).observe(sentinel);
+    })();
   </script>
 </body>
 </html>
