@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Influencer &amp; Direct Buy — TRACKS Native Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.6.0/dist/tabler-icons.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/js/tabler.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --tblr-primary: #FF0249;
+      --tblr-primary-rgb: 255, 2, 73;
+    }
+    .chart-tooltip {
+      position: absolute;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+      z-index: 1000;
+      font-size: 13px;
+      min-width: 220px;
+    }
+    .chart-tooltip .card { margin: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+    .chart-tooltip .tooltip-row { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
+    .chart-tooltip .tooltip-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .chart-tooltip .tooltip-label { flex: 1; }
+    .chart-tooltip .tooltip-value { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+    .chart-wrapper { position: relative; height: 480px; }
+    .chart-legend { padding: 4px 0; } /* layout via d-flex flex-wrap gap-2 utilities */
+    .chart-legend .legend-item {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 6px; font-size: 13px; font-weight: 500;
+      cursor: pointer; user-select: none; transition: opacity 0.2s, box-shadow 0.2s;
+      border: 1px solid transparent;
+    }
+    .chart-legend .legend-item:hover { box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+    .chart-legend .legend-item.inactive { opacity: 0.35; text-decoration: line-through; }
+    .chart-legend .legend-swatch { width: 14px; height: 4px; border-radius: 2px; flex-shrink: 0; }
+    .chart-legend .legend-item[data-type="bar"] .legend-swatch { height: 12px; width: 10px; border-radius: 2px; }
+    .kpi { border-radius: 8px; padding: 14px 16px; height: 100%; }
+    .info-tip { position: relative; cursor: help; display: inline-flex; padding: 4px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
+    .info-tip:hover { background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.06); }
+    .info-tip .tip-text { visibility: hidden; opacity: 0; position: absolute; right: calc(100% + 8px); top: 50%; transform: translateY(-50%); background: var(--tblr-body-color, #1e293b); color: #fff; font-size: 12px; font-weight: 400; padding: 6px 10px; border-radius: 6px; white-space: nowrap; z-index: 1000; transition: opacity 0.15s; pointer-events: none; }
+    .info-tip .tip-text::after { content: ''; position: absolute; left: 100%; top: 50%; transform: translateY(-50%); border: 5px solid transparent; border-left-color: var(--tblr-body-color, #1e293b); }
+    .info-tip:hover .tip-text { visibility: visible; opacity: 1; }
+    /* Row-note tips inside tables: open to the RIGHT (left would clip under the doughnut / scroll edge) */
+    .wt .info-tip .tip-text { left: calc(100% + 8px); right: auto; white-space: normal; min-width: 240px; }
+    .wt .info-tip .tip-text::after { left: auto; right: 100%; border-color: transparent; border-right-color: var(--tblr-body-color, #1e293b); }
+    .kpi-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px; }
+    .kpi-value { font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; display: flex; align-items: baseline; gap: 6px; }
+    .kpi-goal { font-size: 11px; margin-top: 6px; opacity: 0.75; }
+    .kpi-beat { background: #2fb344; color: #fff; }
+    .kpi-beat .kpi-goal { opacity: 0.85; }
+    .kpi-miss { background: #f76707; color: #fff; }
+    .kpi-miss .kpi-goal { opacity: 0.85; }
+    .kpi-neutral { background: var(--tblr-bg-surface-secondary, #f8f9fa); color: var(--tblr-body-color, #1e293b); border: 1px solid rgba(4,32,69,0.1); }
+    .kpi-neutral .kpi-label { color: var(--tblr-secondary, #626976); }
+    .kpi-beat-soft { background: rgba(47,179,68,0.08); color: var(--tblr-body-color, #1e293b); border: 1px solid rgba(47,179,68,0.28); }
+    .kpi-beat-soft .kpi-label { color: var(--tblr-secondary, #626976); }
+    .kpi-miss-soft { background: rgba(247,103,7,0.08); color: var(--tblr-body-color, #1e293b); border: 1px solid rgba(247,103,7,0.28); }
+    .kpi-miss-soft .kpi-label { color: var(--tblr-secondary, #626976); }
+    .kpi-sub { font-size: 11px; opacity: 0.7; }
+    .kpi-beat .kpi-sub { opacity: 0.85; }
+    .kpi-miss .kpi-sub { opacity: 0.85; }
+    .kpi-delta { font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .kpi-delta.up { color: #2fb344; }
+    .kpi-delta.down { color: #d63939; }
+    .kpi-beat .kpi-delta, .kpi-miss .kpi-delta { color: rgba(255,255,255,0.85); }
+    .kpi-compact { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--tblr-secondary, #626976); margin-top: 8px; font-variant-numeric: tabular-nums; }
+    .kpi-compact span { white-space: nowrap; }
+    /* Funnel Overview */
+    .funnel-row { display: flex; align-items: center; padding: 14px 20px; border-bottom: 1px solid rgba(4,32,69,0.07); gap: 12px; }
+    .funnel-row:last-child { border-bottom: none; }
+    .funnel-stage { width: 120px; flex-shrink: 0; display: flex; align-items: center; gap: 10px; }
+    .funnel-bar { width: 3px; height: 24px; border-radius: 2px; flex-shrink: 0; }
+    .funnel-stage-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--tblr-secondary, #626976); line-height: 1.2; }
+    .funnel-kpi { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 3px 8px; border-radius: 5px; background: var(--tblr-bg-surface-secondary, #f8f9fa); border: 1px solid rgba(4,32,69,0.1); }
+    .funnel-kpi-name { color: var(--tblr-secondary, #626976); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.2px; }
+    .funnel-kpi-value { font-weight: 700; color: var(--tblr-body-color, #1e293b); font-variant-numeric: tabular-nums; }
+    .funnel-kpi .kpi-delta { font-size: 10px; }
+    .funnel-kpi-goal { color: var(--tblr-secondary, #94a3b8); font-size: 10px; }
+    /* Channel highlight cards */
+    .channel-card-spend { font-size: 1.1rem; font-weight: 700; color: var(--tblr-body-color, #1e293b); margin-bottom: 12px; font-variant-numeric: tabular-nums; }
+    .channel-card-spend span { font-size: 12px; font-weight: 400; color: var(--tblr-secondary, #626976); }
+    .channel-link { font-size: 12px; font-weight: 500; color: var(--tblr-primary); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; margin-top: 12px; }
+    .channel-link:hover { text-decoration: underline; }
+    /* Filter bar: active filter state */
+    .filter-active { border-color: var(--tblr-primary); color: var(--tblr-primary); font-weight: 600; background-color: rgba(var(--tblr-primary-rgb),0.06); }
+    /* Mobile filter drawer */
+    /* Compact, single-line filter row (desktop) */
+    .filter-row-compact { font-size: 12px; }
+    .filter-row-compact .btn-sm { font-size: 12px; padding: 0.25rem 0.55rem; }
+    .filter-row-compact .form-select-sm { font-size: 12px; padding: 0.25rem 1.5rem 0.25rem 0.5rem; background-position: right 0.35rem center; min-width: 70px !important; max-width: 110px !important; flex: 0 1 auto !important; }
+    .filter-row-compact .filter-dates .dropdown-toggle { font-size: 12px; }
+    .filter-row-compact .filter-dim-sep { margin: 2px 4px !important; }
+    .filter-row-compact .filter-dims { gap: 4px !important; }
+    .filter-row-compact .filter-dates { gap: 4px !important; }
+    .filter-toggle-btn { display: none; }
+    .filter-drawer { display: contents; } /* on desktop: no wrapper behaviour */
+    .filter-active-count { display: none; font-size: 10px; font-weight: 700; background: var(--tblr-primary); color: #fff; border-radius: 50%; width: 18px; height: 18px; line-height: 18px; text-align: center; }
+    @media (max-width: 767.98px) {
+      .filter-toggle-btn { display: inline-flex; }
+      .filter-drawer {
+        display: none; flex-direction: column; gap: 10px;
+        width: 100%; padding-top: 10px; border-top: 1px solid rgba(4,32,69,0.08); margin-top: 6px;
+      }
+      .filter-drawer.show { display: flex; }
+      .filter-drawer .filter-dates { flex-direction: column; gap: 6px; }
+      .filter-drawer .filter-dims { flex-direction: column; gap: 6px; }
+      .filter-drawer .filter-dims select { max-width: 100% !important; min-width: 0 !important; flex: 1 1 100% !important; }
+      .filter-drawer .filter-dim-sep { display: none; }
+      .filter-active-count.has-filters { display: inline-block; }
+    }
+    /* Explore-deeper grid */
+    .explore-grid .card-link { text-decoration: none; color: inherit; transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s; }
+    .explore-grid .card-link:hover { box-shadow: 0 4px 14px rgba(4,32,69,0.08); transform: translateY(-1px); border-color: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.35); }
+    .explore-grid .card-link:hover .ti-chevron-right { color: var(--tblr-primary) !important; }
+    .explore-grid .explore-icon {
+      flex-shrink: 0;
+      width: 34px; height: 34px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.10);
+      color: var(--tblr-primary, #FF0249);
+      border-radius: 8px;
+    }
+    .explore-grid .explore-icon .ti { font-size: 18px; line-height: 1; }
+    /* Breakdown tabs — match the widget-header typography, equal-width tabs */
+    .breakdown-tabs { gap: 2px; }
+    .breakdown-tabs .nav-link {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--tblr-secondary, #626976);
+      min-width: 96px;
+      text-align: center;
+      padding: 0.3rem 0.75rem;
+      border: 1px solid transparent;
+      border-bottom: 2px solid transparent;
+      margin-bottom: 0;
+    }
+    .breakdown-tabs .nav-link:hover { color: var(--tblr-body-color, #1e293b); background: rgba(4,32,69,0.03); border-color: transparent; }
+    .breakdown-tabs .nav-link.active {
+      color: var(--tblr-body-color, #1e293b);
+      background: transparent;
+      border-color: transparent;
+      border-bottom-color: var(--tblr-primary, #FF0249);
+    }
+    /* Section headings: faint separator above + title with thin primary-color underline + muted subtitle */
+    .section-heading {
+      margin-top: 3rem; margin-bottom: 1.25rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(4,32,69,0.10);
+    }
+    .section-heading .section-heading-title {
+      display: inline-block;
+      font-size: 18px; font-weight: 700;
+      color: var(--tblr-body-color, #1e293b);
+      margin: 0 0 8px;
+      padding-bottom: 6px;
+      padding-right: 24px;
+      border-bottom: 2px solid var(--tblr-primary, #FF0249);
+      line-height: 1.2;
+    }
+    .section-heading .section-heading-subtitle {
+      font-size: 12px; color: var(--tblr-secondary, #626976);
+      margin: 0; line-height: 1.35;
+    }
+    /* Section dividers — uses Tabler utilities: border-top border-2 border-primary */
+    .section-label { font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--tblr-body-color, #1e293b); white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; padding: 5px 18px; background: var(--tblr-bg-surface-secondary, #f1f3f5); border-radius: 6px; }
+    .section-subtitle { font-size: 12px; margin-top: -6px; }
+    /* Icon-only dropdown button — grey icon, brand tint on hover (matches info-tip) */
+    .btn-sm-icon { background: transparent !important; border: none !important; box-shadow: none !important; color: var(--tblr-secondary, #626976); padding: 4px 6px; line-height: 1; border-radius: 6px; transition: background 0.15s; }
+    .btn-sm-icon:hover, .btn-sm-icon:focus { background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.06) !important; color: var(--tblr-secondary, #626976); }
+    .no-caret::after { display: none !important; }
+
+    /* Vertical-scroll table with sticky header — shows ~5 rows; horizontal scroll enabled */
+    .geo-scroll-5 { max-height: 260px; overflow: auto; }
+    .geo-hscroll table.wt { min-width: 1180px; }
+    .wt-sticky-head thead th { position: sticky; top: 0; z-index: 2; background: var(--tblr-bg-surface-secondary, #f9fafb); }
+    /* Grouped-header tables: overlap the two sticky rows slightly + pad the content back down.
+       This guarantees no sub-pixel gap shows the tbody behind. */
+    .wt-sticky-head thead tr:not(.th-group) th {
+      top: 22px;
+      padding-top: 0.9rem;
+    }
+    /* Single-row sticky headers (no .th-group above) sit at the top, no offset */
+    .wt-sticky-head thead tr:only-child th {
+      top: 0;
+      padding-top: 0.5rem;
+    }
+    .wt-sticky-head thead .th-group th { z-index: 3; }
+    /* Prevent cell wrapping in horizontally scrolling tables */
+    .geo-hscroll .wt th, .geo-hscroll .wt td { white-space: nowrap; }
+    /* Group header row */
+    .wt thead .th-group .th-group-label {
+      font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--tblr-secondary, #6b7280);
+      background: var(--tblr-bg-surface-secondary, #f9fafb);
+      border-bottom: 1px solid rgba(4,32,69,0.08);
+      padding: 0.35rem 0.75rem;
+    }
+    .wt thead .th-group th[rowspan="2"] { vertical-align: bottom; }
+    /* Freeze first column (Geo) for horizontal scrolling — slightly stronger divider after it */
+    .wt-freeze-first .col-geo-label { position: sticky; left: 0; background: #fff; z-index: 1; min-width: 110px; }
+    .wt-freeze-first thead tr th.col-geo-label { background: var(--tblr-bg-surface-secondary, #f9fafb); z-index: 5; box-shadow: 1px 0 0 rgba(4,32,69,0.12); }
+    .wt-freeze-first tbody .col-geo-label { box-shadow: 1px 0 0 rgba(4,32,69,0.12); }
+    /* Subtle group separators — applied via .group-end on the last cell of each
+       column group (set dynamically at render time so they follow the column picker) */
+    .wt th.group-end, .wt td.group-end {
+      border-right: 1px solid rgba(4,32,69,0.06);
+    }
+    /* Widget-style tables (matches tracks-widgets Tabulator theme) */
+    .wt { font-size: 0.875rem; }
+    .wt thead { background: var(--tblr-bg-surface-secondary, #f9fafb); border-bottom: 1px solid rgba(4,32,69,0.1); }
+    .wt thead th { color: var(--tblr-secondary, #6b7280); font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1rem; padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(4,32,69,0.1); white-space: nowrap; }
+    .wt thead th.sortable { cursor: pointer; user-select: none; transition: color 0.15s; }
+    .wt thead th.sortable:hover { color: var(--tblr-body-color, #1e293b); }
+    .wt thead th.sortable .sort-icon { display: inline-block; width: 12px; margin-left: 4px; opacity: 0.3; vertical-align: middle; }
+    .wt thead th.sortable.sort-active { color: var(--tblr-body-color, #1e293b); font-weight: 600; }
+    .wt thead th.sortable.sort-active .sort-icon { opacity: 1; }
+    .wt tbody tr { border-bottom: 1px solid rgba(4,32,69,0.1); background: transparent; }
+    .wt tbody td { padding: 0.5rem 0.75rem; font-size: 0.8125rem; background: transparent; vertical-align: middle; }
+    .wt tfoot tr { border-top: 2px solid rgba(4,32,69,0.1); background: transparent; }
+    .wt tfoot td { padding: 0.5rem 0.75rem; font-size: 0.8125rem; font-weight: 600; }
+    /* Funnel visual */
+    .funnel-wrap { display: flex; gap: 12px; }
+    .funnel-strip { width: 36px; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px; }
+    .funnel-strip .seg { display: flex; justify-content: center; flex: 1; }
+    .funnel-strip .seg > div { border-radius: 4px; transition: width 0.3s; }
+    .funnel-cards { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+    .funnel-cards .row.row-deck { margin-bottom: 0 !important; }
+    .funnel-cards .card.mb-3 { margin-bottom: 0 !important; }
+    /* Steam / Brand Health mini cards */
+    .steam-stat { text-align: center; }
+    .steam-stat .stat-value { font-size: 1.1rem; font-weight: 700; color: var(--tblr-body-color, #1e293b); font-variant-numeric: tabular-nums; line-height: 1.2; }
+    .steam-stat .stat-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--tblr-secondary, #626976); margin-bottom: 2px; }
+    .steam-stat .stat-sub { font-size: 11px; color: var(--tblr-secondary, #626976); margin-top: 2px; }
+    .steam-stat .stat-delta { font-size: 11px; font-weight: 600; }
+    .steam-stat .stat-delta.up { color: #2fb344; }
+    .steam-stat .stat-delta.down { color: #d63939; }
+    /* Sentiment bar — uses Tabler .progress component with custom height */
+    /* Filter bar card — sticky at top of viewport, subtle indicator label at the start */
+    .brand-filter-card {
+      border-radius: 8px;
+      position: sticky;
+      top: 8px;
+      z-index: 100;
+      transition: box-shadow 0.15s ease;
+    }
+    .brand-filter-card.is-stuck { box-shadow: 0 4px 14px rgba(4,32,69,0.10); }
+    .brand-filter-card > .card-body { border-radius: inherit; }
+    .filter-card-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--tblr-secondary, #626976);
+      display: inline-flex; align-items: center; gap: 6px;
+      padding-right: 10px; margin-right: 4px;
+      border-right: 1px solid rgba(4,32,69,0.10);
+      flex-shrink: 0; white-space: nowrap;
+    }
+    /* Landing Page funnel — only wrap behaviour on narrow screens; all other styling via Tabler utilities */
+    @media (max-width: 991.98px) {
+      .lp-funnel { flex-wrap: wrap !important; gap: 8px !important; }
+      .lp-funnel > .card { flex: 1 1 45% !important; }
+    }
+    /* Interactive lens stats */
+    .steam-stat.lens-clickable {
+      cursor: pointer;
+      padding: 8px 6px 5px;
+      border-radius: 6px;
+      border-bottom: 3px solid transparent;
+      transition: background 0.2s, border-bottom-color 0.2s;
+      position: relative;
+    }
+    .steam-stat.lens-clickable:hover { background: rgba(4,32,69,0.04); }
+    .steam-stat.lens-active {
+      border-bottom-color: var(--tblr-primary);
+    }
+    /* Hero scorecard tiles (status-only) + chart lens chips (selection) — split 2026-06-05 */
+    .score-tile { padding: 10px 12px 9px; }
+    .score-tile .kpi-value { font-size: 1.15rem; }
+    .hero-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--tblr-secondary, #626976); margin-bottom: 6px; }
+    .lens-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .lens-chip { font-size: 11px; font-weight: 600; letter-spacing: 0.3px; padding: 3px 12px; border-radius: 999px; border: 1px solid rgba(4,32,69,0.15); background: transparent; color: var(--tblr-secondary, #626976); cursor: pointer; transition: color 0.15s, background 0.15s, border-color 0.15s; line-height: 1.5; }
+    .lens-chip:hover { border-color: var(--tblr-primary, #FF0249); color: var(--tblr-primary, #FF0249); }
+    .lens-chip.active { background: var(--tblr-primary, #FF0249); border-color: var(--tblr-primary, #FF0249); color: #fff; }
+    /* Command Center wrapper */
+    /* AI Insight placeholder */
+    .ai-insight { border: 1px solid rgba(132,94,247,0.2); background: rgba(132,94,247,0.03); border-radius: 8px; padding: 12px 16px; font-size: 13px; line-height: 1.6; color: var(--tblr-body-color, #1e293b); }
+    .ai-insight-header { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #845ef7; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .ai-insight-header svg { flex-shrink: 0; }
+    .ai-insight-text { margin: 0; }
+    .ai-insight-meta { font-size: 11px; color: var(--tblr-secondary, #626976); margin-top: 8px; text-align: right; }
+    .ai-insight-inline { border: none; background: rgba(132,94,247,0.03); border-radius: 6px; padding: 8px 12px; font-size: 12px; line-height: 1.5; margin-top: 12px; }
+    .ai-insight-inline .ai-insight-header { font-size: 10px; margin-bottom: 4px; }
+    .ai-insight-inline .ai-insight-text { font-size: 12px; }
+    /* Collapsible AI insights */
+    .ai-insight.collapsed .ai-insight-text { display: none; }
+    .ai-insight.collapsed .ai-insight-meta { display: none; }
+    .ai-insight-toggle { cursor: pointer; user-select: none; }
+    .ai-insight-toggle .ai-chevron { display: inline-block; transition: transform 0.2s; font-size: 12px; margin-left: 4px; }
+    .ai-insight.collapsed .ai-chevron { transform: rotate(-90deg); }
+    /* Anomaly / warning variant */
+    .ai-insight.ai-warning { border-color: rgba(247,103,7,0.3); background: rgba(247,103,7,0.04); }
+    .ai-insight.ai-warning .ai-insight-header { color: #f76707; }
+
+    /* Collapsible sidebar — icon-collapse mode (inspired by Gateway app) */
+    /* Sidebar + content flex row */
+    .entry-row { display: flex; gap: 0; }
+    #entryContent { padding-left: 16px; }
+    .sidebar-page-header { padding: 0.5rem 8px 0.5rem 12px; }
+    .sidebar-page-header .sidebar-back-link {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;
+      color: var(--tblr-secondary, #626976); text-decoration: none;
+      padding: 6px 8px; margin: 0 0 0 -8px;
+      border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .sidebar-page-header .sidebar-back-link:hover { color: var(--tblr-primary); background: rgba(var(--tblr-primary-rgb), 0.06); }
+    .sidebar-page-header .sidebar-back-link svg { flex-shrink: 0; }
+    .sidebar-page-header .game-title-block {
+      padding-top: 14px;
+      border-top: 1px solid rgba(4,32,69,0.08);
+    }
+    .sidebar-page-header .page-pretitle { font-size: 0.625rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--tblr-secondary, #626976); margin-bottom: 0.25rem; }
+    .sidebar-page-header .page-pretitle a { color: inherit; text-decoration: none; }
+    .sidebar-page-header .page-pretitle a:hover { color: var(--tblr-primary); }
+    .sidebar-page-header .page-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--tblr-body-color, #1e293b); line-height: 1.2; }
+    #entrySidebar.collapsed .sidebar-page-header { display: none; }
+    #entrySidebar { display: flex; flex-direction: column; }
+    #entrySidebar > nav { flex: 0 0 auto; }
+    .sidebar-footer { border-top: 1px solid rgba(4,32,69,0.08); padding: 8px 0; margin-top: 8px; }
+    .sidebar-footer .nav-link { color: var(--tblr-secondary, #626976); font-size: 13px; }
+    .sidebar-footer .nav-link:hover { color: var(--tblr-primary); }
+    #entrySidebar.collapsed .sidebar-footer { padding: 6px 0; }
+    #entrySidebar { transition: width 0.2s ease-linear, min-width 0.2s ease-linear, flex 0.2s ease-linear; flex: 0 0 13.5%; width: 13.5%; overflow-x: hidden; overflow-y: visible; position: relative; }
+    #entrySidebar .nav-link span, #entrySidebar .group-label { transition: opacity 0.15s ease, margin-top 0.15s ease; white-space: nowrap; }
+    #entrySidebar.collapsed { flex: 0 0 48px; width: 48px; min-width: 48px; }
+    #entrySidebar.collapsed .nav-link { justify-content: center; padding: 8px; position: relative; }
+    #entrySidebar.collapsed .nav-link i { margin: 0; font-size: 18px; }
+    #entrySidebar.collapsed .nav-link span { opacity: 0; width: 0; overflow: hidden; display: inline-block; }
+    #entrySidebar.collapsed .group-label { opacity: 0; height: 0; margin: 0; padding: 0 !important; overflow: hidden; }
+    #entrySidebar.collapsed .nav-item.mt-3 { margin-top: 4px !important; }
+    /* Collapse chevron toggle */
+    #sidebarCollapseToggle { display: inline-flex; align-items: center; justify-content: center; padding: 4px; color: var(--tblr-secondary, #626976); opacity: 0.45; transition: opacity 0.15s; text-decoration: none; border-radius: 4px; }
+    #sidebarCollapseToggle:hover { opacity: 1; color: var(--tblr-body-color, #1e293b); }
+    #sidebarCollapseToggle i { font-size: 16px; transition: transform 0.2s ease; }
+    #entrySidebar.collapsed #sidebarCollapseToggle { justify-content: center; padding: 8px; position: relative; }
+    #entrySidebar.collapsed #sidebarCollapseToggle i { transform: rotate(180deg); }
+    #entrySidebar.collapsed #sidebarCollapseToggle:hover::after { content: attr(data-title); position: absolute; left: 100%; top: 50%; transform: translateY(-50%); background: var(--tblr-body-color, #1e293b); color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 4px; white-space: nowrap; z-index: 100; margin-left: 8px; pointer-events: none; }
+    /* Tooltip on hover in collapsed state */
+    #entrySidebar.collapsed .nav-item > .nav-link:hover::after { content: attr(data-title); position: absolute; left: 100%; top: 50%; transform: translateY(-50%); background: var(--tblr-body-color, #1e293b); color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 4px; white-space: nowrap; z-index: 100; margin-left: 8px; pointer-events: none; }
+    /* Sidebar rail — invisible edge toggle */
+    #sidebarRail { position: absolute; top: 0; bottom: 0; right: -8px; width: 16px; cursor: col-resize; z-index: 20; }
+    #sidebarRail::after { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; transition: background 0.15s; }
+    #sidebarRail:hover::after { background: var(--tblr-primary); }
+    #entryContent { flex: 1; min-width: 0; transition: flex 0.2s ease-linear; }
+    @media (max-width: 991.98px) { .entry-row { flex-direction: column; } #entrySidebar { display: none; } }
+    .command-center { background: rgba(4,32,69,0.025); border-radius: 10px; padding: 14px 16px 16px; border: 1px solid rgba(4,32,69,0.06); margin-bottom: 1.5rem; }
+    .command-center > .card { border: 1px solid rgba(4,32,69,0.10); }
+    .command-center > .card:first-child { margin-bottom: 10px !important; }
+
+    /* ── Performance Media page-specific widgets ── */
+    /* Goal progress rows (Volume vs Goals card) */
+    .goal-row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(4,32,69,0.06); }
+    .goal-row:last-child { border-bottom: none; }
+    .goal-row .goal-name { width: 120px; flex-shrink: 0; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--tblr-secondary, #626976); }
+    .goal-row .goal-vals { width: 175px; flex-shrink: 0; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--tblr-body-color, #1e293b); }
+    .goal-row .goal-vals .goal-target { color: var(--tblr-secondary, #94a3b8); }
+    .goal-row .goal-bar { flex: 1; min-width: 0; }
+    .goal-row .goal-ach { width: 52px; flex-shrink: 0; text-align: right; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .goal-row .goal-ach.beat { color: #2fb344; }
+    .goal-row .goal-ach.miss { color: #f76707; }
+    /* Pacing stat block */
+    .pacing-stat { text-align: center; }
+    .pacing-stat .pacing-value { font-size: 1.1rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--tblr-body-color, #1e293b); line-height: 1.2; }
+    .pacing-stat .pacing-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--tblr-secondary, #626976); margin-bottom: 2px; }
+    .pacing-stat .pacing-sub { font-size: 11px; color: var(--tblr-secondary, #626976); margin-top: 2px; }
+    /* Channel small-multiple trend cards */
+    .sm-chart-wrap { position: relative; height: 170px; }
+    .sm-kpis { display: flex; align-items: flex-start; gap: 8px; font-size: 11px; color: var(--tblr-secondary, #626976); font-variant-numeric: tabular-nums; margin-top: 6px; }
+    .sm-kpis strong { color: var(--tblr-body-color, #1e293b); }
+    .sm-kpis .sm-flag-bad { color: #f76707; font-weight: 700; }
+    .sm-kpis .sm-flag-good { color: #2fb344; font-weight: 700; }
+    .sm-kpis .sm-row-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--tblr-secondary, #94a3b8); width: 64px; flex-shrink: 0; padding-top: 1px; }
+    .sm-kpis .sm-metrics { display: flex; flex-wrap: wrap; gap: 3px 12px; flex: 1; min-width: 0; }
+    .sm-kpis .sm-metrics > span { white-space: nowrap; }
+    .sm-kpis + .sm-kpis { border-top: 1px solid rgba(4,32,69,0.06); padding-top: 6px; }
+  </style>
+</head>
+<body class="page layout-fluid">
+
+    <!-- Navbar -->
+  <header class="navbar navbar-expand-md d-print-none" style="background: var(--tblr-primary); box-shadow: none;">
+    <div class="container-xl">
+      <a href="#" class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
+        <img src="https://tracks.secondstage.io/vite/assets/tracks-home-logo-C086m-iW.png" alt="TRACKS" class="navbar-brand-image">
+      </a>
+      <span class="badge bg-white text-primary ms-n2" style="font-size:10px; font-weight:700; letter-spacing:0.3px;">2.0 UI/UX Concept</span>
+    </div>
+  </header>
+  <!-- Second navbar (main navigation, matches TRACKS layout) -->
+  <header class="navbar-expand-md">
+    <div class="collapse navbar-collapse show" id="navbar-menu">
+      <div class="navbar">
+        <div class="container-xl">
+          <div class="row flex-fill align-items-center">
+            <div class="col">
+              <ul class="navbar-nav">
+                <li class="nav-item active">
+                  <a class="nav-link" href="#">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-device-gamepad-2"></i></span>
+                    <span class="nav-link-title">My Games</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-chart-funnel"></i></span>
+                    <span class="nav-link-title">Attribution Tracking</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-article"></i></span>
+                    <span class="nav-link-title">FAQ</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-book-2"></i></span>
+                    <span class="nav-link-title">Glossary</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-file-code-2"></i></span>
+                    <span class="nav-link-title">Documentation</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+<div class="page-wrapper">
+    <div class="page-body">
+      <div class="container-xl">
+        <div class="entry-row">
+          <!-- Entry sidebar (matches col-lg-2 in tracks/app/views/games/entry.html.erb) -->
+          <div id="entrySidebar">
+            <div class="sidebar-page-header d-flex align-items-center justify-content-between">
+              <a href="#" class="sidebar-back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                <span>My Games</span>
+              </a>
+              <a href="#" id="sidebarCollapseToggle" onclick="toggleSidebar(); return false;" data-title="Expand" title="Toggle sidebar (Cmd+B)">
+                <i class="ti ti-chevron-left" id="sidebarToggleIcon"></i>
+              </a>
+            </div>
+            <nav class="nav nav-pills nav-vertical" style="font-size:13px;">
+              <li class="nav-item"><a class="nav-link" href="nativedash-poc-v3-prelaunch.html" data-title="Overview"><i class="ti ti-layout-dashboard me-2"></i><span>Overview</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="periodcomparison-v1.html" data-title="Period Comparison"><i class="ti ti-arrows-diff me-2"></i><span>Period Comparison</span></a></li>
+              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Growth</span></li>
+              <li class="nav-item"><a class="nav-link" href="installsua-v1.html" data-title="Installs & UA"><i class="ti ti-device-gamepad-2 me-2"></i><span>Installs &amp; UA</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="wishlistinsights-v1.html" data-title="Wishlist Insights"><i class="ti ti-heart me-2"></i><span>Wishlist Insights</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="preorderinsights-v1.html" data-title="Preorder Insights"><i class="ti ti-shopping-cart me-2"></i><span>Preorder Insights</span></a></li>
+              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Game</span></li>
+              <li class="nav-item"><a class="nav-link" href="playerlifecycle-v1.html" data-title="Player Lifecycle"><i class="ti ti-refresh me-2"></i><span>Player Lifecycle</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="monetizationltv-v1.html" data-title="Monetization & LTV"><i class="ti ti-coin me-2"></i><span>Monetization & LTV</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="steaminsights-v1.html" data-title="Steam Insights"><i class="ti ti-brand-steam me-2"></i><span>Steam Insights</span></a></li>
+              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Media & Web</span></li>
+              <li class="nav-item"><a class="nav-link" href="performancemedia-v1.html" data-title="Performance Overview"><i class="ti ti-chart-bar me-2"></i><span>Performance Overview</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="awarenesstracker-v1.html" data-title="Awareness Tracker"><i class="ti ti-eye me-2"></i><span>Awareness Tracker</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="creativeinsights-v1.html" data-title="Creative Performance"><i class="ti ti-palette me-2"></i><span>Creative Performance</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="audienceinsights-v1.html" data-title="Audience Insights"><i class="ti ti-users me-2"></i><span>Audience Insights</span></a></li>
+              <li class="nav-item"><a class="nav-link active" href="#" data-title="Influencer & Direct Buy"><i class="ti ti-speakerphone me-2"></i><span>Influencer &amp; Direct Buy</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="websiteanalytics-v1.html" data-title="Website Analytics"><i class="ti ti-world-www me-2"></i><span>Website Analytics</span></a></li>
+              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Brand</span></li>
+              <li class="nav-item"><a class="nav-link" href="brandhealth-v1.html" data-title="Brand Health"><i class="ti ti-star me-2"></i><span>Brand Health</span></a></li>
+              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Company</span></li>
+              <li class="nav-item"><a class="nav-link" href="sustainability-v1.html" data-title="Sustainability"><i class="ti ti-leaf me-2"></i><span>Sustainability</span></a></li>
+            </nav>
+            <div id="sidebarRail" onclick="toggleSidebar()"></div>
+          </div>
+          <!-- Content area (flexes to fill remaining space) -->
+          <div id="entryContent">
+
+      <!-- Dashboard Tab -->
+      <div id="dashboardTab">
+
+        <!-- Game header strip: logo + developer/publisher (page chrome, deliberately not a card) -->
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div class="d-flex align-items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" aria-label="Urban Brawl" style="height:56px; width:auto; display:block;">
+              <defs>
+                <linearGradient id="urbanGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#1e293b"/>
+                  <stop offset="100%" stop-color="#3d3d5c"/>
+                </linearGradient>
+                <linearGradient id="brawlGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#FF0249"/>
+                  <stop offset="50%" stop-color="#ff2070"/>
+                  <stop offset="100%" stop-color="#FF0249"/>
+                </linearGradient>
+              </defs>
+              <rect x="20" y="12" width="360" height="2" fill="url(#brawlGrad)" opacity="0.7" rx="1"/>
+              <text x="200" y="52" text-anchor="middle" font-family="Impact, 'Arial Black', sans-serif" font-size="42" font-weight="900" letter-spacing="12" fill="url(#urbanGrad)">URBAN</text>
+              <text x="200" y="98" text-anchor="middle" font-family="Impact, 'Arial Black', sans-serif" font-size="52" font-weight="900" letter-spacing="8" fill="url(#brawlGrad)">BRAWL</text>
+              <rect x="20" y="106" width="360" height="2" fill="url(#brawlGrad)" opacity="0.7" rx="1"/>
+            </svg>
+            <div style="width:1px; height:38px; background:rgba(4,32,69,0.15); flex-shrink:0;"></div>
+            <div style="font-size:22px; font-weight:700; color: var(--tblr-body-color, #1e293b); line-height:1.2;">Influencer &amp; Direct Buy</div>
+          </div>
+          <div class="d-flex align-items-center gap-1">
+            <a href="#" class="btn btn-sm btn-ghost-secondary p-2" title="Settings" aria-label="Settings"><i class="ti ti-adjustments-alt" style="font-size:18px;"></i></a>
+            <a href="#" class="btn btn-sm btn-ghost-secondary p-2" title="Tools" aria-label="Tools"><i class="ti ti-tool" style="font-size:18px;"></i></a>
+            <a href="#" class="btn btn-sm btn-ghost-secondary p-2" title="Members" aria-label="Members"><i class="ti ti-users-group" style="font-size:18px;"></i></a>
+          </div>
+        </div>
+
+        <!-- Filter bar (slim) — shadow appears only while stuck (see sentinel observer) -->
+        <div id="filterStickySentinel" style="height:1px;"></div>
+        <div class="card mb-3 brand-filter-card">
+          <div class="card-body py-2 px-3">
+            <div class="d-flex flex-nowrap align-items-center gap-2 filter-row-compact">
+              <!-- Desktop-only filter indicator -->
+              <span class="filter-card-label d-none d-md-inline-flex">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                Filters
+              </span>
+          <!-- Mobile: filter toggle + toggle group always visible -->
+              <button type="button" class="btn btn-sm btn-outline-secondary filter-toggle-btn align-items-center gap-1" onclick="var d=document.getElementById('filterDrawer');d.classList.toggle('show');this.querySelector('.ti').classList.toggle('ti-chevron-down');this.querySelector('.ti').classList.toggle('ti-chevron-up');">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                Filters
+                <span class="filter-active-count has-filters" id="filterCount">1</span>
+                <i class="ti ti-chevron-down" style="font-size:14px;"></i>
+              </button>
+              <!-- Date filters (left side) -->
+              <div class="d-flex align-items-center gap-2 flex-shrink-0 filter-dates">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted flex-shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <div class="dropdown flex-shrink-0">
+                  <button class="btn btn-sm btn-outline-secondary dropdown-toggle filter-active" data-bs-toggle="dropdown">Beat: Launch</button>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item active" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue='Beat: '+this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Launch</a>
+                    <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue='Beat: '+this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Always On</a>
+                    <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue='Beat: '+this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Seasonal</a>
+                  </div>
+                </div>
+                <div class="btn-group btn-group-sm flex-shrink-0" role="group" aria-label="Quick date range">
+                  <button type="button" class="btn btn-outline-secondary">7D</button>
+                  <button type="button" class="btn btn-outline-secondary">30D</button>
+                  <button type="button" class="btn btn-outline-secondary">90D</button>
+                  <button type="button" class="btn btn-primary">All</button>
+                </div>
+                <div class="dropdown flex-shrink-0">
+                  <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                    10 Nov – 26 Feb
+                  </button>
+                  <div class="dropdown-menu p-3" style="min-width:280px;">
+                    <label class="form-label mb-1">Start</label>
+                    <input type="date" class="form-control form-control-sm mb-2" value="2025-11-10">
+                    <label class="form-label mb-1">End</label>
+                    <input type="date" class="form-control form-control-sm mb-2" value="2026-02-26">
+                    <button class="btn btn-sm btn-primary w-100">Apply</button>
+                  </div>
+                </div>
+              </div>
+              <!-- Collapsible filter drawer (always open on desktop via display:contents) -->
+              <div class="filter-drawer" id="filterDrawer">
+                <!-- Dimension filters -->
+                <div class="d-flex align-items-center gap-2 flex-nowrap filter-dims ms-auto" style="min-width:0;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted flex-shrink-0 d-none d-md-block"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                  <div class="dropdown flex-shrink-0">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">Geo</button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item active" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Geo</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">DE</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">AT</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">CH</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">FR</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">UK</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">NL</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">IT</a>
+                    </div>
+                  </div>
+                  <div class="dropdown flex-shrink-0">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">Channel</button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item active" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Channel</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Meta</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Google Search</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">YouTube</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">PMax</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Reddit</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">X</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Creator</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Direct</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">MediaHouse</a>
+                    </div>
+                  </div>
+                  <div class="dropdown flex-shrink-0">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">Strategy</button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item active" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Strategy</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Consideration</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Conversion</a>
+                    </div>
+                  </div>
+                  <div class="dropdown flex-shrink-0">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">Objective</button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item active" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Objective</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Gameplay</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">High Impact</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Leads</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Purchase</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Traffic</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="filter-dim-sep d-none d-md-block" style="border-left:1.5px solid rgba(4,32,69,0.15); align-self:stretch; margin:2px 6px;"></div>
+              <div class="btn-group btn-group-sm flex-shrink-0" role="group" aria-label="View mode">
+                <button type="button" class="btn btn-outline-secondary" title="All traffic combined (paid + organic)" onclick="this.parentNode.querySelectorAll('.btn').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-outline-secondary')});this.classList.remove('btn-outline-secondary');this.classList.add('btn-primary')">Total</button>
+                <button type="button" class="btn btn-primary" title="Only paid-media driven metrics — default on this dashboard" onclick="this.parentNode.querySelectorAll('.btn').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-outline-secondary')});this.classList.remove('btn-outline-secondary');this.classList.add('btn-primary')">Paid</button>
+                <button type="button" class="btn btn-outline-secondary" title="Only organic / unpaid metrics" onclick="this.parentNode.querySelectorAll('.btn').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-outline-secondary')});this.classList.remove('btn-outline-secondary');this.classList.add('btn-primary')">Organic</button>
+              </div>
+              <span class="info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Filter every metric on the dashboard by traffic source.<br><strong>Total:</strong> everything (paid + organic combined).<br><strong>Paid:</strong> only paid-media driven values.<br><strong>Organic:</strong> only organic / unpaid values.</span></span>
+              <button type="button" class="btn btn-sm btn-ghost-secondary align-items-center flex-shrink-0" id="filterReset" style="padding:4px 6px; line-height:1;" title="Reset all filters">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- ═══ INFLUENCER & DIRECT BUY — quiet hero: additive volumes + daily mix ═══ -->
+        <div class="card mt-5 mb-3" id="idIntelCard">
+          <div class="card-status-top bg-primary"></div>
+          <div class="card-body">
+            <div class="d-flex flex-wrap" style="row-gap: 14px;">
+              <div style="flex: 3 1 0; min-width: 300px;">
+                <div class="hero-group-label">Program</div>
+                <div class="row g-2">
+                  <div class="col-4"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Total Spend <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">>28.450&thinsp;&euro; Influencer &amp; Creator + 16.442&thinsp;&euro; Media Houses (Direct Buy).<br>Each group keeps its own goals &mdash; never blended.</span></span></div><div class="kpi-value">44.892&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +2.150</span><span>last 7 days</span></div></div></div>
+                  <div class="col-4"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Activated Creators <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Creators with at least one live content piece in the period.</span></span></div><div class="kpi-value">12</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">+2</span><span>this flight</span></div></div></div>
+                  <div class="col-4"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Media Houses <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Publishers and platforms with at least one active direct buy.</span></span></div><div class="kpi-value">9</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">+1</span><span>this flight</span></div></div></div>
+                </div>
+              </div>
+              <div style="flex: 2 1 0; min-width: 215px; border-left: 1px solid rgba(4,32,69,0.1); padding-left: 12px; margin-left: 12px;">
+                <div class="hero-group-label">Site Traffic</div>
+                <div class="row g-2">
+                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Web Visits <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">48,3K from creator content + 91,0K from direct-buy placements.</span></span></div><div class="kpi-value">139,3K</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +5,2%</span><span>last 7 days</span></div></div></div>
+                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Web Conversions <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Conversions to a gaming storefront from these channels<br>(720 Influencer + 1.240 Media Houses) &mdash; 1,41% of visits.</span></span></div><div class="kpi-value">1.960</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +96</span><span>last 7 days</span></div></div></div>
+                </div>
+              </div>
+              <div style="flex: 2 1 0; min-width: 215px; border-left: 1px solid rgba(4,32,69,0.1); padding-left: 12px; margin-left: 12px;">
+                <div class="hero-group-label">Outcomes</div>
+                <div class="row g-2">
+                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Wishlists <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Modelled wishlists attributed to these channels<br>(3,4K Influencer + 5,8K Media Houses).</span></span></div><div class="kpi-value">9,2K</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +430</span><span>last 7 days</span></div></div></div>
+                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Demo Installs <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">1.116 from creator content + 2.540 from direct buys &mdash; the Discord Quest<br>rewards playing the demo, making it the largest install driver here.<br>CPI is reported per group in the cards below (never blended).</span></span></div><div class="kpi-value">3.656</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +212</span><span>last 7 days</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body border-top pt-3">
+            <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
+              <span style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--tblr-secondary, #626976);">Daily Volume by Group</span>
+              <span class="info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Creator content arrives in spikes (video drops, streams); direct buys deliver in blocks<br>(the Discord Quest window is clearly visible). Switch the metric with the chips &mdash;<br>bars stay split by group, the dashed line shows the cumulative running total.</span></span>
+              <div class="lens-chips" id="idTrendChips">
+                <button type="button" class="lens-chip active" data-metric="visits">Web Visits</button>
+                <button type="button" class="lens-chip" data-metric="conv">Web Conversions</button>
+                <button type="button" class="lens-chip" data-metric="wl">Wishlists</button>
+                <button type="button" class="lens-chip" data-metric="installs">Demo Installs</button>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <div id="idTrendLegend" class="chart-legend d-flex flex-wrap gap-2 flex-fill"></div>
+              <div class="dropdown flex-shrink-0">
+                <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
+                <div class="dropdown-menu dropdown-menu-end">
+                  <button class="dropdown-item" id="idTrendPngBtn">PNG Image</button>
+                  <button class="dropdown-item" id="idTrendCsvBtn">CSV Spreadsheet</button>
+                </div>
+              </div>
+            </div>
+            <div class="chart-wrapper" style="height:260px">
+              <canvas id="idTrendChart"></canvas>
+              <div id="idTrendTooltipEl" class="chart-tooltip opacity-0"></div>
+            </div>
+            <!-- Cost-booking methodology (visible, not tip-only) -->
+            <div class="d-flex align-items-start gap-2 mt-3" style="background: rgba(4,32,69,0.03); border: 1px solid rgba(4,32,69,0.08); border-radius: 8px; padding: 10px 14px; font-size: 12px; line-height: 1.55; color: var(--tblr-body-color, #1e293b);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0" style="margin-top:2px; color: var(--tblr-secondary);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <div>
+                <strong>How costs work on this page:</strong> creator fees and direct buys are booked <strong>per deal</strong> &mdash; not per market or per day. Per-market cost metrics (CPA, CPWL by market) are therefore not shown; market splits cover volumes only. Cost-efficiency is reported per creator and per placement, where the booking actually happened.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ INFLUENCER MARKETING ═══ -->
+        <div class="section-heading">
+          <h3 class="section-heading-title">Influencer Marketing</h3>
+          <p class="section-heading-subtitle">Creator activations with their tracked direct response AND the brand value they generate &mdash; tracked clickouts are a floor for creator value, not the whole of it.</p>
+        </div>
+
+        <div class="row row-deck row-cards mb-3">
+          <div class="col-lg-6">
+            <div class="card h-100">
+              <div class="card-header py-2 px-3" style="min-height:auto;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Influencer &amp; Creator</span><span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Tracked direct-response KPIs for all creator activations &mdash; same card as the Overview.</span></span></div>
+              <div class="card-body">
+                <div class="channel-card-spend">28.450&thinsp;&euro; <span>spend</span></div>
+                <div class="row g-2 mb-2">
+                  <div class="col-6"><div class="kpi kpi-beat-soft"><div class="kpi-label">CPC</div><div class="kpi-value">0,28&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta up" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 20,0%</span><span>vs goal 0,35&thinsp;&euro;</span></div></div></div>
+                  <div class="col-6"><div class="kpi kpi-beat-soft"><div class="kpi-label">Web CR%</div><div class="kpi-value">4,2%</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta up" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 20,0%</span><span>vs goal 3,5%</span></div></div></div>
+                  <div class="col-6"><div class="kpi kpi-neutral"><div class="kpi-label">CPWL</div><div class="kpi-value">8,37&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&darr; 6,2%</span><span>last 7 days</span></div></div></div>
+                  <div class="col-6"><div class="kpi kpi-neutral"><div class="kpi-label">Demo CPI <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Creator deals are bought for reach and credibility, not install efficiency &mdash;<br>installs here are a bonus, not the buying objective (see the value card).</span></span></div><div class="kpi-value">25,49&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&darr; 3,1%</span><span>last 7 days</span></div></div></div>
+                </div>
+                <div class="kpi-compact">
+                  <span>Web Visits: <strong>48,3K</strong></span>
+                  <span>Web Conversions: <strong>720</strong></span>
+                  <span>Wishlists: <strong>3,4K</strong></span>
+                  <span>Demo Installs: <strong>1.116</strong></span>
+                  <span>Content Pieces: <strong>31</strong></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="card h-100">
+              <div class="card-header py-2 px-3" style="min-height:auto;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Creator Value Beyond Clicks</span><span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Creator content works through audiences, mentions and sentiment &mdash; most of its value lands<br>in organic and earned media, not in tracked clickouts. Judging creators on last-click<br>response alone systematically undervalues them; this card shows the brand side.</span></span></div>
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-6 col-md-3"><div class="steam-stat"><div class="stat-label">Social Reach</div><div class="stat-value">6,8M</div><div class="stat-sub">across creator content</div></div></div>
+                  <div class="col-6 col-md-3"><div class="steam-stat"><div class="stat-label">Follower Pool</div><div class="stat-value">14,2M</div><div class="stat-sub">activated creators combined</div></div></div>
+                  <div class="col-6 col-md-3"><div class="steam-stat"><div class="stat-label">Mentions</div><div class="stat-value">1.198</div><div class="stat-sub">486 YouTube &middot; 712 Twitch</div></div></div>
+                  <div class="col-6 col-md-3"><div class="steam-stat"><div class="stat-label">Sentiment</div><div class="stat-value" style="color:#2fb344;">82%</div><div class="stat-sub">on creator content</div></div></div>
+                </div>
+                <div class="mt-3 pt-3 border-top">
+                  <div class="d-flex align-items-center gap-2 mb-1">
+                    <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Weekly Creator-Driven Mentions</span>
+                    <span class="info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Mentions referencing activated creators&rsquo; content, from social listening. Spikes follow<br>content drops &mdash; the earned echo each deal generates beyond its tracked clickouts.</span></span>
+                  </div>
+                  <div style="position: relative; height: 150px;"><canvas id="idMentionsChart"></canvas><div id="idMentionsTooltipEl" class="chart-tooltip opacity-0"></div></div>
+                </div>
+                <div class="mt-3 pt-2 border-top" style="font-size:12px; color: var(--tblr-secondary);">Creator-driven organic effects land in <a href="brandhealth-v1.html" style="color: var(--tblr-primary);">Brand Health</a> and the organic rows of <a href="wishlistinsights-v1.html" style="color: var(--tblr-primary);">Wishlist Insights</a>.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Creator Breakdown</span>
+            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Tracked direct response per creator. Variance is normal &mdash; entertainment-first creators<br>drive fewer clickouts but more reach and mentions; review them with the value card above.<br>Click any column to sort.</span></span>
+            <div class="dropdown ms-1">
+              <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
+              <div class="dropdown-menu dropdown-menu-end">
+                <button class="dropdown-item" id="idCreatorPngBtn">Chart PNG</button>
+                <button class="dropdown-item" id="idCreatorCsvBtn">Table CSV</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-lg-3"><div style="position: relative; height: 220px;"><canvas id="idCreatorChart"></canvas><div id="idCreatorTooltipEl" class="chart-tooltip opacity-0"></div></div></div>
+              <div class="col-lg-9"><div class="table-responsive geo-scroll-5 geo-hscroll"><table class="table wt mb-0 wt-sticky-head wt-freeze-first" id="idCreatorTable"></table></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ MEDIA HOUSES ═══ -->
+        <div class="section-heading">
+          <h3 class="section-heading-title">Media Houses (Direct Buy)</h3>
+          <p class="section-heading-subtitle">Direct placements per publisher and format &mdash; concentration is part of the strategy, so the share of each placement is shown openly rather than averaged away.</p>
+        </div>
+
+        <div class="row row-deck row-cards mb-3">
+          <div class="col-lg-6">
+            <div class="card h-100">
+              <div class="card-header py-2 px-3" style="min-height:auto;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Media Houses (Direct Buy)</span><span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Tracked direct-response KPIs for all direct buys &mdash; same card as the Overview.</span></span></div>
+              <div class="card-body">
+                <div class="channel-card-spend">16.442&thinsp;&euro; <span>spend</span></div>
+                <div class="row g-2 mb-2">
+                  <div class="col-6"><div class="kpi kpi-beat-soft"><div class="kpi-label">CPC</div><div class="kpi-value">0,18&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta up" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 18,2%</span><span>vs goal 0,22&thinsp;&euro;</span></div></div></div>
+                  <div class="col-6"><div class="kpi kpi-beat-soft"><div class="kpi-label">Web CR%</div><div class="kpi-value">6,8%</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta up" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 36,0%</span><span>vs goal 5,0%</span></div></div></div>
+                  <div class="col-6"><div class="kpi kpi-neutral"><div class="kpi-label">CPWL</div><div class="kpi-value">2,83&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&darr; 8,5%</span><span>last 7 days</span></div></div></div>
+                  <div class="col-6"><div class="kpi kpi-neutral"><div class="kpi-label">Demo CPI <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Driven almost entirely by the Discord Quest, which rewards playing the demo<br>(placement CPI 4,12&thinsp;&euro;) &mdash; see the placement breakdown below.</span></span></div><div class="kpi-value">6,47&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&darr; 4,8%</span><span>last 7 days</span></div></div></div>
+                </div>
+                <div class="kpi-compact">
+                  <span>Web Visits: <strong>91,0K</strong></span>
+                  <span>Web Conversions: <strong>1.240</strong></span>
+                  <span>Wishlists: <strong>5,8K</strong></span>
+                  <span>Demo Installs: <strong>2.540</strong></span>
+                  <span>Placements: <strong>9</strong></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="card h-100">
+              <div class="card-header py-2 px-3" style="min-height:auto;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Placement Concentration</span><span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Share of direct-buy wishlists per placement. One dominant placement is a strategy<br>choice, not an anomaly &mdash; but it concentrates renewal risk in a single deal.</span></span></div>
+              <div class="card-body">
+                <div class="row align-items-center g-3">
+                  <div class="col-md-5"><div style="position: relative; height: 205px;"><canvas id="idPlacementPie"></canvas><div id="idPlacementPieTip" class="chart-tooltip opacity-0"></div></div></div>
+                  <div class="col-md-7"><div id="idPlacementShare" style="font-variant-numeric: tabular-nums;"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Placement Breakdown</span>
+            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Tracked direct response per placement &mdash; cost-efficiency reported where the booking<br>actually happened. Click any column to sort.</span></span>
+            <div class="dropdown ms-1">
+              <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
+              <div class="dropdown-menu dropdown-menu-end">
+                <button class="dropdown-item" id="idPlacementCsvBtn">Table CSV</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body p-0" style="border-bottom-left-radius: inherit; border-bottom-right-radius: inherit; overflow: hidden;">
+            <div class="table-responsive geo-hscroll" style="max-height: 400px; overflow: auto; font-variant-numeric: tabular-nums; border-bottom-left-radius: inherit; border-bottom-right-radius: inherit;">
+              <table class="table wt mb-0 wt-sticky-head wt-freeze-first" id="idPlacementTable"></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ MARKETS & DAILY ═══ -->
+        <div class="section-heading">
+          <h3 class="section-heading-title">Markets &amp; Daily Detail</h3>
+          <p class="section-heading-subtitle">Where the visits and wishlists land, and how the flight developed day by day &mdash; volume views only, since deal-level costs cannot honestly be split by market.</p>
+        </div>
+
+        <div class="row row-deck row-cards mb-3">
+          <div class="col-lg-6">
+            <div class="card h-100">
+          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Markets (Volumes)</span>
+            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Visits, conversions and wishlists per market &mdash; no cost columns by design (see the<br>methodology note in the hero): deal-booked costs cannot honestly be split by market.</span></span>
+            <div class="dropdown ms-1">
+              <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
+              <div class="dropdown-menu dropdown-menu-end">
+                <button class="dropdown-item" id="idGeoCsvBtn">CSV Spreadsheet</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive" style="max-height: 380px; overflow:auto; font-variant-numeric: tabular-nums;">
+              <table class="table wt mb-0 wt-sticky-head" id="idGeoTable"></table>
+            </div>
+          </div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="card h-100">
+          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Daily Detail</span>
+            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Day-by-day volumes for the last 14 flight days, both groups combined.<br>Zero-activity days omitted. Click any header to sort.</span></span>
+            <div class="dropdown ms-1">
+              <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
+              <div class="dropdown-menu dropdown-menu-end">
+                <button class="dropdown-item" id="idDailyCsvBtn">CSV Spreadsheet</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive" style="max-height: 380px; overflow:auto; font-variant-numeric: tabular-nums;">
+              <table class="table wt mb-0 wt-sticky-head wt-freeze-first" id="idDailyTable"></table>
+            </div>
+          </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ EXPLORE DEEPER ═══ -->
+        <div class="section-heading">
+          <h3 class="section-heading-title">Explore deeper</h3>
+          <p class="section-heading-subtitle">Related views for this campaign.</p>
+        </div>
+
+        <div class="row row-deck row-cards mb-3 explore-grid">
+          <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="nativedash-poc-v3-prelaunch.html" class="card h-100 card-link">
+              <div class="card-body d-flex align-items-start gap-3">
+                <span class="explore-icon"><i class="ti ti-layout-dashboard"></i></span>
+                <div class="flex-fill">
+                  <div class="fw-semibold">Overview</div>
+                  <div class="text-secondary small">Game &amp; campaign health at a glance</div>
+                </div>
+                <i class="ti ti-chevron-right text-secondary"></i>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="brandhealth-v1.html" class="card h-100 card-link">
+              <div class="card-body d-flex align-items-start gap-3">
+                <span class="explore-icon"><i class="ti ti-star"></i></span>
+                <div class="flex-fill">
+                  <div class="fw-semibold">Brand Health</div>
+                  <div class="text-secondary small">Where the creator halo lands</div>
+                </div>
+                <i class="ti ti-chevron-right text-secondary"></i>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="wishlistinsights-v1.html" class="card h-100 card-link">
+              <div class="card-body d-flex align-items-start gap-3">
+                <span class="explore-icon"><i class="ti ti-heart"></i></span>
+                <div class="flex-fill">
+                  <div class="fw-semibold">Wishlist Insights</div>
+                  <div class="text-secondary small">What these channels convert into</div>
+                </div>
+                <i class="ti ti-chevron-right text-secondary"></i>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="performancemedia-v1.html" class="card h-100 card-link">
+              <div class="card-body d-flex align-items-start gap-3">
+                <span class="explore-icon"><i class="ti ti-chart-bar"></i></span>
+                <div class="flex-fill">
+                  <div class="fw-semibold">Performance Overview</div>
+                  <div class="text-secondary small">The paid-media channel group</div>
+                </div>
+                <i class="ti ti-chevron-right text-secondary"></i>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- ═══ DATA CONTEXT FOOTER ═══ -->
+        <div class="d-flex align-items-center justify-content-between border-top pt-3 mt-4 mb-3" style="font-size:12px; color: var(--tblr-secondary);">
+          <span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1" style="vertical-align:-1px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Last sync: Mar 3, 2026 09:14 CET &middot; Costs booked per deal</span>
+          <span class="d-inline-flex align-items-center gap-2"><span style="width:8px; height:8px; border-radius:50%; background:#2fb344; display:inline-block;"></span> Live</span>
+        </div>
+
+      </div><!-- /dashboardTab -->
+
+          </div><!-- /entryContent -->
+        </div><!-- /entry-row -->
+      </div><!-- /container-xl -->
+    </div><!-- /page-body -->
+
+    <footer class="footer footer-transparent d-print-none">
+      <div class="container-xl">
+        <div class="text-secondary text-center">
+          POC built with <a href="https://tabler.io" class="link-secondary">Tabler</a> &amp; <a href="https://www.chartjs.org" class="link-secondary">Chart.js</a>
+        </div>
+      </div>
+    </footer>
+  </div><!-- /page-wrapper -->
+
+  <script>
+    // ─── Mock data (prelaunch flight; locked to the Overview channel cards:
+    //     Influencer & Creator 28.450 € (12 creators, 48,3K visits, 720 conv, 3,4K WL)
+    //     Media Houses 16.442 € (9 placements, 91,0K visits, 1.240 conv, 5,8K WL) ──
+    function generateDates(start, end) {
+      const dates = [];
+      const cur = new Date(start);
+      const stop = new Date(end);
+      while (cur <= stop) {
+        dates.push(new Date(cur).toISOString().split('T')[0]);
+        cur.setDate(cur.getDate() + 1);
+      }
+      return dates;
+    }
+    const allLabels = generateDates('2025-11-10', '2026-02-26');
+    const days = allLabels.length;
+    let seed = 42;
+    function seededRandom() {
+      seed = (seed * 16807 + 0) % 2147483647;
+      return (seed - 1) / 2147483646;
+    }
+    function fmt(n) { return n.toLocaleString('de-DE'); }
+    const euroT = v => fmt(Math.round(v)) + ' €';
+    const euro2 = v => v.toFixed(2).replace('.', ',') + ' €';
+    const pct1  = v => v.toFixed(1).replace('.', ',') + '%';
+    const pct2  = v => v.toFixed(2).replace('.', ',') + '%';
+    const compact = v => v >= 1e6 ? (v / 1e6).toFixed(1).replace('.', ',') + 'M' : v >= 1e3 ? (v / 1e3).toFixed(1).replace('.', ',') + 'K' : fmt(Math.round(v));
+    function makeTrendCrosshair(scaleId) {
+      return {
+        id: 'ch_' + scaleId,
+        afterDraw(chart) {
+          if (chart.tooltip && chart.tooltip.opacity > 0) {
+            const c = chart.ctx;
+            const x = chart.tooltip.caretX;
+            const scale = chart.scales[scaleId] || Object.values(chart.scales).find(s => s.position === 'left' && s.id !== 'x');
+            if (!scale) return;
+            c.save(); c.beginPath(); c.setLineDash([4, 4]);
+            c.moveTo(x, scale.top); c.lineTo(x, scale.bottom);
+            c.lineWidth = 1; c.strokeStyle = 'rgba(0,0,0,0.25)'; c.stroke(); c.restore();
+          }
+        }
+      };
+    }
+    function makeTrendTooltip(elId, formatters) {
+      return function(context) {
+        const { chart, tooltip } = context;
+        const el = document.getElementById(elId);
+        if (tooltip.opacity === 0) { el.classList.add('opacity-0'); return; }
+        el.classList.remove('opacity-0');
+        if (tooltip.body) {
+          const date = new Date(tooltip.title[0]);
+          const dateStr = isNaN(date) ? tooltip.title[0] : date.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+          let html = '<div class="card"><div class="card-body p-2"><div class="fw-bold mb-1">' + dateStr + '</div><hr class="my-1">';
+          tooltip.dataPoints.forEach(dp => {
+            const color = dp.dataset.borderColor || dp.dataset.backgroundColor;
+            const fmtFn = formatters && formatters[dp.dataset.label] ? formatters[dp.dataset.label] : (v => fmt(v));
+            html += '<div class="tooltip-row"><span class="tooltip-dot" style="background:' + color + '"></span><span class="tooltip-label text-secondary">' + dp.dataset.label + '</span><span class="tooltip-value">' + fmtFn(dp.parsed.y) + '</span></div>';
+          });
+          html += '</div></div>';
+          el.innerHTML = html;
+        }
+        const { offsetLeft, offsetTop } = chart.canvas;
+        const tipW = el.offsetWidth;
+        let left = offsetLeft + tooltip.caretX + 14;
+        if (left + tipW > chart.canvas.offsetLeft + chart.width) left = offsetLeft + tooltip.caretX - tipW - 14;
+        el.style.left = left + 'px';
+        el.style.top = (offsetTop + tooltip.caretY - el.offsetHeight / 2) + 'px';
+      };
+    }
+    const trendXTicks = {
+      maxRotation: 45, autoSkip: true, maxTicksLimit: 14, font: { size: 11 }, color: '#999',
+      callback(value, index) { const d = new Date(allLabels[index]); return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }); }
+    };
+    function downloadChartPng(canvasId, tooltipId, filename) {
+      if (tooltipId) document.getElementById(tooltipId).classList.add('opacity-0');
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = document.getElementById(canvasId).toDataURL('image/png');
+      link.click();
+    }
+    function downloadChartCsv(chart, filename) {
+      const header = ['Date', ...chart.data.datasets.map(ds => ds.label)];
+      const rows = chart.data.labels.map((label, i) => [label, ...chart.data.datasets.map(ds => ds.data[i])].join(','));
+      const blob = new Blob([[header.join(','), ...rows].join('\n')], { type: 'text/csv' });
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = URL.createObjectURL(blob);
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+    function downloadTableCsv(tableEl, filename) {
+      const rows = [];
+      tableEl.querySelectorAll('thead tr, tbody tr, tfoot tr').forEach(tr => {
+        const cells = [];
+        tr.querySelectorAll('th, td').forEach(cell => {
+          if (cell.style.display === 'none') return;
+          let text = cell.textContent.trim().replace(/\s+/g, ' ');
+          if (text.includes(',') || text.includes('"')) text = '"' + text.replace(/"/g, '""') + '"';
+          cells.push(text);
+        });
+        rows.push(cells.join(','));
+      });
+      const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = URL.createObjectURL(blob);
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+    function doughnutTooltip(tooltipElId, metric, fmtFn) {
+      return function(context) {
+        const { chart, tooltip } = context;
+        const el = document.getElementById(tooltipElId);
+        if (tooltip.opacity === 0) { el.classList.add('opacity-0'); return; }
+        el.classList.remove('opacity-0');
+        if (tooltip.dataPoints && tooltip.dataPoints.length) {
+          const dp = tooltip.dataPoints[0];
+          const total = dp.dataset.data.reduce((a, b) => a + b, 0);
+          const share = ((dp.parsed / total) * 100).toFixed(1);
+          el.innerHTML = '<div class="card"><div class="card-body p-2"><div class="fw-bold mb-1">' + dp.label + '</div><hr class="my-1">' +
+            '<div class="tooltip-row"><span class="tooltip-dot" style="background:' + dp.element.options.backgroundColor + '"></span><span class="tooltip-label text-secondary">' + metric + '</span><span class="tooltip-value">' + fmtFn(dp.parsed) + '</span></div>' +
+            '<div class="tooltip-row"><span class="tooltip-dot" style="background:transparent"></span><span class="tooltip-label text-secondary">Share</span><span class="tooltip-value">' + share + '%</span></div>' +
+            '</div></div>';
+        }
+        const { offsetLeft, offsetTop } = chart.canvas;
+        const tipWidth = el.offsetWidth;
+        let left = offsetLeft + tooltip.caretX + 14;
+        if (left + tipWidth > chart.canvas.offsetLeft + chart.width) left = offsetLeft + tooltip.caretX - tipWidth - 14;
+        el.style.left = left + 'px';
+        el.style.top = (offsetTop + tooltip.caretY - el.offsetHeight / 2) + 'px';
+      };
+    }
+
+    // ─── Daily series: creator spikes + Discord-quest block ──
+    const infVisits = new Array(days).fill(0);
+    const mhVisits = new Array(days).fill(0);
+    // creator drops: ~31 content pieces spread over the flight; each spikes 2-3 days
+    const DROPS = [3, 7, 12, 18, 22, 28, 31, 33, 38, 42, 47, 52, 56, 60, 63, 68, 72, 75, 79, 82, 85, 88, 92, 95, 98, 101, 103, 105, 106, 107, 108];
+    DROPS.forEach((d, k) => {
+      seed = 600 + k * 13; seededRandom(); seededRandom();
+      const size = 500 + seededRandom() * 2400;
+      infVisits[d] += size;
+      if (d + 1 < days) infVisits[d + 1] += size * 0.38;
+      if (d + 2 < days) infVisits[d + 2] += size * 0.14;
+    });
+    (function() { const sc = 48300 / infVisits.reduce((a, b) => a + b, 0); for (let i = 0; i < days; i++) infVisits[i] = Math.round(infVisits[i] * sc); })();
+    // MH: small banner baseline + Discord-quest block (days 40–90) + IGN burst
+    for (let i = 0; i < days; i++) {
+      seed = 900 + i * 7; seededRandom(); seededRandom();
+      let v = 150 + seededRandom() * 120;
+      if (i >= 40 && i <= 90) v += 950 + seededRandom() * 350; // Discord Quest window
+      if (i >= 30 && i <= 34) v += 500 + seededRandom() * 250; // TGA-adjacent IGN sponsored
+      mhVisits[i] = v;
+    }
+    (function() { const sc = 91000 / mhVisits.reduce((a, b) => a + b, 0); for (let i = 0; i < days; i++) mhVisits[i] = Math.round(mhVisits[i] * sc); })();
+    // per-group daily series for conversions / wishlists / installs, derived from the
+    // visit shapes and normalized to the locked totals (boost = Discord-Quest install window)
+    function deriveSeries(base, total, seedOff, boost) {
+      const raw = base.map((v, i) => {
+        seed = seedOff + i * 11; seededRandom();
+        let x = v * (0.8 + seededRandom() * 0.4);
+        if (boost && i >= 40 && i <= 90) x *= 1.6;
+        return x;
+      });
+      const sc = total / raw.reduce((a, b) => a + b, 0);
+      return raw.map(v => Math.round(v * sc));
+    }
+    const infConv = deriveSeries(infVisits, 720, 1200);
+    const mhConv  = deriveSeries(mhVisits, 1240, 1300);
+    const infWl   = deriveSeries(infVisits, 3400, 1400);
+    const mhWl    = deriveSeries(mhVisits, 5800, 1500);
+    const infInst = deriveSeries(infVisits, 1116, 1600);
+    const mhInst  = deriveSeries(mhVisits, 2540, 1700, true); // the Quest rewards demo play
+
+    // ═══ HERO TREND — chip-switched daily volume by group ═══
+    (function() {
+      const METRICS = {
+        visits:   { label: 'Web Visits',      inf: infVisits, mh: mhVisits, file: 'daily-web-visits-by-group' },
+        conv:     { label: 'Web Conversions', inf: infConv,   mh: mhConv,   file: 'daily-web-conversions-by-group' },
+        wl:       { label: 'Wishlists',       inf: infWl,     mh: mhWl,     file: 'daily-wishlists-by-group' },
+        installs: { label: 'Demo Installs',   inf: infInst,   mh: mhInst,   file: 'daily-demo-installs-by-group' },
+      };
+      let activeMetric = 'visits';
+      function cumOf(m) { const out = []; let s = 0; for (let i = 0; i < days; i++) { s += m.inf[i] + m.mh[i]; out.push(s); } return out; }
+      const C = [
+        { solid: '#ae3ec9', light: 'rgba(174,62,201,0.55)' },
+        { solid: '#f76707', light: 'rgba(247,103,7,0.45)' },
+        { solid: '#FF0249', light: 'rgba(255,2,73,0.10)' },
+      ];
+      const canvas = document.getElementById('idTrendChart');
+      const chart = new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: allLabels,
+          datasets: [
+            { label: 'Creator', data: infVisits.slice(), backgroundColor: C[0].light, stack: 'v', order: 5 },
+            { label: 'Direct Buy', data: mhVisits.slice(), backgroundColor: C[1].light, stack: 'v', order: 5 },
+            { label: 'Cumulative Total', data: cumOf(METRICS.visits), type: 'line', borderColor: C[2].solid, backgroundColor: 'transparent', borderWidth: 2, borderDash: [4, 3], tension: 0.35, pointRadius: 0, pointHoverRadius: 4, yAxisID: 'yCum', order: 1 },
+          ]
+        },
+        plugins: [makeTrendCrosshair('y')],
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          animation: { duration: 500, easing: 'easeOutQuart' },
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false, external: makeTrendTooltip('idTrendTooltipEl', {
+              'Creator': v => fmt(v), 'Direct Buy': v => fmt(v), 'Cumulative Total': v => fmt(v),
+            }) }
+          },
+          scales: {
+            x: { stacked: true, grid: { display: false }, ticks: trendXTicks },
+            y: { stacked: true, position: 'left', min: 0, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 }, color: '#999', callback: v => compact(v) }, title: { display: true, text: 'Web Visits / day', font: { size: 12 } } },
+            yCum: { position: 'right', min: 0, grid: { drawOnChartArea: false }, ticks: { font: { size: 11 }, color: '#999', callback: v => compact(v) }, title: { display: true, text: 'Cumulative Web Visits', font: { size: 12 } } },
+          }
+        }
+      });
+      function applyMetric(key) {
+        activeMetric = key;
+        const m = METRICS[key];
+        chart.data.datasets[0].data = m.inf.slice();
+        chart.data.datasets[1].data = m.mh.slice();
+        chart.data.datasets[2].data = cumOf(m);
+        chart.options.scales.y.title.text = m.label + ' / day';
+        chart.options.scales.yCum.title.text = 'Cumulative ' + m.label;
+        chart.update();
+        document.querySelectorAll('#idTrendChips .lens-chip').forEach(btn => btn.classList.toggle('active', btn.dataset.metric === key));
+      }
+      document.querySelectorAll('#idTrendChips .lens-chip').forEach(btn => btn.addEventListener('click', () => applyMetric(btn.dataset.metric)));
+      const el = document.getElementById('idTrendLegend');
+      function renderLegend() {
+        el.innerHTML = chart.data.datasets.map((ds, i) => {
+          const hidden = !chart.isDatasetVisible(i);
+          const c = C[i];
+          return '<span class="legend-item ' + (hidden ? 'inactive' : '') + '" data-index="' + i + '" data-type="' + (i < 2 ? 'bar' : 'line') + '" title="' + (hidden ? 'Click to show ' : 'Click to hide ') + ds.label + '" style="background:' + (hidden ? 'transparent' : c.light) + '; border-color:' + (hidden ? '#ccc' : c.solid) + '"><span class="legend-swatch" style="background:' + c.solid + '"></span>' + ds.label + '</span>';
+        }).join('');
+      }
+      el.addEventListener('click', e => {
+        const item = e.target.closest('.legend-item');
+        if (!item) return;
+        const idx = parseInt(item.dataset.index);
+        chart.setDatasetVisibility(idx, !chart.isDatasetVisible(idx));
+        chart.update(); renderLegend();
+      });
+      renderLegend();
+      document.getElementById('idTrendPngBtn').addEventListener('click', () => downloadChartPng('idTrendChart', 'idTrendTooltipEl', METRICS[activeMetric].file + '.png'));
+      document.getElementById('idTrendCsvBtn').addEventListener('click', () => downloadChartCsv(chart, METRICS[activeMetric].file + '.csv'));
+    })();
+
+    // ═══ CREATOR BREAKDOWN — tracked direct response per creator ═══
+    (function() {
+      const rows = [
+        { label: 'MaximilianDood',   color: '#FF0249', cost: 6400, pieces: 3, visits: 11200, conv: 196, wl: 940, inst: 310 },
+        { label: 'GrandFinalGoblin', color: '#206bc4', cost: 4200, pieces: 4, visits: 7200,  conv: 118, wl: 540, inst: 180 },
+        { label: 'fgc.clips',        color: '#f76707', cost: 3800, pieces: 6, visits: 8900,  conv: 124, wl: 670, inst: 220 },
+        { label: 'TechFrameData',    color: '#0ca678', cost: 2900, pieces: 2, visits: 5100,  conv: 64,  wl: 280, inst: 95 },
+        { label: 'ProJuggler',       color: '#ae3ec9', cost: 2200, pieces: 3, visits: 3800,  conv: 52,  wl: 230, inst: 75 },
+        { label: 'なおやん',          color: '#fab005', cost: 1900, pieces: 2, visits: 2700,  conv: 38,  wl: 170, inst: 55 },
+        { label: 'ChimpOverlord',    color: '#15aabf', cost: 1750, pieces: 3, visits: 3100,  conv: 41,  wl: 190, inst: 60 },
+        { label: 'KaedeShirayuki',   color: '#4263eb', cost: 1300, pieces: 2, visits: 1900,  conv: 26,  wl: 120, inst: 40 },
+        { label: 'amiplaysgames',    color: '#2fb344', cost: 1150, pieces: 2, visits: 1600,  conv: 22,  wl: 95,  inst: 30 },
+        { label: 'SaltyArcade',      color: '#d63939', cost: 1050, pieces: 1, visits: 1150,  conv: 14,  wl: 68,  inst: 22 },
+        { label: 'CosplayCraft_DE',  color: '#e8590c', cost: 950,  pieces: 2, visits: 880,   conv: 11,  wl: 52,  inst: 15 },
+        { label: 'PixelPugilist',    color: '#66757f', cost: 850,  pieces: 1, visits: 770,   conv: 14,  wl: 45,  inst: 14 },
+      ];
+      rows.forEach(r => {
+        r.cr   = r.conv / r.visits * 100;
+        r.cpa  = r.cost / r.conv;
+        r.cpwl = r.cost / r.wl;
+        r.cpi  = r.cost / r.inst;
+      });
+      // column groups: Deal | Landing Page | Wishlists | Demo Installs
+      const cols = [
+        { key: 'cost',   head: 'Cost',        fmtFn: euroT },
+        { key: 'pieces', head: 'Pieces',      fmtFn: fmt,  end: true },
+        { key: 'visits', head: 'Web Visits',      fmtFn: fmt },
+        { key: 'conv',   head: 'Web Conversions', fmtFn: fmt },
+        { key: 'cr',     head: 'Web CR%',         fmtFn: pct2 },
+        { key: 'cpa',    head: 'CPA',         fmtFn: euro2, end: true },
+        { key: 'wl',     head: 'Wishlists',   fmtFn: fmt },
+        { key: 'cpwl',   head: 'CPWL',        fmtFn: euro2, end: true },
+        { key: 'inst',   head: 'Installs',    fmtFn: fmt },
+        { key: 'cpi',    head: 'CPI',         fmtFn: euro2 },
+      ];
+      const state = { key: 'wl', asc: false };
+      let chart = null;
+      function render() {
+        const { key, asc } = state;
+        const isText = key === 'label';
+        const sorted = [...rows].sort((a, b) => isText ? (asc ? a.label.localeCompare(b.label) : b.label.localeCompare(a.label)) : (asc ? a[key] - b[key] : b[key] - a[key]));
+        const vals = isText ? [] : sorted.map(r => r[key]);
+        const minV = Math.min(...vals), maxV = Math.max(...vals), range = maxV - minV || 1;
+        let h = '<thead><tr class="th-group">';
+        h += '<th rowspan="2" class="col-geo-label sortable' + (key === 'label' ? ' sort-active' : '') + '" data-key="label">Creator<span class="sort-icon">' + (key === 'label' && !asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
+        h += '<th colspan="2" class="text-center th-group-label group-end">Deal</th>';
+        h += '<th colspan="4" class="text-center th-group-label group-end">Landing Page</th>';
+        h += '<th colspan="2" class="text-center th-group-label group-end">Wishlists</th>';
+        h += '<th colspan="2" class="text-center th-group-label">Demo Installs</th>';
+        h += '</tr><tr>';
+        cols.forEach(c => {
+          const active = key === c.key;
+          h += '<th class="text-end sortable' + (active ? ' sort-active' : '') + (c.end ? ' group-end' : '') + '" data-key="' + c.key + '">' + c.head + '<span class="sort-icon">' + (active && !asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
+        });
+        h += '</tr></thead><tbody>';
+        sorted.forEach(r => {
+          const norm = isText ? 0 : (asc ? 1 - (r[key] - minV) / range : (r[key] - minV) / range);
+          const opacity = (0.04 + norm * 0.18).toFixed(2);
+          const dot = '<span class="d-inline-block rounded-circle me-2" style="width:10px; height:10px; background:' + r.color + '; vertical-align:middle;"></span>';
+          h += '<tr><td class="col-geo-label" style="white-space:nowrap;">' + dot + r.label + '</td>';
+          cols.forEach(c => {
+            const hl = (c.key === key && !isText) ? ' style="background:rgba(116,182,231,' + opacity + ');"' : '';
+            h += '<td class="text-end' + (c.end ? ' group-end' : '') + '"' + hl + '>' + c.fmtFn(r[c.key]) + '</td>';
+          });
+          h += '</tr>';
+        });
+        const t = rows.reduce((a, r) => ({ cost: a.cost + r.cost, pieces: a.pieces + r.pieces, visits: a.visits + r.visits, conv: a.conv + r.conv, wl: a.wl + r.wl, inst: a.inst + r.inst }), { cost: 0, pieces: 0, visits: 0, conv: 0, wl: 0, inst: 0 });
+        h += '</tbody><tfoot style="position: sticky; bottom: 0; z-index: 1; background: var(--tblr-bg-surface, #fff);"><tr><td class="col-geo-label">Total</td>' +
+          '<td class="text-end">' + euroT(t.cost) + '</td><td class="text-end group-end">' + fmt(t.pieces) + '</td><td class="text-end">' + fmt(t.visits) + '</td><td class="text-end">' + fmt(t.conv) + '</td>' +
+          '<td class="text-end">' + pct2(t.conv / t.visits * 100) + '</td><td class="text-end group-end">' + euro2(t.cost / t.conv) + '</td><td class="text-end">' + fmt(t.wl) + '</td><td class="text-end group-end">' + euro2(t.cost / t.wl) + '</td>' +
+          '<td class="text-end">' + fmt(t.inst) + '</td><td class="text-end">' + euro2(t.cost / t.inst) + '</td></tr></tfoot>';
+        const table = document.getElementById('idCreatorTable');
+        table.innerHTML = h;
+        table.querySelectorAll('th.sortable').forEach(thEl => {
+          thEl.addEventListener('click', () => {
+            const k = thEl.dataset.key;
+            if (state.key === k) state.asc = !state.asc;
+            else { state.key = k; state.asc = ['cpa', 'cpwl', 'cpi'].includes(k) || k === 'label'; }
+            render();
+          });
+        });
+        // doughnut follows additive sorts; falls back to wishlist split
+        const additive = ['cost', 'visits', 'conv', 'wl', 'pieces', 'inst'];
+        const pieKey = additive.includes(key) ? key : 'wl';
+        const cm = cols.find(c => c.key === pieKey);
+        if (chart) {
+          chart.data.labels = sorted.map(r => r.label);
+          chart.data.datasets[0].data = sorted.map(r => r[pieKey]);
+          chart.data.datasets[0].backgroundColor = sorted.map(r => r.color);
+          chart.options.plugins.tooltip.external = doughnutTooltip('idCreatorTooltipEl', cm.head, cm.fmtFn);
+          chart.update();
+        }
+      }
+      chart = new Chart(document.getElementById('idCreatorChart'), {
+        type: 'doughnut',
+        data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false, external: () => {} } } }
+      });
+      render();
+      document.getElementById('idCreatorPngBtn').addEventListener('click', () => downloadChartPng('idCreatorChart', 'idCreatorTooltipEl', 'creator-breakdown.png'));
+      document.getElementById('idCreatorCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('idCreatorTable'), 'creator-breakdown.csv'));
+    })();
+
+    // ═══ WEEKLY CREATOR-DRIVEN MENTIONS (value-beyond-clicks card) ═══
+    (function() {
+      const weekLabels = [];
+      const weekIdx = [];
+      for (let i = 0; i < days; i += 7) { weekLabels.push(allLabels[i]); weekIdx.push(i); }
+      function weekly(total, seedOff) {
+        const raw = weekIdx.map((start, k) => {
+          seed = seedOff + k * 17; seededRandom();
+          const drops = DROPS.filter(d => d >= start && d < start + 7).length;
+          return (0.4 + drops) * (0.7 + seededRandom() * 0.6);
+        });
+        const sc = total / raw.reduce((a, b) => a + b, 0);
+        return raw.map(v => Math.round(v * sc));
+      }
+      const yt = weekly(486, 2100);
+      const tw = weekly(712, 2300);
+      new Chart(document.getElementById('idMentionsChart'), {
+        type: 'bar',
+        data: {
+          labels: weekLabels,
+          datasets: [
+            { label: 'YouTube', data: yt, backgroundColor: 'rgba(214,57,57,0.55)', stack: 'm' },
+            { label: 'Twitch',  data: tw, backgroundColor: 'rgba(174,62,201,0.55)', stack: 'm' },
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false, external: makeTrendTooltip('idMentionsTooltipEl', { 'YouTube': v => fmt(v), 'Twitch': v => fmt(v) }) }
+          },
+          scales: {
+            x: { stacked: true, grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 6, font: { size: 10 }, color: '#999', callback(value, index) { const d = new Date(weekLabels[index]); return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }); } } },
+            y: { stacked: true, min: 0, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 10 }, color: '#999' } },
+          }
+        }
+      });
+    })();
+
+    // ═══ PLACEMENT BREAKDOWN — direct buys per publisher × format ═══
+    (function() {
+      const rows = [
+        { label: 'Discord Quest',           house: 'Discord',   format: 'Quest / High-Impact', color: '#5865F2', cost: 6800, visits: 41000, conv: 580, wl: 3020, inst: 1650 },
+        { label: 'IGN Sponsored Article',   house: 'IGN',       format: 'Sponsored Content',   color: '#d63939', cost: 2400, visits: 9800,  conv: 116, wl: 420, inst: 130 },
+        { label: 'GameSpot Homepage',       house: 'GameSpot',  format: 'Display Banner',      color: '#f59f00', cost: 1900, visits: 8200,  conv: 94,  wl: 330, inst: 95 },
+        { label: 'Fandom Wiki Takeover',    house: 'Fandom',    format: 'Takeover',            color: '#0ca678', cost: 1500, visits: 7400,  conv: 90,  wl: 410, inst: 120 },
+        { label: 'EventHubs Sponsored',     house: 'EventHubs', format: 'Sponsored Content',   color: '#206bc4', cost: 980,  visits: 5900,  conv: 88,  wl: 390, inst: 140 },
+        { label: 'Twitch Front Page Spot',  house: 'Twitch',    format: 'High-Impact',         color: '#845ef7', cost: 800,  visits: 6100,  conv: 81,  wl: 360, inst: 125 },
+        { label: 'Dexerto Native',          house: 'Dexerto',   format: 'Native Article',      color: '#15aabf', cost: 850,  visits: 4700,  conv: 52,  wl: 240, inst: 70 },
+        { label: 'Shoryuken Newsletter',    house: 'Shoryuken', format: 'Newsletter',          color: '#fab005', cost: 712,  visits: 4100,  conv: 95,  wl: 430, inst: 155 },
+        { label: 'N4G Display',             house: 'N4G',       format: 'Display Banner',      color: '#66757f', cost: 500,  visits: 3800,  conv: 44,  wl: 200, inst: 55 },
+      ];
+      const totalWl = rows.reduce((a, r) => a + r.wl, 0);
+      rows.forEach(r => {
+        r.cr = r.conv / r.visits * 100;
+        r.cpa = r.cost / r.conv;
+        r.cpwl = r.cost / r.wl;
+        r.cpi = r.cost / r.inst;
+        r.share = r.wl / totalWl * 100;
+      });
+      // concentration doughnut (wishlists per placement)
+      new Chart(document.getElementById('idPlacementPie'), {
+        type: 'doughnut',
+        data: { labels: rows.map(r => r.label), datasets: [{ data: rows.map(r => r.wl), backgroundColor: rows.map(r => r.color), borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false, external: doughnutTooltip('idPlacementPieTip', 'Wishlists', v => fmt(v)) } } }
+      });
+      // ranked share bars next to the doughnut
+      const ranked = [...rows].sort((a, b) => b.wl - a.wl);
+      const maxShare = ranked[0].share;
+      document.getElementById('idPlacementShare').innerHTML = ranked.map(r =>
+        '<div class="d-flex align-items-center gap-2" style="font-size:12px; padding:2px 0;">' +
+        '<span class="d-inline-block rounded-circle flex-shrink-0" style="width:9px; height:9px; background:' + r.color + ';"></span>' +
+        '<span class="flex-shrink-0 text-truncate" style="width:148px;" title="' + r.label + '">' + r.label + '</span>' +
+        '<div class="flex-fill" style="height:8px; background:rgba(4,32,69,0.05); border-radius:4px; overflow:hidden;"><div style="width:' + (r.share / maxShare * 100).toFixed(1) + '%; height:100%; background:' + r.color + '; opacity:0.75; border-radius:4px;"></div></div>' +
+        '<span class="flex-shrink-0 text-end" style="width:108px; color: var(--tblr-secondary);"><strong style="color: var(--tblr-body-color);">' + fmt(r.wl) + '</strong> &middot; ' + pct1(r.share) + '</span>' +
+        '</div>').join('');
+      // placement table — grouped header: Deal | Landing Page | Wishlists | Demo Installs
+      const cols = [
+        { key: 'house',  head: 'Media House', text: true },
+        { key: 'format', head: 'Format',      text: true },
+        { key: 'cost',   head: 'Cost',        fmtFn: euroT, end: true },
+        { key: 'visits', head: 'Web Visits',      fmtFn: fmt },
+        { key: 'conv',   head: 'Web Conversions', fmtFn: fmt },
+        { key: 'cr',     head: 'Web CR%',         fmtFn: pct2 },
+        { key: 'cpa',    head: 'CPA',         fmtFn: euro2, end: true },
+        { key: 'wl',     head: 'Wishlists',   fmtFn: fmt },
+        { key: 'share',  head: 'WL Share%',   fmtFn: pct1 },
+        { key: 'cpwl',   head: 'CPWL',        fmtFn: euro2, end: true },
+        { key: 'inst',   head: 'Installs',    fmtFn: fmt },
+        { key: 'cpi',    head: 'CPI',         fmtFn: euro2 },
+      ];
+      const state = { key: 'wl', asc: false };
+      function render() {
+        const { key, asc } = state;
+        const col = cols.find(c => c.key === key);
+        const isText = key === 'label' || (col && col.text);
+        const sorted = [...rows].sort((a, b) => isText ? (asc ? String(a[key]).localeCompare(String(b[key])) : String(b[key]).localeCompare(String(a[key]))) : (asc ? a[key] - b[key] : b[key] - a[key]));
+        const vals = isText ? [] : sorted.map(r => r[key]);
+        const minV = Math.min(...vals), maxV = Math.max(...vals), range = maxV - minV || 1;
+        let h = '<thead><tr class="th-group">';
+        h += '<th rowspan="2" class="col-geo-label sortable' + (key === 'label' ? ' sort-active' : '') + '" data-key="label" style="min-width:200px;">Placement<span class="sort-icon">' + (key === 'label' && !asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
+        h += '<th colspan="3" class="text-center th-group-label group-end">Deal</th>';
+        h += '<th colspan="4" class="text-center th-group-label group-end">Landing Page</th>';
+        h += '<th colspan="3" class="text-center th-group-label group-end">Wishlists</th>';
+        h += '<th colspan="2" class="text-center th-group-label">Demo Installs</th>';
+        h += '</tr><tr>';
+        cols.forEach(c => {
+          const active = key === c.key;
+          h += '<th class="' + (c.text ? '' : 'text-end ') + 'sortable' + (active ? ' sort-active' : '') + (c.end ? ' group-end' : '') + '" data-key="' + c.key + '">' + c.head + '<span class="sort-icon">' + (active && !asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
+        });
+        h += '</tr></thead><tbody>';
+        sorted.forEach(r => {
+          const norm = isText ? 0 : (asc ? 1 - (r[key] - minV) / range : (r[key] - minV) / range);
+          const opacity = (0.04 + norm * 0.18).toFixed(2);
+          const dot = '<span class="d-inline-block rounded-circle me-2" style="width:10px; height:10px; background:' + r.color + '; vertical-align:middle;"></span>';
+          h += '<tr><td class="col-geo-label" style="white-space:nowrap;">' + dot + r.label + '</td>';
+          cols.forEach(c => {
+            const hl = (c.key === key && !isText && !c.text) ? ' style="background:rgba(116,182,231,' + opacity + ');"' : '';
+            h += '<td class="' + (c.text ? '' : 'text-end') + (c.end ? ' group-end' : '') + '"' + hl + '>' + (c.text ? r[c.key] : c.fmtFn(r[c.key])) + '</td>';
+          });
+          h += '</tr>';
+        });
+        const t = rows.reduce((a, r) => ({ cost: a.cost + r.cost, visits: a.visits + r.visits, conv: a.conv + r.conv, wl: a.wl + r.wl, inst: a.inst + r.inst }), { cost: 0, visits: 0, conv: 0, wl: 0, inst: 0 });
+        h += '</tbody><tfoot style="position: sticky; bottom: 0; z-index: 1; background: var(--tblr-bg-surface, #fff);"><tr><td class="col-geo-label">Total</td><td></td><td></td>' +
+          '<td class="text-end group-end">' + euroT(t.cost) + '</td><td class="text-end">' + fmt(t.visits) + '</td><td class="text-end">' + fmt(t.conv) + '</td>' +
+          '<td class="text-end">' + pct2(t.conv / t.visits * 100) + '</td><td class="text-end group-end">' + euro2(t.cost / t.conv) + '</td><td class="text-end">' + fmt(t.wl) + '</td><td class="text-end">100,0%</td><td class="text-end group-end">' + euro2(t.cost / t.wl) + '</td>' +
+          '<td class="text-end">' + fmt(t.inst) + '</td><td class="text-end">' + euro2(t.cost / t.inst) + '</td></tr></tfoot>';
+        const table = document.getElementById('idPlacementTable');
+        table.innerHTML = h;
+        table.querySelectorAll('th.sortable').forEach(thEl => {
+          thEl.addEventListener('click', () => {
+            const k = thEl.dataset.key;
+            const c = cols.find(x => x.key === k);
+            if (state.key === k) state.asc = !state.asc;
+            else { state.key = k; state.asc = ['cpa', 'cpwl', 'cpi'].includes(k) || k === 'label' || (c && c.text); }
+            render();
+          });
+        });
+      }
+      render();
+      document.getElementById('idPlacementCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('idPlacementTable'), 'placement-breakdown.csv'));
+    })();
+
+    // ═══ MARKETS — volumes only (no cost by design) ═══
+    (function() {
+      const rows = [
+        { label: 'US', flag: 'us', visits: 48800, conv: 690, wl: 3220, inst: 1290 },
+        { label: 'DE', flag: 'de', visits: 22300, conv: 320, wl: 1500, inst: 590 },
+        { label: 'UK', flag: 'gb', visits: 15300, conv: 215, wl: 1010, inst: 400 },
+        { label: 'FR', flag: 'fr', visits: 12500, conv: 175, wl: 820, inst: 330 },
+        { label: 'BR', flag: 'br', visits: 11900, conv: 168, wl: 790, inst: 320 },
+        { label: 'CA', flag: 'ca', visits: 9400,  conv: 132, wl: 620, inst: 245 },
+        { label: 'JP', flag: 'jp', visits: 8300,  conv: 118, wl: 550, inst: 215 },
+        { label: 'Others',         visits: 10800, conv: 142, wl: 690, inst: 266 },
+      ];
+      const totWl = rows.reduce((a, r) => a + r.wl, 0);
+      let h = '<thead><tr class="th-group">' +
+        '<th rowspan="2">Market</th>' +
+        '<th colspan="3" class="text-center th-group-label group-end">Landing Page</th>' +
+        '<th colspan="3" class="text-center th-group-label">Outcomes</th>' +
+        '</tr><tr>' +
+        '<th class="text-end">Web Visits</th><th class="text-end">Web Conversions</th><th class="text-end group-end">Web CR%</th>' +
+        '<th class="text-end">Wishlists</th><th class="text-end">WL Share%</th><th class="text-end">Installs</th>' +
+        '</tr></thead><tbody>';
+      rows.forEach(r => {
+        const flag = r.flag ? '<span class="flag flag-' + r.flag + ' me-1"></span>' : '';
+        h += '<tr><td style="white-space:nowrap;">' + flag + r.label + '</td><td class="text-end">' + fmt(r.visits) + '</td><td class="text-end">' + fmt(r.conv) + '</td><td class="text-end group-end">' + pct2(r.conv / r.visits * 100) + '</td><td class="text-end">' + fmt(r.wl) + '</td><td class="text-end">' + pct1(r.wl / totWl * 100) + '</td><td class="text-end">' + fmt(r.inst) + '</td></tr>';
+      });
+      const t = rows.reduce((a, r) => ({ visits: a.visits + r.visits, conv: a.conv + r.conv, wl: a.wl + r.wl, inst: a.inst + r.inst }), { visits: 0, conv: 0, wl: 0, inst: 0 });
+      h += '</tbody><tfoot><tr><td>Total</td><td class="text-end">' + fmt(t.visits) + '</td><td class="text-end">' + fmt(t.conv) + '</td><td class="text-end group-end">' + pct2(t.conv / t.visits * 100) + '</td><td class="text-end">' + fmt(t.wl) + '</td><td class="text-end">100,0%</td><td class="text-end">' + fmt(t.inst) + '</td></tr></tfoot>';
+      document.getElementById('idGeoTable').innerHTML = h;
+      document.getElementById('idGeoCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('idGeoTable'), 'markets-volumes.csv'));
+    })();
+
+    // ═══ DAILY DETAIL (last 14 active days) ═══
+    (function() {
+      const rows = [];
+      for (let i = days - 1; i >= 0 && rows.length < 14; i--) {
+        const v = infVisits[i] + mhVisits[i];
+        if (v < 50) continue;
+        rows.push({
+          date: allLabels[i], inf: infVisits[i], mh: mhVisits[i], visits: v,
+          conv: infConv[i] + mhConv[i], wl: infWl[i] + mhWl[i], inst: infInst[i] + mhInst[i],
+        });
+      }
+      rows.reverse();
+      const cols = [
+        { key: 'inf',    head: 'Creator',     fmtFn: fmt },
+        { key: 'mh',     head: 'Direct Buy',  fmtFn: fmt, end: true },
+        { key: 'conv',   head: 'Web Conversions', fmtFn: fmt },
+        { key: 'wl',     head: 'Wishlists',   fmtFn: fmt },
+        { key: 'inst',   head: 'Installs',    fmtFn: fmt },
+      ];
+      const state = { key: 'date', asc: true };
+      function render() {
+        const { key, asc } = state;
+        const sorted = [...rows].sort((a, b) => {
+          if (key === 'date') return asc ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date);
+          return asc ? a[key] - b[key] : b[key] - a[key];
+        });
+        const isMetric = key !== 'date';
+        const vals = isMetric ? sorted.map(r => r[key]) : [];
+        const minV = Math.min(...vals), maxV = Math.max(...vals), range = maxV - minV || 1;
+        let h = '<thead><tr class="th-group">';
+        h += '<th rowspan="2" class="col-geo-label sortable' + (key === 'date' ? ' sort-active' : '') + '" data-key="date">Date<span class="sort-icon">' + (key === 'date' && !asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
+        h += '<th colspan="2" class="text-center th-group-label group-end">Web Visits</th>';
+        h += '<th colspan="3" class="text-center th-group-label">Outcomes</th>';
+        h += '</tr><tr>';
+        cols.forEach(c => {
+          const active = key === c.key;
+          h += '<th class="text-end sortable' + (active ? ' sort-active' : '') + (c.end ? ' group-end' : '') + '" data-key="' + c.key + '">' + c.head + '<span class="sort-icon">' + (active && !asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
+        });
+        h += '</tr></thead><tbody>';
+        sorted.forEach(r => {
+          const norm = isMetric ? (asc ? 1 - (r[key] - minV) / range : (r[key] - minV) / range) : 0;
+          const opacity = (0.04 + norm * 0.18).toFixed(2);
+          h += '<tr><td class="col-geo-label" style="white-space:nowrap;">' + r.date + '</td>';
+          cols.forEach(c => {
+            const hl = (c.key === key && isMetric) ? ' style="background:rgba(116,182,231,' + opacity + ');"' : '';
+            h += '<td class="text-end' + (c.end ? ' group-end' : '') + '"' + hl + '>' + c.fmtFn(r[c.key]) + '</td>';
+          });
+          h += '</tr>';
+        });
+        h += '</tbody>';
+        const table = document.getElementById('idDailyTable');
+        table.innerHTML = h;
+        table.querySelectorAll('th.sortable').forEach(thEl => {
+          thEl.addEventListener('click', () => {
+            const k = thEl.dataset.key;
+            if (state.key === k) state.asc = !state.asc;
+            else { state.key = k; state.asc = k === 'date'; }
+            render();
+          });
+        });
+      }
+      render();
+      document.getElementById('idDailyCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('idDailyTable'), 'daily-detail.csv'));
+    })();
+
+    /* ═══ SIDEBAR TOGGLE ═══ */
+    function toggleSidebar() {
+      const sidebar = document.getElementById('entrySidebar');
+      const collapsed = sidebar.classList.toggle('collapsed');
+      document.getElementById('sidebarCollapseToggle').setAttribute('data-title', collapsed ? 'Expand' : 'Collapse');
+      setTimeout(() => {
+        document.querySelectorAll('canvas').forEach(c => {
+          const chart = Chart.getChart(c);
+          if (chart) chart.resize();
+        });
+      }, 250);
+    }
+    document.addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'b') { e.preventDefault(); toggleSidebar(); }
+    });
+
+    /* ═══ FILTER RESET VISIBILITY ═══ */
+    function updateResetVisibility() {
+      const resetBtn = document.getElementById('filterReset');
+      if (!resetBtn) return;
+      let hasActive = false;
+      document.querySelectorAll('.brand-filter-card .form-select').forEach(sel => {
+        if (sel.selectedIndex !== 0) hasActive = true;
+      });
+      if (hasActive) { resetBtn.classList.remove('d-none'); resetBtn.classList.add('d-inline-flex'); }
+    }
+    document.querySelectorAll('.brand-filter-card .form-select').forEach(sel => {
+      sel.addEventListener('change', updateResetVisibility);
+    });
+    updateResetVisibility();
+  </script>
+  <script>
+    // Sticky-state shadow: elevation cue only while the filter bar is actually pinned
+    (function() {
+      const bar = document.querySelector('.brand-filter-card');
+      const sentinel = document.getElementById('filterStickySentinel');
+      if (!bar || !sentinel || !('IntersectionObserver' in window)) return;
+      new IntersectionObserver(([e]) => {
+        bar.classList.toggle('is-stuck', !e.isIntersecting);
+      }, { rootMargin: '-9px 0px 0px 0px' }).observe(sentinel);
+    })();
+  </script>
+</body>
+</html>

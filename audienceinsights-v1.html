@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audience Insights — TRACKS Native Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.6.0/dist/tabler-icons.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/js/tabler.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --tblr-primary: #FF0249;
+      --tblr-primary-rgb: 255, 2, 73;
+    }
+    .chart-tooltip {
+      position: absolute;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+      z-index: 1000;
+      font-size: 13px;
+      min-width: 220px;
+    }
+    .chart-tooltip .card { margin: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+    .chart-tooltip .tooltip-row { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
+    .chart-tooltip .tooltip-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .chart-tooltip .tooltip-label { flex: 1; }
+    .chart-tooltip .tooltip-value { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+    .chart-wrapper { position: relative; height: 480px; }
+    .chart-legend { padding: 4px 0; } /* layout via d-flex flex-wrap gap-2 utilities */
+    .chart-legend .legend-item {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 6px; font-size: 13px; font-weight: 500;
+      cursor: pointer; user-select: none; transition: opacity 0.2s, box-shadow 0.2s;
+      border: 1px solid transparent;
+    }
+    .chart-legend .legend-item:hover { box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+    .chart-legend .legend-item.inactive { opacity: 0.35; text-decoration: line-through; }
+    .chart-legend .legend-swatch { width: 14px; height: 4px; border-radius: 2px; flex-shrink: 0; }
+    .chart-legend .legend-item[data-type="bar"] .legend-swatch { height: 12px; width: 10px; border-radius: 2px; }
+    .kpi { border-radius: 8px; padding: 14px 16px; height: 100%; }
+    .info-tip { position: relative; cursor: help; display: inline-flex; padding: 4px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
+    .info-tip:hover { background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.06); }
+    .info-tip .tip-text { visibility: hidden; opacity: 0; position: absolute; right: calc(100% + 8px); top: 50%; transform: translateY(-50%); background: var(--tblr-body-color, #1e293b); color: #fff; font-size: 12px; font-weight: 400; padding: 6px 10px; border-radius: 6px; white-space: nowrap; z-index: 1000; transition: opacity 0.15s; pointer-events: none; }
+    .info-tip .tip-text::after { content: ''; position: absolute; left: 100%; top: 50%; transform: translateY(-50%); border: 5px solid transparent; border-left-color: var(--tblr-body-color, #1e293b); }
+    .info-tip:hover .tip-text { visibility: visible; opacity: 1; }
+    /* Row-note tips inside tables: open to the RIGHT (left would clip under the doughnut / scroll edge) */
+    .wt .info-tip .tip-text { left: calc(100% + 8px); right: auto; white-space: normal; min-width: 240px; }
+    .wt .info-tip .tip-text::after { left: auto; right: 100%; border-color: transparent; border-right-color: var(--tblr-body-color, #1e293b); }
+    .kpi-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px; }
+    .kpi-value { font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; display: flex; align-items: baseline; gap: 6px; }
+    .kpi-goal { font-size: 11px; margin-top: 6px; opacity: 0.75; }
+    .kpi-beat { background: #2fb344; color: #fff; }
+    .kpi-beat .kpi-goal { opacity: 0.85; }
+    .kpi-miss { background: #f76707; color: #fff; }
+    .kpi-miss .kpi-goal { opacity: 0.85; }
+    .kpi-neutral { background: var(--tblr-bg-surface-secondary, #f8f9fa); color: var(--tblr-body-color, #1e293b); border: 1px solid rgba(4,32,69,0.1); }
+    .kpi-neutral .kpi-label { color: var(--tblr-secondary, #626976); }
+    .kpi-beat-soft { background: rgba(47,179,68,0.08); color: var(--tblr-body-color, #1e293b); border: 1px solid rgba(47,179,68,0.28); }
+    .kpi-beat-soft .kpi-label { color: var(--tblr-secondary, #626976); }
+    .kpi-miss-soft { background: rgba(247,103,7,0.08); color: var(--tblr-body-color, #1e293b); border: 1px solid rgba(247,103,7,0.28); }
+    .kpi-miss-soft .kpi-label { color: var(--tblr-secondary, #626976); }
+    .kpi-sub { font-size: 11px; opacity: 0.7; }
+    .kpi-beat .kpi-sub { opacity: 0.85; }
+    .kpi-miss .kpi-sub { opacity: 0.85; }
+    .kpi-delta { font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .kpi-delta.up { color: #2fb344; }
+    .kpi-delta.down { color: #d63939; }
+    .kpi-beat .kpi-delta, .kpi-miss .kpi-delta { color: rgba(255,255,255,0.85); }
+    .kpi-compact { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--tblr-secondary, #626976); margin-top: 8px; font-variant-numeric: tabular-nums; }
+    .kpi-compact span { white-space: nowrap; }
+    /* Funnel Overview */
+    .funnel-row { display: flex; align-items: center; padding: 14px 20px; border-bottom: 1px solid rgba(4,32,69,0.07); gap: 12px; }
+    .funnel-row:last-child { border-bottom: none; }
+    .funnel-stage { width: 120px; flex-shrink: 0; display: flex; align-items: center; gap: 10px; }
+    .funnel-bar { width: 3px; height: 24px; border-radius: 2px; flex-shrink: 0; }
+    .funnel-stage-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--tblr-secondary, #626976); line-height: 1.2; }
+    .funnel-kpi { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 3px 8px; border-radius: 5px; background: var(--tblr-bg-surface-secondary, #f8f9fa); border: 1px solid rgba(4,32,69,0.1); }
+    .funnel-kpi-name { color: var(--tblr-secondary, #626976); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.2px; }
+    .funnel-kpi-value { font-weight: 700; color: var(--tblr-body-color, #1e293b); font-variant-numeric: tabular-nums; }
+    .funnel-kpi .kpi-delta { font-size: 10px; }
+    .funnel-kpi-goal { color: var(--tblr-secondary, #94a3b8); font-size: 10px; }
+    /* Channel highlight cards */
+    .channel-card-spend { font-size: 1.1rem; font-weight: 700; color: var(--tblr-body-color, #1e293b); margin-bottom: 12px; font-variant-numeric: tabular-nums; }
+    .channel-card-spend span { font-size: 12px; font-weight: 400; color: var(--tblr-secondary, #626976); }
+    .channel-link { font-size: 12px; font-weight: 500; color: var(--tblr-primary); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; margin-top: 12px; }
+    .channel-link:hover { text-decoration: underline; }
+    /* Filter bar: active filter state */
+    .filter-active { border-color: var(--tblr-primary); color: var(--tblr-primary); font-weight: 600; background-color: rgba(var(--tblr-primary-rgb),0.06); }
+    /* Mobile filter drawer */
+    /* Compact, single-line filter row (desktop) */
+    .filter-row-compact { font-size: 12px; }
+    .filter-row-compact .btn-sm { font-size: 12px; padding: 0.25rem 0.55rem; }
+    .filter-row-compact .form-select-sm { font-size: 12px; padding: 0.25rem 1.5rem 0.25rem 0.5rem; background-position: right 0.35rem center; min-width: 70px !important; max-width: 110px !important; flex: 0 1 auto !important; }
+    .filter-row-compact .filter-dates .dropdown-toggle { font-size: 12px; }
+    .filter-row-compact .filter-dim-sep { margin: 2px 4px !important; }
+    .filter-row-compact .filter-dims { gap: 4px !important; }
+    .filter-row-compact .filter-dates { gap: 4px !important; }
+    .filter-toggle-btn { display: none; }
+    .filter-drawer { display: contents; } /* on desktop: no wrapper behaviour */
+    .filter-active-count { display: none; font-size: 10px; font-weight: 700; background: var(--tblr-primary); color: #fff; border-radius: 50%; width: 18px; height: 18px; line-height: 18px; text-align: center; }
+    @media (max-width: 767.98px) {
+      .filter-toggle-btn { display: inline-flex; }
+      .filter-drawer {
+        display: none; flex-direction: column; gap: 10px;
+        width: 100%; padding-top: 10px; border-top: 1px solid rgba(4,32,69,0.08); margin-top: 6px;
+      }
+      .filter-drawer.show { display: flex; }
+      .filter-drawer .filter-dates { flex-direction: column; gap: 6px; }
+      .filter-drawer .filter-dims { flex-direction: column; gap: 6px; }
+      .filter-drawer .filter-dims select { max-width: 100% !important; min-width: 0 !important; flex: 1 1 100% !important; }
+      .filter-drawer .filter-dim-sep { display: none; }
+      .filter-active-count.has-filters { display: inline-block; }
+    }
+    /* Explore-deeper grid */
+    .explore-grid .card-link { text-decoration: none; color: inherit; transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s; }
+    .explore-grid .card-link:hover { box-shadow: 0 4px 14px rgba(4,32,69,0.08); transform: translateY(-1px); border-color: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.35); }
+    .explore-grid .card-link:hover .ti-chevron-right { color: var(--tblr-primary) !important; }
+    .explore-grid .explore-icon {
+      flex-shrink: 0;
+      width: 34px; height: 34px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.10);
+      color: var(--tblr-primary, #FF0249);
+      border-radius: 8px;
+    }
+    .explore-grid .explore-icon .ti { font-size: 18px; line-height: 1; }
+    /* Breakdown tabs — match the widget-header typography, equal-width tabs */
+    .breakdown-tabs { gap: 2px; }
+    .breakdown-tabs .nav-link {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--tblr-secondary, #626976);
+      min-width: 96px;
+      text-align: center;
+      padding: 0.3rem 0.75rem;
+      border: 1px solid transparent;
+      border-bottom: 2px solid transparent;
+      margin-bottom: 0;
+    }
+    .breakdown-tabs .nav-link:hover { color: var(--tblr-body-color, #1e293b); background: rgba(4,32,69,0.03); border-color: transparent; }
+    .breakdown-tabs .nav-link.active {
+      color: var(--tblr-body-color, #1e293b);
+      background: transparent;
+      border-color: transparent;
+      border-bottom-color: var(--tblr-primary, #FF0249);
+    }
+    /* Section headings: faint separator above + title with thin primary-color underline + muted subtitle */
+    .section-heading {
+      margin-top: 3rem; margin-bottom: 1.25rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(4,32,69,0.10);
+    }
+    .section-heading .section-heading-title {
+      display: inline-block;
+      font-size: 18px; font-weight: 700;
+      color: var(--tblr-body-color, #1e293b);
+      margin: 0 0 8px;
+      padding-bottom: 6px;
+      padding-right: 24px;
+      border-bottom: 2px solid var(--tblr-primary, #FF0249);
+      line-height: 1.2;
+    }
+    .section-heading .section-heading-subtitle {
+      font-size: 12px; color: var(--tblr-secondary, #626976);
+      margin: 0; line-height: 1.35;
+    }
+    /* Section dividers — uses Tabler utilities: border-top border-2 border-primary */
+    .section-label { font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--tblr-body-color, #1e293b); white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; padding: 5px 18px; background: var(--tblr-bg-surface-secondary, #f1f3f5); border-radius: 6px; }
+    .section-subtitle { font-size: 12px; margin-top: -6px; }
+    /* Icon-only dropdown button — grey icon, brand tint on hover (matches info-tip) */
+    .btn-sm-icon { background: transparent !important; border: none !important; box-shadow: none !important; color: var(--tblr-secondary, #626976); padding: 4px 6px; line-height: 1; border-radius: 6px; transition: background 0.15s; }
+    .btn-sm-icon:hover, .btn-sm-icon:focus { background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.06) !important; color: var(--tblr-secondary, #626976); }
+    .no-caret::after { display: none !important; }
+
+    /* Vertical-scroll table with sticky header — shows ~5 rows; horizontal scroll enabled */
+    .geo-scroll-5 { max-height: 260px; overflow: auto; }
+    .geo-hscroll table.wt { min-width: 1180px; }
+    .wt-sticky-head thead th { position: sticky; top: 0; z-index: 2; background: var(--tblr-bg-surface-secondary, #f9fafb); }
+    /* Grouped-header tables: overlap the two sticky rows slightly + pad the content back down.
+       This guarantees no sub-pixel gap shows the tbody behind. */
+    .wt-sticky-head thead tr:not(.th-group) th {
+      top: 22px;
+      padding-top: 0.9rem;
+    }
+    /* Single-row sticky headers (no .th-group above) sit at the top, no offset */
+    .wt-sticky-head thead tr:only-child th {
+      top: 0;
+      padding-top: 0.5rem;
+    }
+    .wt-sticky-head thead .th-group th { z-index: 3; }
+    /* Prevent cell wrapping in horizontally scrolling tables */
+    .geo-hscroll .wt th, .geo-hscroll .wt td { white-space: nowrap; }
+    /* Group header row */
+    .wt thead .th-group .th-group-label {
+      font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--tblr-secondary, #6b7280);
+      background: var(--tblr-bg-surface-secondary, #f9fafb);
+      border-bottom: 1px solid rgba(4,32,69,0.08);
+      padding: 0.35rem 0.75rem;
+    }
+    .wt thead .th-group th[rowspan="2"] { vertical-align: bottom; }
+    /* Freeze first column (Geo) for horizontal scrolling — slightly stronger divider after it */
+    .wt-freeze-first .col-geo-label { position: sticky; left: 0; background: #fff; z-index: 1; min-width: 110px; }
+    .wt-freeze-first thead tr th.col-geo-label { background: var(--tblr-bg-surface-secondary, #f9fafb); z-index: 5; box-shadow: 1px 0 0 rgba(4,32,69,0.12); }
+    .wt-freeze-first tbody .col-geo-label { box-shadow: 1px 0 0 rgba(4,32,69,0.12); }
+    /* Subtle group separators — applied via .group-end on the last cell of each
+       column group (set dynamically at render time so they follow the column picker) */
+    .wt th.group-end, .wt td.group-end {
+      border-right: 1px solid rgba(4,32,69,0.06);
+    }
+    /* Widget-style tables (matches tracks-widgets Tabulator theme) */
+    .wt { font-size: 0.875rem; }
+    .wt thead { background: var(--tblr-bg-surface-secondary, #f9fafb); border-bottom: 1px solid rgba(4,32,69,0.1); }
+    .wt thead th { color: var(--tblr-secondary, #6b7280); font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1rem; padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(4,32,69,0.1); white-space: nowrap; }
+    .wt thead th.sortable { cursor: pointer; user-select: none; transition: color 0.15s; }
+    .wt thead th.sortable:hover { color: var(--tblr-body-color, #1e293b); }
+    .wt thead th.sortable .sort-icon { display: inline-block; width: 12px; margin-left: 4px; opacity: 0.3; vertical-align: middle; }
+    .wt thead th.sortable.sort-active { color: var(--tblr-body-color, #1e293b); font-weight: 600; }
+    .wt thead th.sortable.sort-active .sort-icon { opacity: 1; }
+    .wt tbody tr { border-bottom: 1px solid rgba(4,32,69,0.1); background: transparent; }
+    .wt tbody td { padding: 0.5rem 0.75rem; font-size: 0.8125rem; background: transparent; vertical-align: middle; }
+    .wt tfoot tr { border-top: 2px solid rgba(4,32,69,0.1); background: transparent; }
+    .wt tfoot td { padding: 0.5rem 0.75rem; font-size: 0.8125rem; font-weight: 600; }
+    /* Funnel visual */
+    .funnel-wrap { display: flex; gap: 12px; }
+    .funnel-strip { width: 36px; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px; }
+    .funnel-strip .seg { display: flex; justify-content: center; flex: 1; }
+    .funnel-strip .seg > div { border-radius: 4px; transition: width 0.3s; }
+    .funnel-cards { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+    .funnel-cards .row.row-deck { margin-bottom: 0 !important; }
+    .funnel-cards .card.mb-3 { margin-bottom: 0 !important; }
+    /* Steam / Brand Health mini cards */
+    .steam-stat { text-align: center; }
+    .steam-stat .stat-value { font-size: 1.1rem; font-weight: 700; color: var(--tblr-body-color, #1e293b); font-variant-numeric: tabular-nums; line-height: 1.2; }
+    .steam-stat .stat-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--tblr-secondary, #626976); margin-bottom: 2px; }
+    .steam-stat .stat-sub { font-size: 11px; color: var(--tblr-secondary, #626976); margin-top: 2px; }
+    .steam-stat .stat-delta { font-size: 11px; font-weight: 600; }
+    .steam-stat .stat-delta.up { color: #2fb344; }
+    .steam-stat .stat-delta.down { color: #d63939; }
+    /* Sentiment bar — uses Tabler .progress component with custom height */
+    /* Filter bar card — sticky at top of viewport, subtle indicator label at the start */
+    .brand-filter-card {
+      border-radius: 8px;
+      position: sticky;
+      top: 8px;
+      z-index: 100;
+      transition: box-shadow 0.15s ease;
+    }
+    .brand-filter-card.is-stuck { box-shadow: 0 4px 14px rgba(4,32,69,0.10); }
+    .brand-filter-card > .card-body { border-radius: inherit; }
+    .filter-card-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--tblr-secondary, #626976);
+      display: inline-flex; align-items: center; gap: 6px;
+      padding-right: 10px; margin-right: 4px;
+      border-right: 1px solid rgba(4,32,69,0.10);
+      flex-shrink: 0; white-space: nowrap;
+    }
+    /* Landing Page funnel — only wrap behaviour on narrow screens; all other styling via Tabler utilities */
+    @media (max-width: 991.98px) {
+      .lp-funnel { flex-wrap: wrap !important; gap: 8px !important; }
+      .lp-funnel > .card { flex: 1 1 45% !important; }
+    }
+    /* Interactive lens stats */
+    .steam-stat.lens-clickable {
+      cursor: pointer;
+      padding: 8px 6px 5px;
+      border-radius: 6px;
+      border-bottom: 3px solid transparent;
+      transition: background 0.2s, border-bottom-color 0.2s;
+      position: relative;
+    }
+    .steam-stat.lens-clickable:hover { background: rgba(4,32,69,0.04); }
+    .steam-stat.lens-active {
+      border-bottom-color: var(--tblr-primary);
+    }
+    /* Hero scorecard tiles (status-only) + chart lens chips (selection) — split 2026-06-05 */
+    .score-tile { padding: 10px 12px 9px; }
+    .score-tile .kpi-value { font-size: 1.15rem; }
+    .hero-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--tblr-secondary, #626976); margin-bottom: 6px; }
+    .lens-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .lens-chip { font-size: 11px; font-weight: 600; letter-spacing: 0.3px; padding: 3px 12px; border-radius: 999px; border: 1px solid rgba(4,32,69,0.15); background: transparent; color: var(--tblr-secondary, #626976); cursor: pointer; transition: color 0.15s, background 0.15s, border-color 0.15s; line-height: 1.5; }
+    .lens-chip:hover { border-color: var(--tblr-primary, #FF0249); color: var(--tblr-primary, #FF0249); }
+    .lens-chip.active { background: var(--tblr-primary, #FF0249); border-color: var(--tblr-primary, #FF0249); color: #fff; }
+    /* Command Center wrapper */
+    /* AI Insight placeholder */
+    .ai-insight { border: 1px solid rgba(132,94,247,0.2); background: rgba(132,94,247,0.03); border-radius: 8px; padding: 12px 16px; font-size: 13px; line-height: 1.6; color: var(--tblr-body-color, #1e293b); }
+    .ai-insight-header { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #845ef7; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .ai-insight-header svg { flex-shrink: 0; }
+    .ai-insight-text { margin: 0; }
+    .ai-insight-meta { font-size: 11px; color: var(--tblr-secondary, #626976); margin-top: 8px; text-align: right; }
+    .ai-insight-inline { border: none; background: rgba(132,94,247,0.03); border-radius: 6px; padding: 8px 12px; font-size: 12px; line-height: 1.5; margin-top: 12px; }
+    .ai-insight-inline .ai-insight-header { font-size: 10px; margin-bottom: 4px; }
+    .ai-insight-inline .ai-insight-text { font-size: 12px; }
+    /* Collapsible AI insights */
+    .ai-insight.collapsed .ai-insight-text { display: none; }
+    .ai-insight.collapsed .ai-insight-meta { display: none; }
+    .ai-insight-toggle { cursor: pointer; user-select: none; }
+    .ai-insight-toggle .ai-chevron { display: inline-block; transition: transform 0.2s; font-size: 12px; margin-left: 4px; }
+    .ai-insight.collapsed .ai-chevron { transform: rotate(-90deg); }
+    /* Anomaly / warning variant */
+    .ai-insight.ai-warning { border-color: rgba(247,103,7,0.3); background: rgba(247,103,7,0.04); }
+    .ai-insight.ai-warning .ai-insight-header { color: #f76707; }
+
+    /* Collapsible sidebar — icon-collapse mode (inspired by Gateway app) */
+    /* Sidebar + content flex row */
+    .entry-row { display: flex; gap: 0; }
+    #entryContent { padding-left: 16px; }
+    .sidebar-page-header { padding: 0.5rem 8px 0.5rem 12px; }
+    .sidebar-page-header .sidebar-back-link {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;
+      color: var(--tblr-secondary, #626976); text-decoration: none;
+      padding: 6px 8px; margin: 0 0 0 -8px;
+      border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .sidebar-page-header .sidebar-back-link:hover { color: var(--tblr-primary); background: rgba(var(--tblr-primary-rgb), 0.06); }
+    .sidebar-page-header .sidebar-back-link svg { flex-shrink: 0; }
+    .sidebar-page-header .game-title-block {
+      padding-top: 14px;
+      border-top: 1px solid rgba(4,32,69,0.08);
+    }
+    .sidebar-page-header .page-pretitle { font-size: 0.625rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--tblr-secondary, #626976); margin-bottom: 0.25rem; }
+    .sidebar-page-header .page-pretitle a { color: inherit; text-decoration: none; }
+    .sidebar-page-header .page-pretitle a:hover { color: var(--tblr-primary); }
+    .sidebar-page-header .page-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--tblr-body-color, #1e293b); line-height: 1.2; }
+    #entrySidebar.collapsed .sidebar-page-header { display: none; }
+    #entrySidebar { display: flex; flex-direction: column; }
+    #entrySidebar > nav { flex: 0 0 auto; }
+    .sidebar-footer { border-top: 1px solid rgba(4,32,69,0.08); padding: 8px 0; margin-top: 8px; }
+    .sidebar-footer .nav-link { color: var(--tblr-secondary, #626976); font-size: 13px; }
+    .sidebar-footer .nav-link:hover { color: var(--tblr-primary); }
+    #entrySidebar.collapsed .sidebar-footer { padding: 6px 0; }
+    #entrySidebar { transition: width 0.2s ease-linear, min-width 0.2s ease-linear, flex 0.2s ease-linear; flex: 0 0 13.5%; width: 13.5%; overflow-x: hidden; overflow-y: visible; position: relative; }
+    #entrySidebar .nav-link span, #entrySidebar .group-label { transition: opacity 0.15s ease, margin-top 0.15s ease; white-space: nowrap; }
+    #entrySidebar.collapsed { flex: 0 0 48px; width: 48px; min-width: 48px; }
+    #entrySidebar.collapsed .nav-link { justify-content: center; padding: 8px; position: relative; }
+    #entrySidebar.collapsed .nav-link i { margin: 0; font-size: 18px; }
+    #entrySidebar.collapsed .nav-link span { opacity: 0; width: 0; overflow: hidden; display: inline-block; }
+    #entrySidebar.collapsed .group-label { opacity: 0; height: 0; margin: 0; padding: 0 !important; overflow: hidden; }
+    #entrySidebar.collapsed .nav-item.mt-3 { margin-top: 4px !important; }
+    /* Collapse chevron toggle */
+    #sidebarCollapseToggle { display: inline-flex; align-items: center; justify-content: center; padding: 4px; color: var(--tblr-secondary, #626976); opacity: 0.45; transition: opacity 0.15s; text-decoration: none; border-radius: 4px; }
+    #sidebarCollapseToggle:hover { opacity: 1; color: var(--tblr-body-color, #1e293b); }
+    #sidebarCollapseToggle i { font-size: 16px; transition: transform 0.2s ease; }
+    #entrySidebar.collapsed #sidebarCollapseToggle { justify-content: center; padding: 8px; position: relative; }
+    #entrySidebar.collapsed #sidebarCollapseToggle i { transform: rotate(180deg); }
+    #entrySidebar.collapsed #sidebarCollapseToggle:hover::after { content: attr(data-title); position: absolute; left: 100%; top: 50%; transform: translateY(-50%); background: var(--tblr-body-color, #1e293b); color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 4px; white-space: nowrap; z-index: 100; margin-left: 8px; pointer-events: none; }
+    /* Tooltip on hover in collapsed state */
+    #entrySidebar.collapsed .nav-item > .nav-link:hover::after { content: attr(data-title); position: absolute; left: 100%; top: 50%; transform: translateY(-50%); background: var(--tblr-body-color, #1e293b); color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 4px; white-space: nowrap; z-index: 100; margin-left: 8px; pointer-events: none; }
+    /* Sidebar rail — invisible edge toggle */
+    #sidebarRail { position: absolute; top: 0; bottom: 0; right: -8px; width: 16px; cursor: col-resize; z-index: 20; }
+    #sidebarRail::after { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; transition: background 0.15s; }
+    #sidebarRail:hover::after { background: var(--tblr-primary); }
+    #entryContent { flex: 1; min-width: 0; transition: flex 0.2s ease-linear; }
+    @media (max-width: 991.98px) { .entry-row { flex-direction: column; } #entrySidebar { display: none; } }
+    .command-center { background: rgba(4,32,69,0.025); border-radius: 10px; padding: 14px 16px 16px; border: 1px solid rgba(4,32,69,0.06); margin-bottom: 1.5rem; }
+    .command-center > .card { border: 1px solid rgba(4,32,69,0.10); }
+    .command-center > .card:first-child { margin-bottom: 10px !important; }
+
+    /* ── Performance Media page-specific widgets ── */
+    /* Goal progress rows (Volume vs Goals card) */
+    .goal-row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(4,32,69,0.06); }
+    .goal-row:last-child { border-bottom: none; }
+    .goal-row .goal-name { width: 120px; flex-shrink: 0; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--tblr-secondary, #626976); }
+    .goal-row .goal-vals { width: 175px; flex-shrink: 0; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--tblr-body-color, #1e293b); }
+    .goal-row .goal-vals .goal-target { color: var(--tblr-secondary, #94a3b8); }
+    .goal-row .goal-bar { flex: 1; min-width: 0; }
+    .goal-row .goal-ach { width: 52px; flex-shrink: 0; text-align: right; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .goal-row .goal-ach.beat { color: #2fb344; }
+    .goal-row .goal-ach.miss { color: #f76707; }
+    /* Pacing stat block */
+    .pacing-stat { text-align: center; }
+    .pacing-stat .pacing-value { font-size: 1.1rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--tblr-body-color, #1e293b); line-height: 1.2; }
+    .pacing-stat .pacing-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--tblr-secondary, #626976); margin-bottom: 2px; }
+    .pacing-stat .pacing-sub { font-size: 11px; color: var(--tblr-secondary, #626976); margin-top: 2px; }
+    /* Channel small-multiple trend cards */
+    .sm-chart-wrap { position: relative; height: 170px; }
+    .sm-kpis { display: flex; align-items: flex-start; gap: 8px; font-size: 11px; color: var(--tblr-secondary, #626976); font-variant-numeric: tabular-nums; margin-top: 6px; }
+    .sm-kpis strong { color: var(--tblr-body-color, #1e293b); }
+    .sm-kpis .sm-flag-bad { color: #f76707; font-weight: 700; }
+    .sm-kpis .sm-flag-good { color: #2fb344; font-weight: 700; }
+    .sm-kpis .sm-row-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--tblr-secondary, #94a3b8); width: 64px; flex-shrink: 0; padding-top: 1px; }
+    .sm-kpis .sm-metrics { display: flex; flex-wrap: wrap; gap: 3px 12px; flex: 1; min-width: 0; }
+    .sm-kpis .sm-metrics > span { white-space: nowrap; }
+    .sm-kpis + .sm-kpis { border-top: 1px solid rgba(4,32,69,0.06); padding-top: 6px; }
+  </style>
+</head>
+<body class="page layout-fluid">
+
+    <!-- Navbar -->
+  <header class="navbar navbar-expand-md d-print-none" style="background: var(--tblr-primary); box-shadow: none;">
+    <div class="container-xl">
+      <a href="#" class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
+        <img src="https://tracks.secondstage.io/vite/assets/tracks-home-logo-C086m-iW.png" alt="TRACKS" class="navbar-brand-image">
+      </a>
+      <span class="badge bg-white text-primary ms-n2" style="font-size:10px; font-weight:700; letter-spacing:0.3px;">2.0 UI/UX Concept</span>
+    </div>
+  </header>
+  <!-- Second navbar (main navigation, matches TRACKS layout) -->
+  <header class="navbar-expand-md">
+    <div class="collapse navbar-collapse show" id="navbar-menu">
+      <div class="navbar">
+        <div class="container-xl">
+          <div class="row flex-fill align-items-center">
+            <div class="col">
+              <ul class="navbar-nav">
+                <li class="nav-item active">
+                  <a class="nav-link" href="#">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-device-gamepad-2"></i></span>
+                    <span class="nav-link-title">My Games</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-chart-funnel"></i></span>
+                    <span class="nav-link-title">Attribution Tracking</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-article"></i></span>
+                    <span class="nav-link-title">FAQ</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-book-2"></i></span>
+                    <span class="nav-link-title">Glossary</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-file-code-2"></i></span>
+                    <span class="nav-link-title">Documentation</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+<div class="page-wrapper">
+    <div class="page-body">
+      <div class="container-xl">
+        <div class="entry-row">
+          <!-- Entry sidebar (matches col-lg-2 in tracks/app/views/games/entry.html.erb) -->
+          <div id="entrySidebar">
+            <div class="sidebar-page-header d-flex align-items-center justify-content-between">
+              <a href="#" class="sidebar-back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                <span>My Games</span>
+              </a>
+              <a href="#" id="sidebarCollapseToggle" onclick="toggleSidebar(); return false;" data-title="Expand" title="Toggle sidebar (Cmd+B)">
+                <i class="ti ti-chevron-left" id="sidebarToggleIcon"></i>
+              </a>
+            </div>
+            <nav class="nav nav-pills nav-vertical" style="font-size:13px;">
+              <li class="nav-item"><a class="nav-link" href="nativedash-poc-v3-prelaunch.html" data-title="Overview"><i class="ti ti-layout-dashboard me-2"></i><span>Overview</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="periodcomparison-v1.html" data-title="Period Comparison"><i class="ti ti-arrows-diff me-2"></i><span>Period Comparison</span></a></li>
+              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Growth</span></li>
+              <li class="nav-item"><a class="nav-link" href="installsua-v1.html" data-title="Installs & UA"><i class="ti ti-device-gamepad-2 me-2"></i><span>Installs &amp; UA</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="wishlistinsights-v1.html" data-title="Wishlist Insights"><i class="ti ti-heart me-2"></i><span>Wishlist Insights</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="preorderinsights-v1.html" data-title="Preorder Insights"><i class="ti ti-shopping-cart me-2"></i><span>Preorder Insights</span></a></li>
+              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Game</span></li>
+              <li class="nav-item"><a class="nav-link" href="playerlifecycle-v1.html" data-title="Player Lifecycle"><i class="ti ti-refresh me-2"></i><span>Player Lifecycle</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="monetizationltv-v1.html" data-title="Monetization & LTV"><i class="ti ti-coin me-2"></i><span>Monetization & LTV</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="steaminsights-v1.html" data-title="Steam Insights"><i class="ti ti-brand-steam me-2"></i><span>Steam Insights</span></a></li>
+              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Media & Web</span></li>
+              <li class="nav-item"><a class="nav-link" href="performancemedia-v1.html" data-title="Performance Overview"><i class="ti ti-chart-bar me-2"></i><span>Performance Overview</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="awarenesstracker-v1.html" data-title="Awareness Tracker"><i class="ti ti-eye me-2"></i><span>Awareness Tracker</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="creativeinsights-v1.html" data-title="Creative Performance"><i class="ti ti-palette me-2"></i><span>Creative Performance</span></a></li>
+              <li class="nav-item"><a class="nav-link active" href="#" data-title="Audience Insights"><i class="ti ti-users me-2"></i><span>Audience Insights</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="influencerdirectbuy-v1.html" data-title="Influencer & Direct Buy"><i class="ti ti-speakerphone me-2"></i><span>Influencer & Direct Buy</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="websiteanalytics-v1.html" data-title="Website Analytics"><i class="ti ti-world-www me-2"></i><span>Website Analytics</span></a></li>
+              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Brand</span></li>
+              <li class="nav-item"><a class="nav-link" href="brandhealth-v1.html" data-title="Brand Health"><i class="ti ti-star me-2"></i><span>Brand Health</span></a></li>
+              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Company</span></li>
+              <li class="nav-item"><a class="nav-link" href="sustainability-v1.html" data-title="Sustainability"><i class="ti ti-leaf me-2"></i><span>Sustainability</span></a></li>
+            </nav>
+            <div id="sidebarRail" onclick="toggleSidebar()"></div>
+          </div>
+          <!-- Content area (flexes to fill remaining space) -->
+          <div id="entryContent">
+
+      <!-- Dashboard Tab -->
+      <div id="dashboardTab">
+
+        <!-- Game header strip: logo + developer/publisher (page chrome, deliberately not a card) -->
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div class="d-flex align-items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" aria-label="Urban Brawl" style="height:56px; width:auto; display:block;">
+              <defs>
+                <linearGradient id="urbanGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#1e293b"/>
+                  <stop offset="100%" stop-color="#3d3d5c"/>
+                </linearGradient>
+                <linearGradient id="brawlGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#FF0249"/>
+                  <stop offset="50%" stop-color="#ff2070"/>
+                  <stop offset="100%" stop-color="#FF0249"/>
+                </linearGradient>
+              </defs>
+              <rect x="20" y="12" width="360" height="2" fill="url(#brawlGrad)" opacity="0.7" rx="1"/>
+              <text x="200" y="52" text-anchor="middle" font-family="Impact, 'Arial Black', sans-serif" font-size="42" font-weight="900" letter-spacing="12" fill="url(#urbanGrad)">URBAN</text>
+              <text x="200" y="98" text-anchor="middle" font-family="Impact, 'Arial Black', sans-serif" font-size="52" font-weight="900" letter-spacing="8" fill="url(#brawlGrad)">BRAWL</text>
+              <rect x="20" y="106" width="360" height="2" fill="url(#brawlGrad)" opacity="0.7" rx="1"/>
+            </svg>
+            <div style="width:1px; height:38px; background:rgba(4,32,69,0.15); flex-shrink:0;"></div>
+            <div style="font-size:22px; font-weight:700; color: var(--tblr-body-color, #1e293b); line-height:1.2;">Audience Insights</div>
+          </div>
+          <div class="d-flex align-items-center gap-1">
+            <a href="#" class="btn btn-sm btn-ghost-secondary p-2" title="Settings" aria-label="Settings"><i class="ti ti-adjustments-alt" style="font-size:18px;"></i></a>
+            <a href="#" class="btn btn-sm btn-ghost-secondary p-2" title="Tools" aria-label="Tools"><i class="ti ti-tool" style="font-size:18px;"></i></a>
+            <a href="#" class="btn btn-sm btn-ghost-secondary p-2" title="Members" aria-label="Members"><i class="ti ti-users-group" style="font-size:18px;"></i></a>
+          </div>
+        </div>
+
+        <!-- Filter bar (slim) — shadow appears only while stuck (see sentinel observer) -->
+        <div id="filterStickySentinel" style="height:1px;"></div>
+        <div class="card mb-3 brand-filter-card">
+          <div class="card-body py-2 px-3">
+            <div class="d-flex flex-nowrap align-items-center gap-2 filter-row-compact">
+              <!-- Desktop-only filter indicator -->
+              <span class="filter-card-label d-none d-md-inline-flex">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                Filters
+              </span>
+          <!-- Mobile: filter toggle + toggle group always visible -->
+              <button type="button" class="btn btn-sm btn-outline-secondary filter-toggle-btn align-items-center gap-1" onclick="var d=document.getElementById('filterDrawer');d.classList.toggle('show');this.querySelector('.ti').classList.toggle('ti-chevron-down');this.querySelector('.ti').classList.toggle('ti-chevron-up');">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                Filters
+                <span class="filter-active-count has-filters" id="filterCount">1</span>
+                <i class="ti ti-chevron-down" style="font-size:14px;"></i>
+              </button>
+              <!-- Date filters (left side) -->
+              <div class="d-flex align-items-center gap-2 flex-shrink-0 filter-dates">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted flex-shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <div class="dropdown flex-shrink-0">
+                  <button class="btn btn-sm btn-outline-secondary dropdown-toggle filter-active" data-bs-toggle="dropdown">Beat: Launch</button>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item active" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue='Beat: '+this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Launch</a>
+                    <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue='Beat: '+this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Always On</a>
+                    <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue='Beat: '+this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Seasonal</a>
+                  </div>
+                </div>
+                <div class="btn-group btn-group-sm flex-shrink-0" role="group" aria-label="Quick date range">
+                  <button type="button" class="btn btn-outline-secondary">7D</button>
+                  <button type="button" class="btn btn-outline-secondary">30D</button>
+                  <button type="button" class="btn btn-outline-secondary">90D</button>
+                  <button type="button" class="btn btn-primary">All</button>
+                </div>
+                <div class="dropdown flex-shrink-0">
+                  <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                    10 Nov – 26 Feb
+                  </button>
+                  <div class="dropdown-menu p-3" style="min-width:280px;">
+                    <label class="form-label mb-1">Start</label>
+                    <input type="date" class="form-control form-control-sm mb-2" value="2025-11-10">
+                    <label class="form-label mb-1">End</label>
+                    <input type="date" class="form-control form-control-sm mb-2" value="2026-02-26">
+                    <button class="btn btn-sm btn-primary w-100">Apply</button>
+                  </div>
+                </div>
+              </div>
+              <!-- Collapsible filter drawer (always open on desktop via display:contents) -->
+              <div class="filter-drawer" id="filterDrawer">
+                <!-- Dimension filters -->
+                <div class="d-flex align-items-center gap-2 flex-nowrap filter-dims ms-auto" style="min-width:0;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted flex-shrink-0 d-none d-md-block"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                  <div class="dropdown flex-shrink-0">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">Geo</button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item active" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Geo</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">DE</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">AT</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">CH</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">FR</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">UK</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">NL</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">IT</a>
+                    </div>
+                  </div>
+                  <div class="dropdown flex-shrink-0">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">Channel</button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item active" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Channel</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Meta</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Google Search</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">YouTube</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">PMax</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Reddit</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">X</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Creator</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Direct</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">MediaHouse</a>
+                    </div>
+                  </div>
+                  <div class="dropdown flex-shrink-0">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">Strategy</button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item active" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Strategy</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Consideration</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Conversion</a>
+                    </div>
+                  </div>
+                  <div class="dropdown flex-shrink-0">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">Objective</button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item active" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Objective</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Gameplay</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">High Impact</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Leads</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Purchase</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Traffic</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="filter-dim-sep d-none d-md-block" style="border-left:1.5px solid rgba(4,32,69,0.15); align-self:stretch; margin:2px 6px;"></div>
+              <div class="btn-group btn-group-sm flex-shrink-0" role="group" aria-label="View mode">
+                <button type="button" class="btn btn-outline-secondary" title="All traffic combined (paid + organic)" onclick="this.parentNode.querySelectorAll('.btn').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-outline-secondary')});this.classList.remove('btn-outline-secondary');this.classList.add('btn-primary')">Total</button>
+                <button type="button" class="btn btn-primary" title="Only paid-media driven metrics — default on this dashboard" onclick="this.parentNode.querySelectorAll('.btn').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-outline-secondary')});this.classList.remove('btn-outline-secondary');this.classList.add('btn-primary')">Paid</button>
+                <button type="button" class="btn btn-outline-secondary" title="Only organic / unpaid metrics" onclick="this.parentNode.querySelectorAll('.btn').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-outline-secondary')});this.classList.remove('btn-outline-secondary');this.classList.add('btn-primary')">Organic</button>
+              </div>
+              <span class="info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Filter every metric on the dashboard by traffic source.<br><strong>Total:</strong> everything (paid + organic combined).<br><strong>Paid:</strong> only paid-media driven values.<br><strong>Organic:</strong> only organic / unpaid values.</span></span>
+              <button type="button" class="btn btn-sm btn-ghost-secondary align-items-center flex-shrink-0" id="filterReset" style="padding:4px 6px; line-height:1;" title="Reset all filters">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- ═══ AUDIENCE HEALTH — quiet hero: status tiles + budget-vs-conversion share ═══ -->
+        <div class="card mt-5 mb-3" id="aiIntelCard">
+          <div class="card-status-top bg-primary"></div>
+          <div class="card-body">
+            <div class="d-flex flex-wrap" style="row-gap: 14px;">
+              <div style="flex: 2 1 0; min-width: 215px;">
+                <div class="hero-group-label">Reach</div>
+                <div class="row g-2">
+                  <div class="col-6">
+                <div class="kpi kpi-neutral score-tile">
+                  <div class="kpi-label">Reach <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Unique people reached across all paid audiences (platform-reported, per-platform dedup).</span></span></div>
+                  <div class="kpi-value">46,2M</div>
+                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +1,8M</span><span>last 7 days</span></div>
+                </div>
+              </div>
+                  <div class="col-6">
+                <div class="kpi kpi-neutral score-tile">
+                  <div class="kpi-label">Frequency* <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Impressions &divide; reach across the flight &mdash; modelled.</span></span></div>
+                  <div class="kpi-value">4,5&times;</div>
+                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +0,2</span><span>last 7 days</span></div>
+                </div>
+              </div>
+                </div>
+              </div>
+              <div style="flex: 2 1 0; min-width: 215px; border-left: 1px solid rgba(4,32,69,0.1); padding-left: 12px; margin-left: 12px;">
+                <div class="hero-group-label">Conversions</div>
+                <div class="row g-2">
+                  <div class="col-6">
+                <div class="kpi kpi-neutral score-tile">
+                  <div class="kpi-label">Pixel Conversions <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Conversions per ad-platform pixels &amp; postbacks &mdash; see the methodology note below;<br>differs from the web-analytics count by design.</span></span></div>
+                  <div class="kpi-value">39.450</div>
+                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +2.030</span><span>last 7 days</span></div>
+                </div>
+              </div>
+                  <div class="col-6">
+                <div class="kpi kpi-beat-soft score-tile">
+                  <div class="kpi-label">CPA (pixel) <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Cost per pixel conversion. Beats goal here while the web-analytics CPA (8,04&thinsp;&euro;)<br>misses it &mdash; same spend, two measurement worlds (see note below).</span></span></div>
+                  <div class="kpi-value">7,41&thinsp;&euro;</div>
+                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 1,2%</span><span>vs goal 7,50&thinsp;&euro;</span></div>
+                </div>
+              </div>
+                </div>
+              </div>
+              <div style="flex: 2 1 0; min-width: 215px; border-left: 1px solid rgba(4,32,69,0.1); padding-left: 12px; margin-left: 12px;">
+                <div class="hero-group-label">Demographics</div>
+                <div class="row g-2">
+                  <div class="col-6">
+                <div class="kpi kpi-neutral score-tile">
+                  <div class="kpi-label">Top Age <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Largest age segment by reach.</span></span></div>
+                  <div class="kpi-value">25&ndash;34</div>
+                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">40,2%</span><span>of reach</span></div>
+                </div>
+              </div>
+                  <div class="col-6">
+                <div class="kpi kpi-neutral score-tile">
+                  <div class="kpi-label">Top Gender <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Largest gender segment by reach.</span></span></div>
+                  <div class="kpi-value">Male</div>
+                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">71,0%</span><span>of reach</span></div>
+                </div>
+              </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body border-top pt-3">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Budget vs Conversion Share by Audience</span>
+              <span class="info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Each audience&rsquo;s share of spend next to its share of conversions &mdash;<br>bars further right than their budget earn more than they cost.<br>The CR% line shows conversion quality independent of size.</span></span>
+              <div id="aiShareLegend" class="chart-legend d-flex flex-wrap gap-2 flex-fill"></div>
+              <div class="dropdown flex-shrink-0">
+                <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
+                <div class="dropdown-menu dropdown-menu-end">
+                  <button class="dropdown-item" id="aiSharePngBtn">PNG Image</button>
+                  <button class="dropdown-item" id="aiShareCsvBtn">CSV Spreadsheet</button>
+                </div>
+              </div>
+            </div>
+            <div class="chart-wrapper" style="height:280px">
+              <canvas id="aiShareChart"></canvas>
+              <div id="aiShareTooltipEl" class="chart-tooltip opacity-0"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ AUDIENCE PERFORMANCE ═══ -->
+        <div class="section-heading">
+          <h3 class="section-heading-title">Audience Performance</h3>
+          <p class="section-heading-subtitle">The full KPI chain per audience and targeting type &mdash; showing which segments earn their budget and which to scale, trim or rebuild.</p>
+        </div>
+
+        <!-- ═══ AUDIENCE SPLIT — composition donuts ═══ -->
+        <div class="card mb-3">
+          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Audience Split</span>
+            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Reach and conversion composition by targeting type and by audience &mdash;<br>where the people are vs where the conversions come from. Hover any slice for detail.</span></span>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-6 col-lg-3"><div class="text-center"><div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary); margin-bottom:8px;">Reach by Targeting</div><div style="position: relative; height: 170px;"><canvas id="aiSplitReachTgt"></canvas><div id="aiSplitReachTgtTip" class="chart-tooltip opacity-0"></div></div></div></div>
+              <div class="col-6 col-lg-3"><div class="text-center"><div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary); margin-bottom:8px;">Conversions by Targeting</div><div style="position: relative; height: 170px;"><canvas id="aiSplitConvTgt"></canvas><div id="aiSplitConvTgtTip" class="chart-tooltip opacity-0"></div></div></div></div>
+              <div class="col-6 col-lg-3"><div class="text-center"><div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary); margin-bottom:8px;">Reach by Audience</div><div style="position: relative; height: 170px;"><canvas id="aiSplitReachAud"></canvas><div id="aiSplitReachAudTip" class="chart-tooltip opacity-0"></div></div></div></div>
+              <div class="col-6 col-lg-3"><div class="text-center"><div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary); margin-bottom:8px;">Conversions by Audience</div><div style="position: relative; height: 170px;"><canvas id="aiSplitConvAud"></canvas><div id="aiSplitConvAudTip" class="chart-tooltip opacity-0"></div></div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary); margin-right:14px;">Audience Breakdown</span>
+            <ul class="nav nav-tabs breakdown-tabs mb-0 flex-shrink-0" id="aiBreakdownTabs" role="tablist" style="border-bottom:0;">
+              <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#aiTabAudience" role="tab" data-dim="audience">by audience</a></li>
+              <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#aiTabTargeting" role="tab" data-dim="targeting">by targeting type</a></li>
+            </ul>
+            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Cost, delivery, reach and conversion chain per dimension.<br>Frequency* is modelled. Click any column to sort.</span></span>
+            <div class="dropdown ms-1">
+              <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
+              <div class="dropdown-menu dropdown-menu-end">
+                <button class="dropdown-item" id="aiBreakdownPngBtn">Chart PNG (active tab)</button>
+                <button class="dropdown-item" id="aiBreakdownCsvBtn">Table CSV (active tab)</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="tab-content" id="aiBreakdownPanes"></div>
+          </div>
+        </div>
+
+        <!-- ═══ DEMOGRAPHICS ═══ -->
+        <div class="section-heading">
+          <h3 class="section-heading-title">Demographics</h3>
+          <p class="section-heading-subtitle">Who the campaign actually reaches and what each segment costs &mdash; the basis for tightening or widening the demographic targeting.</p>
+        </div>
+
+        <div class="d-flex align-items-start gap-2 mb-3" style="background: rgba(4,32,69,0.03); border: 1px solid rgba(4,32,69,0.08); border-radius: 8px; padding: 10px 14px; font-size: 12px; line-height: 1.55; color: var(--tblr-body-color, #1e293b);">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0" style="margin-top:2px; color: var(--tblr-secondary);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <div>
+            <strong>Measurement note:</strong> conversions, CPA and CR% on this page are based on <strong>ad-platform pixels and postbacks</strong> and can differ from other dashboard pages (web analytics counts 36.300 paid web conversions; the pixels report 39.450). The <strong>&ldquo;Unknown&rdquo;</strong> demographic is traffic the platforms could not classify (consent restrictions) &mdash; it is shown for completeness but should not be read as an audience segment.
+          </div>
+        </div>
+
+        <div class="row row-deck row-cards mb-3">
+          <div class="col-lg-6">
+            <div class="card h-100">
+          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Performance by Age</span>
+            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Reach split (doughnut) and the response/cost chain per age segment.<br>Unknown is de-emphasized (see note above).</span></span>
+            <div class="dropdown ms-1">
+              <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
+              <div class="dropdown-menu dropdown-menu-end">
+                <button class="dropdown-item" id="aiAgeCsvBtn">CSV Spreadsheet</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-md-3"><div style="position: relative; height: 190px;"><canvas id="aiAgePie"></canvas><div id="aiAgePieTooltipEl" class="chart-tooltip opacity-0"></div></div></div>
+              <div class="col-md-9"><div class="table-responsive" style="font-variant-numeric: tabular-nums;"><table class="table wt mb-0" id="aiAgeTable"></table></div></div>
+            </div>
+          </div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="card h-100">
+          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Performance by Gender</span>
+            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Reach split (doughnut) and the response/cost chain per gender segment.</span></span>
+            <div class="dropdown ms-1">
+              <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
+              <div class="dropdown-menu dropdown-menu-end">
+                <button class="dropdown-item" id="aiGenderCsvBtn">CSV Spreadsheet</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-md-3"><div style="position: relative; height: 160px;"><canvas id="aiGenderPie"></canvas><div id="aiGenderPieTooltipEl" class="chart-tooltip opacity-0"></div></div></div>
+              <div class="col-md-9"><div class="table-responsive" style="font-variant-numeric: tabular-nums;"><table class="table wt mb-0" id="aiGenderTable"></table></div></div>
+            </div>
+          </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row row-deck row-cards mb-3">
+          <div class="col-lg-6">
+            <div class="card h-100">
+          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Reach &amp; Cost by Age</span>
+            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Reach bars per age segment with the CPA line &mdash; where volume is cheap vs expensive.</span></span>
+            <div class="dropdown ms-1">
+              <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
+              <div class="dropdown-menu dropdown-menu-end">
+                <button class="dropdown-item" id="aiDemoPngBtn">PNG Image</button>
+                <button class="dropdown-item" id="aiDemoCsvBtn">CSV Spreadsheet</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="aiDemoLegend" class="chart-legend d-flex flex-wrap gap-2 mb-2"></div>
+            <div class="chart-wrapper" style="height:260px">
+              <canvas id="aiDemoChart"></canvas>
+              <div id="aiDemoTooltipEl" class="chart-tooltip opacity-0"></div>
+            </div>
+          </div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="card h-100">
+          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Demographic Matrix</span>
+            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">CTR and CPA per gender &times; age cell &mdash; spots the exact segments that respond cheaply.</span></span>
+            <div class="dropdown ms-1">
+              <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
+              <div class="dropdown-menu dropdown-menu-end">
+                <button class="dropdown-item" id="aiMatrixCsvBtn">CSV Spreadsheet</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive geo-hscroll" style="font-variant-numeric: tabular-nums;">
+              <table class="table wt mb-0 wt-freeze-first" id="aiMatrixTable"></table>
+            </div>
+          </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ DEEP DIVE ═══ -->
+        <div class="section-heading">
+          <h3 class="section-heading-title">Deep Dive</h3>
+          <p class="section-heading-subtitle">Audience &times; market combinations and per-ad-group detail &mdash; down to the level where targeting and budgets are actually configured in the ad platforms.</p>
+        </div>
+
+        <!-- ═══ AUDIENCE × MARKET DEEP DIVE ═══ -->
+        <div class="card mb-3">
+          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Audience &times; Market Deep Dive</span>
+            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">The full KPI chain per audience &times; market combination (top combinations by cost) &mdash;<br>localizes audience decisions to the market where they apply. Click any header to sort.</span></span>
+            <div class="dropdown ms-1">
+              <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
+              <div class="dropdown-menu dropdown-menu-end">
+                <button class="dropdown-item" id="aiPivotCsvBtn">CSV Spreadsheet</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body p-0" style="border-bottom-left-radius: inherit; border-bottom-right-radius: inherit; overflow: hidden;">
+            <div class="table-responsive geo-hscroll" style="max-height: 420px; overflow: auto; font-variant-numeric: tabular-nums; border-bottom-left-radius: inherit; border-bottom-right-radius: inherit;">
+              <table class="table wt mb-0 wt-sticky-head wt-freeze-first" id="aiPivotTable"></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ AD GROUPS ═══ -->
+        <div class="card mb-3">
+          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Ad Group Breakdown</span>
+            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Per-ad-group performance with <strong>channels as column groups</strong> &mdash; dashes mean the ad group<br>does not run on that channel. Names encode market &middot; targeting &middot; audience.</span></span>
+            <div class="dropdown ms-1">
+              <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
+              <div class="dropdown-menu dropdown-menu-end">
+                <button class="dropdown-item" id="aiAdgCsvBtn">CSV Spreadsheet</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body p-0" style="border-bottom-left-radius: inherit; border-bottom-right-radius: inherit; overflow: hidden;">
+            <div class="table-responsive geo-hscroll" style="max-height: 420px; overflow: auto; font-variant-numeric: tabular-nums; border-bottom-left-radius: inherit; border-bottom-right-radius: inherit;">
+              <table class="table wt mb-0 wt-sticky-head wt-freeze-first" id="aiAdgTable"></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ EXPLORE DEEPER ═══ -->
+        <div class="section-heading">
+          <h3 class="section-heading-title">Explore deeper</h3>
+          <p class="section-heading-subtitle">Related views for this campaign.</p>
+        </div>
+
+        <div class="row row-deck row-cards mb-3 explore-grid">
+          <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="nativedash-poc-v3-prelaunch.html" class="card h-100 card-link">
+              <div class="card-body d-flex align-items-start gap-3">
+                <span class="explore-icon"><i class="ti ti-layout-dashboard"></i></span>
+                <div class="flex-fill">
+                  <div class="fw-semibold">Overview</div>
+                  <div class="text-secondary small">Game &amp; campaign health at a glance</div>
+                </div>
+                <i class="ti ti-chevron-right text-secondary"></i>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="performancemedia-v1.html" class="card h-100 card-link">
+              <div class="card-body d-flex align-items-start gap-3">
+                <span class="explore-icon"><i class="ti ti-chart-bar"></i></span>
+                <div class="flex-fill">
+                  <div class="fw-semibold">Performance Overview</div>
+                  <div class="text-secondary small">The media buying these audiences run in</div>
+                </div>
+                <i class="ti ti-chevron-right text-secondary"></i>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="creativeinsights-v1.html" class="card h-100 card-link">
+              <div class="card-body d-flex align-items-start gap-3">
+                <span class="explore-icon"><i class="ti ti-palette"></i></span>
+                <div class="flex-fill">
+                  <div class="fw-semibold">Creative Insights</div>
+                  <div class="text-secondary small">What these audiences are shown</div>
+                </div>
+                <i class="ti ti-chevron-right text-secondary"></i>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="awarenesstracker-v1.html" class="card h-100 card-link">
+              <div class="card-body d-flex align-items-start gap-3">
+                <span class="explore-icon"><i class="ti ti-eye"></i></span>
+                <div class="flex-fill">
+                  <div class="fw-semibold">Awareness Tracker</div>
+                  <div class="text-secondary small">Upper-funnel quality &amp; reach</div>
+                </div>
+                <i class="ti ti-chevron-right text-secondary"></i>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- ═══ DATA CONTEXT FOOTER ═══ -->
+        <div class="d-flex align-items-center justify-content-between border-top pt-3 mt-4 mb-3" style="font-size:12px; color: var(--tblr-secondary);">
+          <span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1" style="vertical-align:-1px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Last sync: Mar 3, 2026 09:14 CET &middot; Conversions: ad-platform pixels &amp; postbacks</span>
+          <span class="d-inline-flex align-items-center gap-2"><span style="width:8px; height:8px; border-radius:50%; background:#2fb344; display:inline-block;"></span> Live</span>
+        </div>
+
+      </div><!-- /dashboardTab -->
+
+          </div><!-- /entryContent -->
+        </div><!-- /entry-row -->
+      </div><!-- /container-xl -->
+    </div><!-- /page-body -->
+
+    <footer class="footer footer-transparent d-print-none">
+      <div class="container-xl">
+        <div class="text-secondary text-center">
+          POC built with <a href="https://tabler.io" class="link-secondary">Tabler</a> &amp; <a href="https://www.chartjs.org" class="link-secondary">Chart.js</a>
+        </div>
+      </div>
+    </footer>
+  </div><!-- /page-wrapper -->
+
+  <script>
+    // ─── Mock data (prelaunch flight, performance media 292.138 €; audience taxonomy reuses the
+    //     Overview's audience names. Pixel world: 39.450 conversions · CPA 7,41 € (vs web 36.300 / 8,04 €).
+    //     Reach 46,2M @ 4,5× frequency ──
+    function fmt(n) { return n.toLocaleString('de-DE'); }
+    const euroT = v => fmt(Math.round(v)) + ' €';
+    const euro2 = v => v.toFixed(2).replace('.', ',') + ' €';
+    const pct1  = v => v.toFixed(1).replace('.', ',') + '%';
+    const pct2  = v => v.toFixed(2).replace('.', ',') + '%';
+    const compact = v => v >= 1e6 ? (v / 1e6).toFixed(1).replace('.', ',') + 'M' : v >= 1e3 ? (v / 1e3).toFixed(1).replace('.', ',') + 'K' : fmt(Math.round(v));
+    let seed = 42;
+    function seededRandom() {
+      seed = (seed * 16807 + 0) % 2147483647;
+      return (seed - 1) / 2147483646;
+    }
+    function makeGradient(ctx, canvas, color) {
+      const g = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      g.addColorStop(0, color);
+      g.addColorStop(1, 'rgba(255,255,255,0)');
+      return g;
+    }
+    function downloadChartPng(canvasId, tooltipId, filename) {
+      if (tooltipId) document.getElementById(tooltipId).classList.add('opacity-0');
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = document.getElementById(canvasId).toDataURL('image/png');
+      link.click();
+    }
+    function downloadChartCsv(chart, filename) {
+      const header = ['Label', ...chart.data.datasets.map(ds => ds.label)];
+      const rows = chart.data.labels.map((label, i) => [label, ...chart.data.datasets.map(ds => ds.data[i])].join(','));
+      const blob = new Blob([[header.join(','), ...rows].join('\n')], { type: 'text/csv' });
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = URL.createObjectURL(blob);
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+    function downloadTableCsv(tableEl, filename) {
+      const rows = [];
+      tableEl.querySelectorAll('thead tr, tbody tr, tfoot tr').forEach(tr => {
+        const cells = [];
+        tr.querySelectorAll('th, td').forEach(cell => {
+          if (cell.style.display === 'none') return;
+          let text = cell.textContent.trim().replace(/\s+/g, ' ');
+          if (text.includes(',') || text.includes('"')) text = '"' + text.replace(/"/g, '""') + '"';
+          cells.push(text);
+        });
+        rows.push(cells.join(','));
+      });
+      const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = URL.createObjectURL(blob);
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+    function barTooltip(elId, formatters) {
+      return function(context) {
+        const { chart, tooltip } = context;
+        const el = document.getElementById(elId);
+        if (tooltip.opacity === 0) { el.classList.add('opacity-0'); return; }
+        el.classList.remove('opacity-0');
+        if (tooltip.body) {
+          let html = '<div class="card"><div class="card-body p-2"><div class="fw-bold mb-1">' + tooltip.title[0] + '</div><hr class="my-1">';
+          tooltip.dataPoints.forEach(dp => {
+            const color = dp.dataset.borderColor || dp.dataset.backgroundColor;
+            const fmtFn = formatters && formatters[dp.dataset.label] ? formatters[dp.dataset.label] : (v => fmt(v));
+            html += '<div class="tooltip-row"><span class="tooltip-dot" style="background:' + color + '"></span><span class="tooltip-label text-secondary">' + dp.dataset.label + '</span><span class="tooltip-value">' + fmtFn(dp.parsed.y) + '</span></div>';
+          });
+          html += '</div></div>';
+          el.innerHTML = html;
+        }
+        const { offsetLeft, offsetTop } = chart.canvas;
+        const tipW = el.offsetWidth;
+        let left = offsetLeft + tooltip.caretX + 14;
+        if (left + tipW > chart.canvas.offsetLeft + chart.width) left = offsetLeft + tooltip.caretX - tipW - 14;
+        el.style.left = left + 'px';
+        el.style.top = (offsetTop + tooltip.caretY - el.offsetHeight / 2) + 'px';
+      };
+    }
+
+    // ═══ AUDIENCE DATA — cost/reach/conversions per audience (v3 audience names) ═══
+    const AUD = [
+      { label: 'Fighting Game Fans',     targeting: 'Prospecting', color: '#FF0249', cost: 89400, reach: 14200000, freq: 4.9, conv: 14900, ctr: 1.32 },
+      { label: 'Core Gamers 18–34',      targeting: 'Prospecting', color: '#206bc4', cost: 64300, reach: 11800000, freq: 4.6, conv: 6900,  ctr: 1.05 },
+      { label: 'Interest: eSports',      targeting: 'Prospecting', color: '#f76707', cost: 38200, reach: 7400000,  freq: 4.2, conv: 3300,  ctr: 0.92 },
+      { label: 'LAL: Past Buyers',       targeting: 'Lookalike',   color: '#0ca678', cost: 34800, reach: 5100000,  freq: 4.4, conv: 4700,  ctr: 1.21 },
+      { label: 'LAL: High LTV',          targeting: 'Lookalike',   color: '#ae3ec9', cost: 26300, reach: 3600000,  freq: 4.3, conv: 3050,  ctr: 1.18 },
+      { label: 'Retarget: Web Visitors', targeting: 'Retargeting', color: '#fab005', cost: 21500, reach: 1900000,  freq: 5.8, conv: 4800,  ctr: 2.45 },
+      { label: 'Streamers & Creators',   targeting: 'Prospecting', color: '#868e96', cost: 17638, reach: 2200000,  freq: 4.1, conv: 1800,  ctr: 1.02 },
+    ];
+    const TOTAL_COST = AUD.reduce((a, r) => a + r.cost, 0);
+    const TOTAL_CONV = AUD.reduce((a, r) => a + r.conv, 0);
+    AUD.forEach(r => {
+      r.imp = Math.round(r.reach * r.freq);
+      r.clk = Math.round(r.imp * r.ctr / 100);
+      r.cr  = r.conv / r.clk * 100;
+      r.cpa = r.cost / r.conv;
+      r.costShare = r.cost / TOTAL_COST * 100;
+      r.convShare = r.conv / TOTAL_CONV * 100;
+    });
+
+    // ═══ HERO — Budget vs Conversion Share by audience ═══
+    (function() {
+      const canvas = document.getElementById('aiShareChart');
+      const ctx = canvas.getContext('2d');
+      const C = [
+        { label: 'Cost Share %', color: 'rgba(32,107,196,0.55)', solid: '#206bc4' },
+        { label: 'Conversion Share %', color: 'rgba(255,2,73,0.55)', solid: '#FF0249' },
+        { label: 'CR %', color: '#0ca678', solid: '#0ca678' },
+      ];
+      const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: AUD.map(r => r.label),
+          datasets: [
+            { label: 'Cost Share %', data: AUD.map(r => +r.costShare.toFixed(1)), backgroundColor: C[0].color, yAxisID: 'y', order: 5 },
+            { label: 'Conversion Share %', data: AUD.map(r => +r.convShare.toFixed(1)), backgroundColor: C[1].color, yAxisID: 'y', order: 5 },
+            { label: 'CR %', data: AUD.map(r => +r.cr.toFixed(2)), type: 'line', borderColor: C[2].solid, backgroundColor: 'transparent', borderWidth: 2, borderDash: [4, 3], tension: 0.35, pointRadius: 3, pointBackgroundColor: '#fff', pointBorderColor: C[2].solid, yAxisID: 'yCr', order: 1 },
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          animation: { duration: 600, easing: 'easeOutQuart' },
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false, external: barTooltip('aiShareTooltipEl', {
+              'Cost Share %': pct1, 'Conversion Share %': pct1, 'CR %': pct2,
+            }) }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#999', maxRotation: 30 } },
+            y: { position: 'left', min: 0, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 }, color: '#999', callback: v => v + '%' }, title: { display: true, text: 'Share of total', font: { size: 12 } } },
+            yCr: { position: 'right', min: 0, grid: { drawOnChartArea: false }, ticks: { font: { size: 11 }, color: '#999', callback: v => v + '%' }, title: { display: true, text: 'CR %', font: { size: 12 } } },
+          }
+        }
+      });
+      const el = document.getElementById('aiShareLegend');
+      function render() {
+        el.innerHTML = chart.data.datasets.map((ds, i) => {
+          const hidden = !chart.isDatasetVisible(i);
+          const c = C[i];
+          return '<span class="legend-item ' + (hidden ? 'inactive' : '') + '" data-index="' + i + '" data-type="' + (i < 2 ? 'bar' : 'line') + '" title="' + (hidden ? 'Click to show ' : 'Click to hide ') + ds.label + '" style="background:' + (hidden ? 'transparent' : c.color) + '; border-color:' + (hidden ? '#ccc' : c.solid) + '"><span class="legend-swatch" style="background:' + c.solid + '"></span>' + ds.label + '</span>';
+        }).join('');
+      }
+      el.addEventListener('click', e => {
+        const item = e.target.closest('.legend-item');
+        if (!item) return;
+        const idx = parseInt(item.dataset.index);
+        chart.setDatasetVisibility(idx, !chart.isDatasetVisible(idx));
+        chart.update(); render();
+      });
+      render();
+      document.getElementById('aiSharePngBtn').addEventListener('click', () => downloadChartPng('aiShareChart', 'aiShareTooltipEl', 'budget-vs-conversion-share.png'));
+      document.getElementById('aiShareCsvBtn').addEventListener('click', () => downloadChartCsv(chart, 'budget-vs-conversion-share.csv'));
+    })();
+
+    // ═══ AUDIENCE / TARGETING BREAKDOWN ═══
+    const aiDims = {
+      audience: { labelHead: 'Audience', rows: AUD },
+      targeting: {
+        labelHead: 'Targeting Type',
+        rows: (function() {
+          const groups = {};
+          AUD.forEach(r => {
+            if (!groups[r.targeting]) groups[r.targeting] = { label: r.targeting, cost: 0, reach: 0, imp: 0, clk: 0, conv: 0 };
+            const g = groups[r.targeting];
+            g.cost += r.cost; g.reach += r.reach; g.imp += r.imp; g.clk += r.clk; g.conv += r.conv;
+          });
+          const colors = { Prospecting: '#206bc4', Lookalike: '#0ca678', Retargeting: '#fab005' };
+          return Object.values(groups).map(g => ({
+            ...g, color: colors[g.label],
+            freq: g.imp / g.reach,
+            ctr: g.clk / g.imp * 100,
+            cr: g.conv / g.clk * 100,
+            cpa: g.cost / g.conv,
+            costShare: g.cost / TOTAL_COST * 100,
+            convShare: g.conv / TOTAL_CONV * 100,
+          }));
+        })(),
+      }
+    };
+    const aiCols = [
+      { key: 'cost',  head: 'Cost',         fmtFn: euroT },
+      { key: 'imp',   head: 'Impressions',  fmtFn: fmt },
+      { key: 'clk',   head: 'Clicks',       fmtFn: fmt },
+      { key: 'ctr',   head: 'CTR%',         fmtFn: pct2 },
+      { key: 'reach', head: 'Reach',        fmtFn: compact },
+      { key: 'freq',  head: 'Frequency*',   fmtFn: v => v.toFixed(1).replace('.', ',') + '×' },
+      { key: 'conv',  head: 'Conversions',  fmtFn: fmt },
+      { key: 'cr',    head: 'CR%',          fmtFn: pct2 },
+      { key: 'cpa',   head: 'CPA',          fmtFn: euro2 },
+    ];
+    const aiAscDefault = ['cpa'];
+    const aiSortState = { audience: { key: 'cpa', asc: true }, targeting: { key: 'cpa', asc: true } };
+    const aiCharts = {};
+
+    function aiDoughnutTooltip(tooltipElId, metric, fmtFn) {
+      return function(context) {
+        const { chart, tooltip } = context;
+        const el = document.getElementById(tooltipElId);
+        if (tooltip.opacity === 0) { el.classList.add('opacity-0'); return; }
+        el.classList.remove('opacity-0');
+        if (tooltip.dataPoints && tooltip.dataPoints.length) {
+          const dp = tooltip.dataPoints[0];
+          const total = dp.dataset.data.reduce((a, b) => a + b, 0);
+          const share = ((dp.parsed / total) * 100).toFixed(1);
+          el.innerHTML = '<div class="card"><div class="card-body p-2"><div class="fw-bold mb-1">' + dp.label + '</div><hr class="my-1">' +
+            '<div class="tooltip-row"><span class="tooltip-dot" style="background:' + dp.element.options.backgroundColor + '"></span><span class="tooltip-label text-secondary">' + metric + '</span><span class="tooltip-value">' + fmtFn(dp.parsed) + '</span></div>' +
+            '<div class="tooltip-row"><span class="tooltip-dot" style="background:transparent"></span><span class="tooltip-label text-secondary">Share</span><span class="tooltip-value">' + share + '%</span></div>' +
+            '</div></div>';
+        }
+        const { offsetLeft, offsetTop } = chart.canvas;
+        const tipWidth = el.offsetWidth;
+        let left = offsetLeft + tooltip.caretX + 14;
+        if (left + tipWidth > chart.canvas.offsetLeft + chart.width) left = offsetLeft + tooltip.caretX - tipWidth - 14;
+        el.style.left = left + 'px';
+        el.style.top = (offsetTop + tooltip.caretY - el.offsetHeight / 2) + 'px';
+      };
+    }
+
+    (function() {
+      const panes = document.getElementById('aiBreakdownPanes');
+      const paneIds = { audience: 'aiTabAudience', targeting: 'aiTabTargeting' };
+      Object.keys(aiDims).forEach((dim, i) => {
+        const pane = document.createElement('div');
+        pane.className = 'tab-pane' + (i === 0 ? ' active' : '');
+        pane.id = paneIds[dim];
+        pane.setAttribute('role', 'tabpanel');
+        pane.innerHTML =
+          '<div class="row align-items-center">' +
+          '  <div class="col-lg-3"><div style="position: relative; height: 220px;"><canvas id="aiChart-' + dim + '"></canvas><div id="aiTooltip-' + dim + '" class="chart-tooltip opacity-0"></div></div></div>' +
+          '  <div class="col-lg-9"><div class="table-responsive geo-scroll-5 geo-hscroll"><table class="table wt mb-0 wt-sticky-head wt-freeze-first" id="aiTable-' + dim + '"></table></div></div>' +
+          '</div>';
+        panes.appendChild(pane);
+      });
+    })();
+
+    function aiRenderTable(dim) {
+      const { key, asc } = aiSortState[dim];
+      const isText = key === 'label';
+      const rows = [...aiDims[dim].rows].sort((a, b) => {
+        if (isText) return asc ? a.label.localeCompare(b.label) : b.label.localeCompare(a.label);
+        return asc ? a[key] - b[key] : b[key] - a[key];
+      });
+      const vals = isText ? [] : rows.map(r => r[key]);
+      const minV = Math.min(...vals), maxV = Math.max(...vals), range = maxV - minV || 1;
+      let h = '<thead><tr>';
+      h += '<th class="col-geo-label sortable' + (key === 'label' ? ' sort-active' : '') + '" data-key="label">' + aiDims[dim].labelHead + '<span class="sort-icon">' + (key === 'label' && !asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
+      aiCols.forEach(c => {
+        const active = key === c.key;
+        h += '<th class="text-end sortable' + (active ? ' sort-active' : '') + '" data-key="' + c.key + '">' + c.head + '<span class="sort-icon">' + (active && !asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
+      });
+      h += '</tr></thead><tbody>';
+      rows.forEach(r => {
+        const norm = isText ? 0 : (asc ? 1 - (r[key] - minV) / range : (r[key] - minV) / range);
+        const opacity = (0.04 + norm * 0.18).toFixed(2);
+        const bold = norm > 0.9 ? ' font-weight:600;' : '';
+        const dot = '<span class="d-inline-block rounded-circle me-2" style="width:10px; height:10px; background:' + r.color + '; vertical-align:middle;"></span>';
+        h += '<tr><td class="col-geo-label" style="white-space:nowrap;">' + dot + r.label + (dim === 'audience' ? ' <span class="badge bg-secondary-lt ms-1" style="font-size:9px;">' + r.targeting + '</span>' : '') + '</td>';
+        aiCols.forEach(c => {
+          const hl = (c.key === key && !isText) ? ' style="background:rgba(116,182,231,' + opacity + ');' + bold + '"' : '';
+          h += '<td class="text-end"' + hl + '>' + c.fmtFn(r[c.key]) + '</td>';
+        });
+        h += '</tr>';
+      });
+      h += '</tbody>';
+      const table = document.getElementById('aiTable-' + dim);
+      table.innerHTML = h;
+      table.querySelectorAll('th.sortable').forEach(thEl => {
+        thEl.addEventListener('click', () => {
+          const k = thEl.dataset.key;
+          const s = aiSortState[dim];
+          if (s.key === k) s.asc = !s.asc;
+          else { s.key = k; s.asc = aiAscDefault.includes(k) || k === 'label'; }
+          aiRenderTable(dim);
+        });
+      });
+      const additive = ['cost', 'imp', 'clk', 'reach', 'conv'];
+      const pieKey = additive.includes(key) ? key : 'conv';
+      const cm = aiCols.find(c => c.key === pieKey);
+      const chart = aiCharts[dim];
+      if (chart) {
+        chart.data.labels = rows.map(r => r.label);
+        chart.data.datasets[0].data = rows.map(r => r[pieKey]);
+        chart.data.datasets[0].backgroundColor = rows.map(r => r.color);
+        chart.options.plugins.tooltip.external = aiDoughnutTooltip('aiTooltip-' + dim, cm.head, cm.fmtFn);
+        chart.update();
+      }
+    }
+    Object.keys(aiDims).forEach(dim => {
+      aiCharts[dim] = new Chart(document.getElementById('aiChart-' + dim), {
+        type: 'doughnut',
+        data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false, external: () => {} } } }
+      });
+      aiRenderTable(dim);
+    });
+    document.querySelectorAll('#aiBreakdownTabs a[data-bs-toggle="tab"]').forEach(tab => {
+      tab.addEventListener('shown.bs.tab', (e) => {
+        const pane = document.querySelector(e.target.getAttribute('href'));
+        if (pane) pane.querySelectorAll('canvas').forEach(c => { const inst = Chart.getChart(c); if (inst) inst.resize(); });
+      });
+    });
+    function aiActiveDim() {
+      const link = document.querySelector('#aiBreakdownTabs .nav-link.active');
+      return link ? link.dataset.dim : 'audience';
+    }
+    document.getElementById('aiBreakdownPngBtn').addEventListener('click', () => {
+      const dim = aiActiveDim();
+      downloadChartPng('aiChart-' + dim, 'aiTooltip-' + dim, 'audience-breakdown-' + dim + '.png');
+    });
+    document.getElementById('aiBreakdownCsvBtn').addEventListener('click', () => {
+      downloadTableCsv(document.getElementById('aiTable-' + aiActiveDim()), 'audience-breakdown-' + aiActiveDim() + '.csv');
+    });
+
+    // ═══ AUDIENCE SPLIT DONUTS — reach & conversions by targeting / audience ═══
+    (function() {
+      const TGT_COLORS = { Prospecting: '#206bc4', Lookalike: '#0ca678', Retargeting: '#fab005' };
+      const tgt = aiDims.targeting.rows;
+      function donut(canvasId, labels, data, colors, metric, fmtFn) {
+        new Chart(document.getElementById(canvasId), {
+          type: 'doughnut',
+          data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }] },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false, external: aiDoughnutTooltip(canvasId + 'Tip', metric, fmtFn) } } }
+        });
+      }
+      donut('aiSplitReachTgt', tgt.map(r => r.label), tgt.map(r => r.reach), tgt.map(r => TGT_COLORS[r.label]), 'Reach', compact);
+      donut('aiSplitConvTgt', tgt.map(r => r.label), tgt.map(r => r.conv), tgt.map(r => TGT_COLORS[r.label]), 'Conversions', fmt);
+      donut('aiSplitReachAud', AUD.map(r => r.label), AUD.map(r => r.reach), AUD.map(r => r.color), 'Reach', compact);
+      donut('aiSplitConvAud', AUD.map(r => r.label), AUD.map(r => r.conv), AUD.map(r => r.color), 'Conversions', fmt);
+    })();
+
+    // ═══ DEMOGRAPHICS — age & gender tables, matrix, chart ═══
+    (function() {
+      const AGE = [
+        { label: '18–24',   reach: 13500000, costPct: 25.0, ctr: 1.21, cr: 2.9, cpa: 8.90, cpc: 0.14, cpcv: 0.11 },
+        { label: '25–34',   reach: 18600000, costPct: 38.0, ctr: 1.65, cr: 3.4, cpa: 6.80, cpc: 0.11, cpcv: 0.09 },
+        { label: '35–44',   reach: 9300000,  costPct: 22.0, ctr: 1.38, cr: 2.8, cpa: 8.10, cpc: 0.13, cpcv: 0.10 },
+        { label: '45–54',   reach: 2600000,  costPct: 7.0,  ctr: 1.12, cr: 2.2, cpa: 9.60, cpc: 0.16, cpcv: 0.14 },
+        { label: '55+',     reach: 1100000,  costPct: 3.0,  ctr: 0.95, cr: 1.9, cpa: 11.20, cpc: 0.19, cpcv: 0.17 },
+        { label: 'Unknown', reach: 1100000,  costPct: 5.0,  ctr: 0.52, cr: 1.6, cpa: 19.40, cpc: 0.55, cpcv: 0.41, unknown: true },
+      ];
+      const GENDER = [
+        { label: 'Male',    reach: 32800000, costPct: 71.0, ctr: 1.42, cr: 3.1, cpa: 7.05, cpc: 0.12, cpcv: 0.10 },
+        { label: 'Female',  reach: 10600000, costPct: 23.0, ctr: 1.28, cr: 2.6, cpa: 8.40, cpc: 0.13, cpcv: 0.11 },
+        { label: 'Unknown', reach: 2800000,  costPct: 6.0,  ctr: 0.55, cr: 1.7, cpa: 14.90, cpc: 0.48, cpcv: 0.37, unknown: true },
+      ];
+      function demoTable(tableId, rows, head) {
+        let h = '<thead><tr><th>' + head + '</th><th class="text-end">Cost Share%</th><th class="text-end">Reach</th><th class="text-end">Reach Share%</th><th class="text-end">CTR%</th><th class="text-end">CR%</th><th class="text-end">CPC</th><th class="text-end">CPCV</th><th class="text-end">CPA</th></tr></thead><tbody>';
+        rows.forEach((r, ri) => {
+          const style = r.unknown ? ' style="opacity:0.55;"' : '';
+          const colors = head === 'Age' ? ['#FF0249', '#206bc4', '#f76707', '#0ca678', '#ae3ec9', '#ced4da'] : ['#206bc4', '#ae3ec9', '#ced4da'];
+          const dot = '<span class="d-inline-block rounded-circle me-2" style="width:10px; height:10px; background:' + colors[ri] + '; vertical-align:middle;"></span>';
+          h += '<tr' + style + '><td style="white-space:nowrap;">' + dot + r.label + (r.unknown ? ' <span class="badge bg-secondary-lt ms-1" style="font-size:9px;">unclassified</span>' : '') + '</td>' +
+            '<td class="text-end">' + pct1(r.costPct) + '</td>' +
+            '<td class="text-end">' + compact(r.reach) + '</td>' +
+            '<td class="text-end">' + pct1(r.reach / rows.reduce((a, x) => a + x.reach, 0) * 100) + '</td>' +
+            '<td class="text-end">' + pct2(r.ctr) + '</td>' +
+            '<td class="text-end">' + pct1(r.cr) + '</td>' +
+            '<td class="text-end">' + (r.cpc).toFixed(2).replace('.', ',') + ' €</td>' +
+            '<td class="text-end">' + (r.cpcv).toFixed(2).replace('.', ',') + ' €</td>' +
+            '<td class="text-end">' + euro2(r.cpa) + '</td></tr>';
+        });
+        h += '</tbody>';
+        document.getElementById(tableId).innerHTML = h;
+      }
+      demoTable('aiAgeTable', AGE, 'Age');
+      demoTable('aiGenderTable', GENDER, 'Gender');
+      // Reach-split doughnuts next to the tables (Unknown in muted gray)
+      const AGE_COLORS = ['#FF0249', '#206bc4', '#f76707', '#0ca678', '#ae3ec9', '#ced4da'];
+      const GENDER_COLORS = ['#206bc4', '#ae3ec9', '#ced4da'];
+      new Chart(document.getElementById('aiAgePie'), {
+        type: 'doughnut',
+        data: { labels: AGE.map(a => a.label), datasets: [{ data: AGE.map(a => a.reach), backgroundColor: AGE_COLORS, borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false, external: aiDoughnutTooltip('aiAgePieTooltipEl', 'Reach', v => compact(v)) } } }
+      });
+      new Chart(document.getElementById('aiGenderPie'), {
+        type: 'doughnut',
+        data: { labels: GENDER.map(g => g.label), datasets: [{ data: GENDER.map(g => g.reach), backgroundColor: GENDER_COLORS, borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false, external: aiDoughnutTooltip('aiGenderPieTooltipEl', 'Reach', v => compact(v)) } } }
+      });
+      document.getElementById('aiAgeCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('aiAgeTable'), 'performance-by-age.csv'));
+      document.getElementById('aiGenderCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('aiGenderTable'), 'performance-by-gender.csv'));
+
+      // Reach & cost by age (LINEAR — the old report used log scales)
+      const ages = AGE.filter(a => !a.unknown);
+      const canvas = document.getElementById('aiDemoChart');
+      const ctx = canvas.getContext('2d');
+      const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ages.map(a => a.label),
+          datasets: [
+            { label: 'Reach', data: ages.map(a => a.reach), backgroundColor: 'rgba(32,107,196,0.45)', yAxisID: 'y', order: 5 },
+            { label: 'CPA', data: ages.map(a => a.cpa), type: 'line', borderColor: '#FF0249', backgroundColor: 'transparent', borderWidth: 2, borderDash: [4, 3], tension: 0.35, pointRadius: 3, pointBackgroundColor: '#fff', pointBorderColor: '#FF0249', yAxisID: 'yCpa', order: 1 },
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          animation: { duration: 600, easing: 'easeOutQuart' },
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false, external: barTooltip('aiDemoTooltipEl', { 'Reach': v => compact(v), 'CPA': euro2 }) }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#999' } },
+            y: { position: 'left', min: 0, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 }, color: '#999', callback: v => compact(v) }, title: { display: true, text: 'Reach', font: { size: 12 } } },
+            yCpa: { position: 'right', min: 0, grid: { drawOnChartArea: false }, ticks: { font: { size: 11 }, color: '#999', callback: v => v.toFixed(2).replace('.', ',') + ' €' }, title: { display: true, text: 'CPA (€)', font: { size: 12 } } },
+          }
+        }
+      });
+      const el = document.getElementById('aiDemoLegend');
+      const DC = [{ c: '#206bc4', l: 'rgba(32,107,196,0.45)' }, { c: '#FF0249', l: 'rgba(255,2,73,0.10)' }];
+      function render() {
+        el.innerHTML = chart.data.datasets.map((ds, i) => {
+          const hidden = !chart.isDatasetVisible(i);
+          return '<span class="legend-item ' + (hidden ? 'inactive' : '') + '" data-index="' + i + '" data-type="' + (i === 0 ? 'bar' : 'line') + '" title="' + (hidden ? 'Click to show ' : 'Click to hide ') + ds.label + '" style="background:' + (hidden ? 'transparent' : DC[i].l) + '; border-color:' + (hidden ? '#ccc' : DC[i].c) + '"><span class="legend-swatch" style="background:' + DC[i].c + '"></span>' + ds.label + '</span>';
+        }).join('');
+      }
+      el.addEventListener('click', e => {
+        const item = e.target.closest('.legend-item');
+        if (!item) return;
+        const idx = parseInt(item.dataset.index);
+        chart.setDatasetVisibility(idx, !chart.isDatasetVisible(idx));
+        chart.update(); render();
+      });
+      render();
+      document.getElementById('aiDemoPngBtn').addEventListener('click', () => downloadChartPng('aiDemoChart', 'aiDemoTooltipEl', 'reach-cost-by-age.png'));
+      document.getElementById('aiDemoCsvBtn').addEventListener('click', () => downloadChartCsv(chart, 'reach-cost-by-age.csv'));
+
+      // Demographic matrix: gender rows × age cols, CTR + CPA per cell
+      const M_AGES = AGE.filter(a => !a.unknown).map(a => a.label);
+      let m = '<thead><tr><th class="col-geo-label">Gender \\ Age</th>';
+      M_AGES.forEach(a => { m += '<th class="text-end group-end" colspan="1">' + a + '</th>'; });
+      m += '</tr></thead><tbody>';
+      GENDER.filter(g => !g.unknown).forEach(g => {
+        m += '<tr><td class="col-geo-label">' + g.label + '</td>';
+        AGE.filter(a => !a.unknown).forEach(a => {
+          seed = 3000 + g.label.length * 31 + a.label.length * 7 + a.cpa * 10; seededRandom(); seededRandom();
+          const ctr = (a.ctr * (g.label === 'Male' ? 1.06 : 0.92) * (0.9 + seededRandom() * 0.2));
+          const cpa = (a.cpa * (g.label === 'Male' ? 0.94 : 1.1) * (0.9 + seededRandom() * 0.2));
+          const good = cpa < 7.5;
+          m += '<td class="text-end group-end" style="line-height:1.35;">' + pct2(ctr) + '<br><span style="display:inline-block; padding:1px 6px; border-radius:4px; font-size:11px; font-weight:700; background:' + (good ? 'rgba(47,179,68,0.14)' : 'rgba(4,32,69,0.05)') + '; color:' + (good ? '#2fb344' : 'var(--tblr-secondary, #626976)') + ';">' + euro2(cpa) + '</span></td>';
+        });
+        m += '</tr>';
+      });
+      m += '</tbody>';
+      document.getElementById('aiMatrixTable').innerHTML = m;
+      document.getElementById('aiMatrixCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('aiMatrixTable'), 'demographic-matrix.csv'));
+    })();
+
+    // ═══ AUDIENCE × MARKET DEEP DIVE ═══
+    (function() {
+      const rows = [
+        { aud: 'Fighting Game Fans',     tgt: 'Prospecting', geo: 'US', ch: 'Meta',   cost: 31200, reach: 4900000, freq: 4.9, conv: 5400 },
+        { aud: 'Fighting Game Fans',     tgt: 'Prospecting', geo: 'DE', ch: 'Meta',   cost: 19800, reach: 3300000, freq: 4.8, conv: 3300 },
+        { aud: 'Core Gamers 18–34',      tgt: 'Prospecting', geo: 'US', ch: 'Meta',   cost: 24600, reach: 4700000, freq: 4.6, conv: 2700 },
+        { aud: 'LAL: Past Buyers',       tgt: 'Lookalike',   geo: 'US', ch: 'Meta',   cost: 18700, reach: 2700000, freq: 4.4, conv: 2600 },
+        { aud: 'Interest: eSports',      tgt: 'Prospecting', geo: 'DE', ch: 'Google', cost: 14900, reach: 2900000, freq: 4.2, conv: 1300 },
+        { aud: 'Fighting Game Fans',     tgt: 'Prospecting', geo: 'UK', ch: 'Meta',   cost: 13400, reach: 2200000, freq: 4.7, conv: 2250 },
+        { aud: 'Core Gamers 18–34',      tgt: 'Prospecting', geo: 'FR', ch: 'Google', cost: 12800, reach: 2500000, freq: 4.5, conv: 1350 },
+        { aud: 'Retarget: Web Visitors', tgt: 'Retargeting', geo: 'US', ch: 'Meta',   cost: 12400, reach: 1050000, freq: 5.9, conv: 2800 },
+        { aud: 'LAL: Past Buyers',       tgt: 'Lookalike',   geo: 'DE', ch: 'Meta',   cost: 10200, reach: 1500000, freq: 4.3, conv: 1350 },
+        { aud: 'Fighting Game Fans',     tgt: 'Prospecting', geo: 'JP', ch: 'TikTok', cost: 9800,  reach: 1600000, freq: 4.5, conv: 1250 },
+        { aud: 'Retarget: Web Visitors', tgt: 'Retargeting', geo: 'DE', ch: 'Google', cost: 9100,  reach: 790000,  freq: 5.7, conv: 2000 },
+        { aud: 'LAL: High LTV',          tgt: 'Lookalike',   geo: 'US', ch: 'Meta',   cost: 8900,  reach: 1200000, freq: 4.3, conv: 1050 },
+      ];
+      rows.forEach(r => {
+        r.imp = Math.round(r.reach * r.freq);
+        seed = 4100 + r.cost % 97; seededRandom();
+        r.clk = Math.round(r.imp * (0.010 + seededRandom() * 0.006));
+        r.ctr = r.clk / r.imp * 100;
+        r.cr  = r.conv / r.clk * 100;
+        r.cpa = r.cost / r.conv;
+      });
+      const cols = [
+        { key: 'tgt',   head: 'Targeting',   text: true },
+        { key: 'geo',   head: 'Market',      text: true },
+        { key: 'ch',    head: 'Channel',     text: true },
+        { key: 'cost',  head: 'Cost',        fmtFn: euroT },
+        { key: 'imp',   head: 'Impressions', fmtFn: fmt },
+        { key: 'clk',   head: 'Clicks',      fmtFn: fmt },
+        { key: 'ctr',   head: 'CTR%',        fmtFn: pct2 },
+        { key: 'reach', head: 'Reach',       fmtFn: compact },
+        { key: 'freq',  head: 'Frequency*',  fmtFn: v => v.toFixed(1).replace('.', ',') + '×' },
+        { key: 'conv',  head: 'Conversions', fmtFn: fmt },
+        { key: 'cr',    head: 'CR%',         fmtFn: pct2 },
+        { key: 'cpa',   head: 'CPA',         fmtFn: euro2 },
+      ];
+      const state = { key: 'cost', asc: false };
+      function render() {
+        const { key, asc } = state;
+        const col = cols.find(c => c.key === key);
+        const isText = key === 'aud' || (col && col.text);
+        const sorted = [...rows].sort((a, b) => isText ? (asc ? String(a[key]).localeCompare(String(b[key])) : String(b[key]).localeCompare(String(a[key]))) : (asc ? a[key] - b[key] : b[key] - a[key]));
+        const vals = isText ? [] : sorted.map(r => r[key]);
+        const minV = Math.min(...vals), maxV = Math.max(...vals), range = maxV - minV || 1;
+        let h = '<thead><tr>';
+        h += '<th class="col-geo-label sortable' + (key === 'aud' ? ' sort-active' : '') + '" data-key="aud" style="min-width:200px;">Audience<span class="sort-icon">' + (key === 'aud' && !asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
+        cols.forEach(c => {
+          const active = key === c.key;
+          h += '<th class="' + (c.text ? '' : 'text-end ') + 'sortable' + (active ? ' sort-active' : '') + '" data-key="' + c.key + '">' + c.head + '<span class="sort-icon">' + (active && !asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
+        });
+        h += '</tr></thead><tbody>';
+        sorted.forEach(r => {
+          const norm = isText ? 0 : (asc ? 1 - (r[key] - minV) / range : (r[key] - minV) / range);
+          const opacity = (0.04 + norm * 0.18).toFixed(2);
+          h += '<tr><td class="col-geo-label" style="white-space:nowrap;">' + r.aud + '</td>';
+          cols.forEach(c => {
+            const hl = (c.key === key && !isText && !c.text) ? ' style="background:rgba(116,182,231,' + opacity + ');"' : '';
+            h += '<td class="' + (c.text ? '' : 'text-end') + '"' + hl + '>' + (c.text ? r[c.key] : c.fmtFn(r[c.key])) + '</td>';
+          });
+          h += '</tr>';
+        });
+        h += '</tbody>';
+        const table = document.getElementById('aiPivotTable');
+        table.innerHTML = h;
+        table.querySelectorAll('th.sortable').forEach(thEl => {
+          thEl.addEventListener('click', () => {
+            const k = thEl.dataset.key;
+            const c = cols.find(x => x.key === k);
+            if (state.key === k) state.asc = !state.asc;
+            else { state.key = k; state.asc = ['cpa'].includes(k) || k === 'aud' || (c && c.text); }
+            render();
+          });
+        });
+      }
+      render();
+      document.getElementById('aiPivotCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('aiPivotTable'), 'audience-market-pivot.csv'));
+    })();
+
+    // ═══ AD GROUP BREAKDOWN — channels as column groups ═══
+    (function() {
+      // Per-channel metrics; null = ad group does not run on that channel
+      const CH = ['Meta', 'Google', 'TikTok'];
+      const rows = [
+        { name: 'USCA-Core_Prospecting-FightingGameFans',    m: { cost: 19400, ctr: 1.42, freq: 4.9, cr: 4.3 }, g: null, t: { cost: 11800, ctr: 1.18, freq: 5.1, cr: 3.2 } },
+        { name: 'DE-Core_Prospecting-FightingGameFans',      m: { cost: 12600, ctr: 1.36, freq: 4.8, cr: 4.1 }, g: null, t: { cost: 7200,  ctr: 1.10, freq: 5.0, cr: 3.0 } },
+        { name: 'UK-Core_Prospecting-FightingGameFans',      m: { cost: 13400, ctr: 1.31, freq: 4.7, cr: 3.9 }, g: null, t: null },
+        { name: 'USCA-Secondary_Prospecting-CoreGamers1834', m: { cost: 15800, ctr: 1.05, freq: 4.6, cr: 2.6 }, g: { cost: 8800, ctr: 0.84, freq: 4.1, cr: 2.1 }, t: null },
+        { name: 'FR-Secondary_Prospecting-CoreGamers1834',   m: { cost: 8400,  ctr: 0.98, freq: 4.5, cr: 2.4 }, g: { cost: 4400, ctr: 0.79, freq: 4.0, cr: 2.0 }, t: null },
+        { name: 'DE-Secondary_Prospecting-eSports',          m: null, g: { cost: 9100, ctr: 0.88, freq: 4.2, cr: 2.2 }, t: { cost: 5800, ctr: 0.95, freq: 4.6, cr: 2.4 } },
+        { name: 'USCA-LAL_Lookalike-PastBuyers',             m: { cost: 18700, ctr: 1.21, freq: 4.4, cr: 3.7 }, g: null, t: null },
+        { name: 'DE-LAL_Lookalike-PastBuyers',               m: { cost: 10200, ctr: 1.16, freq: 4.3, cr: 3.5 }, g: null, t: null },
+        { name: 'USCA-RT_Retargeting-WebVisitors',           m: { cost: 8300,  ctr: 2.51, freq: 5.9, cr: 6.4 }, g: { cost: 4100, ctr: 2.21, freq: 5.4, cr: 5.8 }, t: null },
+        { name: 'DE-RT_Retargeting-WebVisitors',             m: { cost: 6100,  ctr: 2.38, freq: 5.7, cr: 6.1 }, g: { cost: 3000, ctr: 2.12, freq: 5.2, cr: 5.5 }, t: null },
+        { name: 'JP-Core_Prospecting-FightingGameFans',      m: null, g: null, t: { cost: 9800, ctr: 1.24, freq: 4.5, cr: 3.4 } },
+        { name: 'USCA-Core_Prospecting-StreamersCreators',   m: { cost: 5600, ctr: 1.04, freq: 4.1, cr: 2.7 }, g: null, t: { cost: 4000, ctr: 0.96, freq: 4.3, cr: 2.3 } },
+      ];
+      const KEYMAP = { Meta: 'm', Google: 'g', TikTok: 't' };
+      const SUB = [
+        { key: 'cost', head: 'Cost',       fmtFn: euroT },
+        { key: 'ctr',  head: 'CTR%',       fmtFn: pct2 },
+        { key: 'freq', head: 'Freq*',      fmtFn: v => v.toFixed(1).replace('.', ',') + '×' },
+        { key: 'cr',   head: 'CR%',        fmtFn: pct2 },
+      ];
+      let h = '<thead><tr class="th-group"><th rowspan="2" class="col-geo-label" style="min-width:300px;">Ad Group</th>';
+      CH.forEach((ch, ci) => {
+        h += '<th colspan="' + SUB.length + '" class="text-center th-group-label' + (ci < CH.length - 1 ? ' group-end' : '') + '">' + ch + '</th>';
+      });
+      h += '</tr><tr>';
+      CH.forEach((ch, ci) => {
+        SUB.forEach((s, si) => {
+          h += '<th class="text-end' + (si === SUB.length - 1 && ci < CH.length - 1 ? ' group-end' : '') + '">' + s.head + '</th>';
+        });
+      });
+      h += '</tr></thead><tbody>';
+      rows.forEach(r => {
+        h += '<tr><td class="col-geo-label" style="white-space:nowrap; font-size:12px;">' + r.name + '</td>';
+        CH.forEach((ch, ci) => {
+          const d = r[KEYMAP[ch]];
+          SUB.forEach((s, si) => {
+            const end = si === SUB.length - 1 && ci < CH.length - 1 ? ' group-end' : '';
+            h += '<td class="text-end' + end + '">' + (d ? s.fmtFn(d[s.key]) : '<span class="text-secondary">&mdash;</span>') + '</td>';
+          });
+        });
+        h += '</tr>';
+      });
+      // totals
+      h += '</tbody><tfoot style="position: sticky; bottom: 0; z-index: 1; background: var(--tblr-bg-surface, #fff);"><tr><td class="col-geo-label">Total</td>';
+      CH.forEach((ch, ci) => {
+        const ds = rows.map(r => r[KEYMAP[ch]]).filter(Boolean);
+        const cost = ds.reduce((a, d) => a + d.cost, 0);
+        const avg = k => ds.reduce((a, d) => a + d[k] * d.cost, 0) / cost;
+        const vals = [euroT(cost), pct2(avg('ctr')), avg('freq').toFixed(1).replace('.', ',') + '×', pct2(avg('cr'))];
+        vals.forEach((v, si) => {
+          const end = si === SUB.length - 1 && ci < CH.length - 1 ? ' group-end' : '';
+          h += '<td class="text-end' + end + '">' + v + '</td>';
+        });
+      });
+      h += '</tr></tfoot>';
+      document.getElementById('aiAdgTable').innerHTML = h;
+      document.getElementById('aiAdgCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('aiAdgTable'), 'ad-groups-by-channel.csv'));
+    })();
+
+    /* ═══ SIDEBAR TOGGLE ═══ */
+    function toggleSidebar() {
+      const sidebar = document.getElementById('entrySidebar');
+      const collapsed = sidebar.classList.toggle('collapsed');
+      document.getElementById('sidebarCollapseToggle').setAttribute('data-title', collapsed ? 'Expand' : 'Collapse');
+      setTimeout(() => {
+        document.querySelectorAll('canvas').forEach(c => {
+          const chart = Chart.getChart(c);
+          if (chart) chart.resize();
+        });
+      }, 250);
+    }
+    document.addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'b') { e.preventDefault(); toggleSidebar(); }
+    });
+
+    /* ═══ FILTER RESET VISIBILITY ═══ */
+    function updateResetVisibility() {
+      const resetBtn = document.getElementById('filterReset');
+      if (!resetBtn) return;
+      let hasActive = false;
+      document.querySelectorAll('.brand-filter-card .form-select').forEach(sel => {
+        if (sel.selectedIndex !== 0) hasActive = true;
+      });
+      if (hasActive) { resetBtn.classList.remove('d-none'); resetBtn.classList.add('d-inline-flex'); }
+    }
+    document.querySelectorAll('.brand-filter-card .form-select').forEach(sel => {
+      sel.addEventListener('change', updateResetVisibility);
+    });
+    updateResetVisibility();
+  </script>
+  <script>
+    // Sticky-state shadow: elevation cue only while the filter bar is actually pinned
+    (function() {
+      const bar = document.querySelector('.brand-filter-card');
+      const sentinel = document.getElementById('filterStickySentinel');
+      if (!bar || !sentinel || !('IntersectionObserver' in window)) return;
+      new IntersectionObserver(([e]) => {
+        bar.classList.toggle('is-stuck', !e.isIntersecting);
+      }, { rootMargin: '-9px 0px 0px 0px' }).observe(sentinel);
+    })();
+  </script>
+</body>
+</html>

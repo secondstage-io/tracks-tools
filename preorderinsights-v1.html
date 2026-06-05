@@ -1,0 +1,1693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preorder Insights — TRACKS Native Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.6.0/dist/tabler-icons.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/js/tabler.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --tblr-primary: #FF0249;
+      --tblr-primary-rgb: 255, 2, 73;
+    }
+    .chart-tooltip {
+      position: absolute;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+      z-index: 1000;
+      font-size: 13px;
+      min-width: 220px;
+    }
+    .chart-tooltip .card { margin: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+    .chart-tooltip .tooltip-row { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
+    .chart-tooltip .tooltip-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .chart-tooltip .tooltip-label { flex: 1; }
+    .chart-tooltip .tooltip-value { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+    .chart-wrapper { position: relative; height: 480px; }
+    .chart-legend { padding: 4px 0; } /* layout via d-flex flex-wrap gap-2 utilities */
+    .chart-legend .legend-item {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 6px; font-size: 13px; font-weight: 500;
+      cursor: pointer; user-select: none; transition: opacity 0.2s, box-shadow 0.2s;
+      border: 1px solid transparent;
+    }
+    .chart-legend .legend-item:hover { box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+    .chart-legend .legend-item.inactive { opacity: 0.35; text-decoration: line-through; }
+    .chart-legend .legend-swatch { width: 14px; height: 4px; border-radius: 2px; flex-shrink: 0; }
+    .chart-legend .legend-item[data-type="bar"] .legend-swatch { height: 12px; width: 10px; border-radius: 2px; }
+    .kpi { border-radius: 8px; padding: 14px 16px; height: 100%; }
+    .info-tip { position: relative; cursor: help; display: inline-flex; padding: 4px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
+    .info-tip:hover { background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.06); }
+    .info-tip .tip-text { visibility: hidden; opacity: 0; position: absolute; right: calc(100% + 8px); top: 50%; transform: translateY(-50%); background: var(--tblr-body-color, #1e293b); color: #fff; font-size: 12px; font-weight: 400; padding: 6px 10px; border-radius: 6px; white-space: nowrap; z-index: 1000; transition: opacity 0.15s; pointer-events: none; }
+    .info-tip .tip-text::after { content: ''; position: absolute; left: 100%; top: 50%; transform: translateY(-50%); border: 5px solid transparent; border-left-color: var(--tblr-body-color, #1e293b); }
+    .info-tip:hover .tip-text { visibility: visible; opacity: 1; }
+    /* Row-note tips inside tables: open to the RIGHT (left would clip under the doughnut / scroll edge) */
+    .wt .info-tip .tip-text, .info-tip.tip-right .tip-text { left: calc(100% + 8px); right: auto; white-space: normal; min-width: 240px; }
+    .wt .info-tip .tip-text::after, .info-tip.tip-right .tip-text::after { left: auto; right: 100%; border-color: transparent; border-right-color: var(--tblr-body-color, #1e293b); }
+    .kpi-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px; }
+    .kpi-value { font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; display: flex; align-items: baseline; gap: 6px; }
+    .kpi-goal { font-size: 11px; margin-top: 6px; opacity: 0.75; }
+    .kpi-beat { background: #2fb344; color: #fff; }
+    .kpi-beat .kpi-goal { opacity: 0.85; }
+    .kpi-miss { background: #f76707; color: #fff; }
+    .kpi-miss .kpi-goal { opacity: 0.85; }
+    .kpi-neutral { background: var(--tblr-bg-surface-secondary, #f8f9fa); color: var(--tblr-body-color, #1e293b); border: 1px solid rgba(4,32,69,0.1); }
+    .kpi-neutral .kpi-label { color: var(--tblr-secondary, #626976); }
+    .kpi-beat-soft { background: rgba(47,179,68,0.08); color: var(--tblr-body-color, #1e293b); border: 1px solid rgba(47,179,68,0.28); }
+    .kpi-beat-soft .kpi-label { color: var(--tblr-secondary, #626976); }
+    .kpi-miss-soft { background: rgba(247,103,7,0.08); color: var(--tblr-body-color, #1e293b); border: 1px solid rgba(247,103,7,0.28); }
+    .kpi-miss-soft .kpi-label { color: var(--tblr-secondary, #626976); }
+    .kpi-sub { font-size: 11px; opacity: 0.7; }
+    .kpi-beat .kpi-sub { opacity: 0.85; }
+    .kpi-miss .kpi-sub { opacity: 0.85; }
+    .kpi-delta { font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .kpi-delta.up { color: #2fb344; }
+    .kpi-delta.down { color: #d63939; }
+    .kpi-beat .kpi-delta, .kpi-miss .kpi-delta { color: rgba(255,255,255,0.85); }
+    .kpi-compact { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--tblr-secondary, #626976); margin-top: 8px; font-variant-numeric: tabular-nums; }
+    .kpi-compact span { white-space: nowrap; }
+    /* Funnel Overview */
+    .funnel-row { display: flex; align-items: center; padding: 14px 20px; border-bottom: 1px solid rgba(4,32,69,0.07); gap: 12px; }
+    .funnel-row:last-child { border-bottom: none; }
+    .funnel-stage { width: 120px; flex-shrink: 0; display: flex; align-items: center; gap: 10px; }
+    .funnel-bar { width: 3px; height: 24px; border-radius: 2px; flex-shrink: 0; }
+    .funnel-stage-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--tblr-secondary, #626976); line-height: 1.2; }
+    .funnel-kpi { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 3px 8px; border-radius: 5px; background: var(--tblr-bg-surface-secondary, #f8f9fa); border: 1px solid rgba(4,32,69,0.1); }
+    .funnel-kpi-name { color: var(--tblr-secondary, #626976); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.2px; }
+    .funnel-kpi-value { font-weight: 700; color: var(--tblr-body-color, #1e293b); font-variant-numeric: tabular-nums; }
+    .funnel-kpi .kpi-delta { font-size: 10px; }
+    .funnel-kpi-goal { color: var(--tblr-secondary, #94a3b8); font-size: 10px; }
+    /* Channel highlight cards */
+    .channel-card-spend { font-size: 1.1rem; font-weight: 700; color: var(--tblr-body-color, #1e293b); margin-bottom: 12px; font-variant-numeric: tabular-nums; }
+    .channel-card-spend span { font-size: 12px; font-weight: 400; color: var(--tblr-secondary, #626976); }
+    .channel-link { font-size: 12px; font-weight: 500; color: var(--tblr-primary); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; margin-top: 12px; }
+    .channel-link:hover { text-decoration: underline; }
+    /* Filter bar: active filter state */
+    .filter-active { border-color: var(--tblr-primary); color: var(--tblr-primary); font-weight: 600; background-color: rgba(var(--tblr-primary-rgb),0.06); }
+    /* Mobile filter drawer */
+    /* Compact, single-line filter row (desktop) */
+    .filter-row-compact { font-size: 12px; }
+    .filter-row-compact .btn-sm { font-size: 12px; padding: 0.25rem 0.55rem; }
+    .filter-row-compact .form-select-sm { font-size: 12px; padding: 0.25rem 1.5rem 0.25rem 0.5rem; background-position: right 0.35rem center; min-width: 70px !important; max-width: 110px !important; flex: 0 1 auto !important; }
+    .filter-row-compact .filter-dates .dropdown-toggle { font-size: 12px; }
+    .filter-row-compact .filter-dim-sep { margin: 2px 4px !important; }
+    .filter-row-compact .filter-dims { gap: 4px !important; }
+    .filter-row-compact .filter-dates { gap: 4px !important; }
+    .filter-toggle-btn { display: none; }
+    .filter-drawer { display: contents; } /* on desktop: no wrapper behaviour */
+    .filter-active-count { display: none; font-size: 10px; font-weight: 700; background: var(--tblr-primary); color: #fff; border-radius: 50%; width: 18px; height: 18px; line-height: 18px; text-align: center; }
+    @media (max-width: 767.98px) {
+      .filter-toggle-btn { display: inline-flex; }
+      .filter-drawer {
+        display: none; flex-direction: column; gap: 10px;
+        width: 100%; padding-top: 10px; border-top: 1px solid rgba(4,32,69,0.08); margin-top: 6px;
+      }
+      .filter-drawer.show { display: flex; }
+      .filter-drawer .filter-dates { flex-direction: column; gap: 6px; }
+      .filter-drawer .filter-dims { flex-direction: column; gap: 6px; }
+      .filter-drawer .filter-dims select { max-width: 100% !important; min-width: 0 !important; flex: 1 1 100% !important; }
+      .filter-drawer .filter-dim-sep { display: none; }
+      .filter-active-count.has-filters { display: inline-block; }
+    }
+    /* Explore-deeper grid */
+    .explore-grid .card-link { text-decoration: none; color: inherit; transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s; }
+    .explore-grid .card-link:hover { box-shadow: 0 4px 14px rgba(4,32,69,0.08); transform: translateY(-1px); border-color: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.35); }
+    .explore-grid .card-link:hover .ti-chevron-right { color: var(--tblr-primary) !important; }
+    .explore-grid .explore-icon {
+      flex-shrink: 0;
+      width: 34px; height: 34px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.10);
+      color: var(--tblr-primary, #FF0249);
+      border-radius: 8px;
+    }
+    .explore-grid .explore-icon .ti { font-size: 18px; line-height: 1; }
+    /* Breakdown tabs — match the widget-header typography, equal-width tabs */
+    .breakdown-tabs { gap: 2px; }
+    .breakdown-tabs .nav-link {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--tblr-secondary, #626976);
+      min-width: 96px;
+      text-align: center;
+      padding: 0.3rem 0.75rem;
+      border: 1px solid transparent;
+      border-bottom: 2px solid transparent;
+      margin-bottom: 0;
+    }
+    .breakdown-tabs .nav-link:hover { color: var(--tblr-body-color, #1e293b); background: rgba(4,32,69,0.03); border-color: transparent; }
+    .breakdown-tabs .nav-link.active {
+      color: var(--tblr-body-color, #1e293b);
+      background: transparent;
+      border-color: transparent;
+      border-bottom-color: var(--tblr-primary, #FF0249);
+    }
+    /* Section headings: faint separator above + title with thin primary-color underline + muted subtitle */
+    .section-heading {
+      margin-top: 3rem; margin-bottom: 1.25rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(4,32,69,0.10);
+    }
+    .section-heading .section-heading-title {
+      display: inline-block;
+      font-size: 18px; font-weight: 700;
+      color: var(--tblr-body-color, #1e293b);
+      margin: 0 0 8px;
+      padding-bottom: 6px;
+      padding-right: 24px;
+      border-bottom: 2px solid var(--tblr-primary, #FF0249);
+      line-height: 1.2;
+    }
+    .section-heading .section-heading-subtitle {
+      font-size: 12px; color: var(--tblr-secondary, #626976);
+      margin: 0; line-height: 1.35;
+    }
+    /* Section dividers — uses Tabler utilities: border-top border-2 border-primary */
+    .section-label { font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--tblr-body-color, #1e293b); white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; padding: 5px 18px; background: var(--tblr-bg-surface-secondary, #f1f3f5); border-radius: 6px; }
+    .section-subtitle { font-size: 12px; margin-top: -6px; }
+    /* Icon-only dropdown button — grey icon, brand tint on hover (matches info-tip) */
+    .btn-sm-icon { background: transparent !important; border: none !important; box-shadow: none !important; color: var(--tblr-secondary, #626976); padding: 4px 6px; line-height: 1; border-radius: 6px; transition: background 0.15s; }
+    .btn-sm-icon:hover, .btn-sm-icon:focus { background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.06) !important; color: var(--tblr-secondary, #626976); }
+    .no-caret::after { display: none !important; }
+
+    /* Vertical-scroll table with sticky header — shows ~5 rows; horizontal scroll enabled */
+    .geo-scroll-5 { max-height: 260px; overflow: auto; }
+    .geo-hscroll table.wt { min-width: 1180px; }
+    .wt-sticky-head thead th { position: sticky; top: 0; z-index: 2; background: var(--tblr-bg-surface-secondary, #f9fafb); }
+    /* Grouped-header tables: overlap the two sticky rows slightly + pad the content back down.
+       This guarantees no sub-pixel gap shows the tbody behind. */
+    .wt-sticky-head thead tr:not(.th-group) th {
+      top: 22px;
+      padding-top: 0.9rem;
+    }
+    /* Single-row sticky headers (no .th-group above) sit at the top, no offset */
+    .wt-sticky-head thead tr:only-child th {
+      top: 0;
+      padding-top: 0.5rem;
+    }
+    .wt-sticky-head thead .th-group th { z-index: 3; }
+    /* Prevent cell wrapping in horizontally scrolling tables */
+    .geo-hscroll .wt th, .geo-hscroll .wt td { white-space: nowrap; }
+    /* Group header row */
+    .wt thead .th-group .th-group-label {
+      font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--tblr-secondary, #6b7280);
+      background: var(--tblr-bg-surface-secondary, #f9fafb);
+      border-bottom: 1px solid rgba(4,32,69,0.08);
+      padding: 0.35rem 0.75rem;
+    }
+    .wt thead .th-group th[rowspan="2"] { vertical-align: bottom; }
+    /* Freeze first column (Geo) for horizontal scrolling — slightly stronger divider after it */
+    .wt-freeze-first .col-geo-label { position: sticky; left: 0; background: #fff; z-index: 1; min-width: 110px; }
+    .wt-freeze-first thead tr th.col-geo-label { background: var(--tblr-bg-surface-secondary, #f9fafb); z-index: 5; box-shadow: 1px 0 0 rgba(4,32,69,0.12); }
+    .wt-freeze-first tbody .col-geo-label { box-shadow: 1px 0 0 rgba(4,32,69,0.12); }
+    /* Subtle group separators — applied via .group-end on the last cell of each
+       column group (set dynamically at render time so they follow the column picker) */
+    .wt th.group-end, .wt td.group-end {
+      border-right: 1px solid rgba(4,32,69,0.06);
+    }
+    /* Widget-style tables (matches tracks-widgets Tabulator theme) */
+    .wt { font-size: 0.875rem; }
+    .wt thead { background: var(--tblr-bg-surface-secondary, #f9fafb); border-bottom: 1px solid rgba(4,32,69,0.1); }
+    .wt thead th { color: var(--tblr-secondary, #6b7280); font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1rem; padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(4,32,69,0.1); white-space: nowrap; }
+    .wt thead th.sortable { cursor: pointer; user-select: none; transition: color 0.15s; }
+    .wt thead th.sortable:hover { color: var(--tblr-body-color, #1e293b); }
+    .wt thead th.sortable .sort-icon { display: inline-block; width: 12px; margin-left: 4px; opacity: 0.3; vertical-align: middle; }
+    .wt thead th.sortable.sort-active { color: var(--tblr-body-color, #1e293b); font-weight: 600; }
+    .wt thead th.sortable.sort-active .sort-icon { opacity: 1; }
+    .wt tbody tr { border-bottom: 1px solid rgba(4,32,69,0.1); background: transparent; }
+    .wt tbody td { padding: 0.5rem 0.75rem; font-size: 0.8125rem; background: transparent; vertical-align: middle; }
+    .wt tfoot tr { border-top: 2px solid rgba(4,32,69,0.1); background: transparent; }
+    .wt tfoot td { padding: 0.5rem 0.75rem; font-size: 0.8125rem; font-weight: 600; }
+    /* Funnel visual */
+    .funnel-wrap { display: flex; gap: 12px; }
+    .funnel-strip { width: 36px; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px; }
+    .funnel-strip .seg { display: flex; justify-content: center; flex: 1; }
+    .funnel-strip .seg > div { border-radius: 4px; transition: width 0.3s; }
+    .funnel-cards { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+    .funnel-cards .row.row-deck { margin-bottom: 0 !important; }
+    .funnel-cards .card.mb-3 { margin-bottom: 0 !important; }
+    /* Steam / Brand Health mini cards */
+    .steam-stat { text-align: center; }
+    .steam-stat .stat-value { font-size: 1.1rem; font-weight: 700; color: var(--tblr-body-color, #1e293b); font-variant-numeric: tabular-nums; line-height: 1.2; }
+    .steam-stat .stat-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--tblr-secondary, #626976); margin-bottom: 2px; }
+    .steam-stat .stat-sub { font-size: 11px; color: var(--tblr-secondary, #626976); margin-top: 2px; }
+    .steam-stat .stat-delta { font-size: 11px; font-weight: 600; }
+    .steam-stat .stat-delta.up { color: #2fb344; }
+    .steam-stat .stat-delta.down { color: #d63939; }
+    /* Sentiment bar — uses Tabler .progress component with custom height */
+    /* Filter bar card — sticky at top of viewport, subtle indicator label at the start */
+    .brand-filter-card {
+      border-radius: 8px;
+      position: sticky;
+      top: 8px;
+      z-index: 100;
+      transition: box-shadow 0.15s ease;
+    }
+    .brand-filter-card.is-stuck { box-shadow: 0 4px 14px rgba(4,32,69,0.10); }
+    .brand-filter-card > .card-body { border-radius: inherit; }
+    .filter-card-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--tblr-secondary, #626976);
+      display: inline-flex; align-items: center; gap: 6px;
+      padding-right: 10px; margin-right: 4px;
+      border-right: 1px solid rgba(4,32,69,0.10);
+      flex-shrink: 0; white-space: nowrap;
+    }
+    /* Landing Page funnel — only wrap behaviour on narrow screens; all other styling via Tabler utilities */
+    @media (max-width: 991.98px) {
+      .lp-funnel { flex-wrap: wrap !important; gap: 8px !important; }
+      .lp-funnel > .card { flex: 1 1 45% !important; }
+    }
+    /* Interactive lens stats */
+    .steam-stat.lens-clickable {
+      cursor: pointer;
+      padding: 8px 6px 5px;
+      border-radius: 6px;
+      border-bottom: 3px solid transparent;
+      transition: background 0.2s, border-bottom-color 0.2s;
+      position: relative;
+    }
+    .steam-stat.lens-clickable:hover { background: rgba(4,32,69,0.04); }
+    .steam-stat.lens-active {
+      border-bottom-color: var(--tblr-primary);
+    }
+    /* Hero scorecard tiles (status-only) — rolled out from the PM pilot 2026-06-05 */
+    .score-tile { padding: 10px 12px 9px; }
+    .score-tile .kpi-value { font-size: 1.15rem; }
+    .hero-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--tblr-secondary, #626976); margin-bottom: 6px; }
+    /* Command Center wrapper */
+    /* AI Insight placeholder */
+    .ai-insight { border: 1px solid rgba(132,94,247,0.2); background: rgba(132,94,247,0.03); border-radius: 8px; padding: 12px 16px; font-size: 13px; line-height: 1.6; color: var(--tblr-body-color, #1e293b); }
+    .ai-insight-header { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #845ef7; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .ai-insight-header svg { flex-shrink: 0; }
+    .ai-insight-text { margin: 0; }
+    .ai-insight-meta { font-size: 11px; color: var(--tblr-secondary, #626976); margin-top: 8px; text-align: right; }
+    .ai-insight-inline { border: none; background: rgba(132,94,247,0.03); border-radius: 6px; padding: 8px 12px; font-size: 12px; line-height: 1.5; margin-top: 12px; }
+    .ai-insight-inline .ai-insight-header { font-size: 10px; margin-bottom: 4px; }
+    .ai-insight-inline .ai-insight-text { font-size: 12px; }
+    /* Collapsible AI insights */
+    .ai-insight.collapsed .ai-insight-text { display: none; }
+    .ai-insight.collapsed .ai-insight-meta { display: none; }
+    .ai-insight-toggle { cursor: pointer; user-select: none; }
+    .ai-insight-toggle .ai-chevron { display: inline-block; transition: transform 0.2s; font-size: 12px; margin-left: 4px; }
+    .ai-insight.collapsed .ai-chevron { transform: rotate(-90deg); }
+    /* Anomaly / warning variant */
+    .ai-insight.ai-warning { border-color: rgba(247,103,7,0.3); background: rgba(247,103,7,0.04); }
+    .ai-insight.ai-warning .ai-insight-header { color: #f76707; }
+
+    /* Collapsible sidebar — icon-collapse mode (inspired by Gateway app) */
+    /* Sidebar + content flex row */
+    .entry-row { display: flex; gap: 0; }
+    #entryContent { padding-left: 16px; }
+    .sidebar-page-header { padding: 0.5rem 8px 0.5rem 12px; }
+    .sidebar-page-header .sidebar-back-link {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;
+      color: var(--tblr-secondary, #626976); text-decoration: none;
+      padding: 6px 8px; margin: 0 0 0 -8px;
+      border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .sidebar-page-header .sidebar-back-link:hover { color: var(--tblr-primary); background: rgba(var(--tblr-primary-rgb), 0.06); }
+    .sidebar-page-header .sidebar-back-link svg { flex-shrink: 0; }
+    .sidebar-page-header .game-title-block {
+      padding-top: 14px;
+      border-top: 1px solid rgba(4,32,69,0.08);
+    }
+    .sidebar-page-header .page-pretitle { font-size: 0.625rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--tblr-secondary, #626976); margin-bottom: 0.25rem; }
+    .sidebar-page-header .page-pretitle a { color: inherit; text-decoration: none; }
+    .sidebar-page-header .page-pretitle a:hover { color: var(--tblr-primary); }
+    .sidebar-page-header .page-title { font-size: 1.25rem; font-weight: 600; margin: 0; color: var(--tblr-body-color, #1e293b); line-height: 1.2; }
+    #entrySidebar.collapsed .sidebar-page-header { display: none; }
+    #entrySidebar { display: flex; flex-direction: column; }
+    #entrySidebar > nav { flex: 0 0 auto; }
+    .sidebar-footer { border-top: 1px solid rgba(4,32,69,0.08); padding: 8px 0; margin-top: 8px; }
+    .sidebar-footer .nav-link { color: var(--tblr-secondary, #626976); font-size: 13px; }
+    .sidebar-footer .nav-link:hover { color: var(--tblr-primary); }
+    #entrySidebar.collapsed .sidebar-footer { padding: 6px 0; }
+    #entrySidebar { transition: width 0.2s ease-linear, min-width 0.2s ease-linear, flex 0.2s ease-linear; flex: 0 0 13.5%; width: 13.5%; overflow-x: hidden; overflow-y: visible; position: relative; }
+    #entrySidebar .nav-link span, #entrySidebar .group-label { transition: opacity 0.15s ease, margin-top 0.15s ease; white-space: nowrap; }
+    #entrySidebar.collapsed { flex: 0 0 48px; width: 48px; min-width: 48px; }
+    #entrySidebar.collapsed .nav-link { justify-content: center; padding: 8px; position: relative; }
+    #entrySidebar.collapsed .nav-link i { margin: 0; font-size: 18px; }
+    #entrySidebar.collapsed .nav-link span { opacity: 0; width: 0; overflow: hidden; display: inline-block; }
+    #entrySidebar.collapsed .group-label { opacity: 0; height: 0; margin: 0; padding: 0 !important; overflow: hidden; }
+    #entrySidebar.collapsed .nav-item.mt-3 { margin-top: 4px !important; }
+    /* Collapse chevron toggle */
+    #sidebarCollapseToggle { display: inline-flex; align-items: center; justify-content: center; padding: 4px; color: var(--tblr-secondary, #626976); opacity: 0.45; transition: opacity 0.15s; text-decoration: none; border-radius: 4px; }
+    #sidebarCollapseToggle:hover { opacity: 1; color: var(--tblr-body-color, #1e293b); }
+    #sidebarCollapseToggle i { font-size: 16px; transition: transform 0.2s ease; }
+    #entrySidebar.collapsed #sidebarCollapseToggle { justify-content: center; padding: 8px; position: relative; }
+    #entrySidebar.collapsed #sidebarCollapseToggle i { transform: rotate(180deg); }
+    #entrySidebar.collapsed #sidebarCollapseToggle:hover::after { content: attr(data-title); position: absolute; left: 100%; top: 50%; transform: translateY(-50%); background: var(--tblr-body-color, #1e293b); color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 4px; white-space: nowrap; z-index: 100; margin-left: 8px; pointer-events: none; }
+    /* Tooltip on hover in collapsed state */
+    #entrySidebar.collapsed .nav-item > .nav-link:hover::after { content: attr(data-title); position: absolute; left: 100%; top: 50%; transform: translateY(-50%); background: var(--tblr-body-color, #1e293b); color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 4px; white-space: nowrap; z-index: 100; margin-left: 8px; pointer-events: none; }
+    /* Sidebar rail — invisible edge toggle */
+    #sidebarRail { position: absolute; top: 0; bottom: 0; right: -8px; width: 16px; cursor: col-resize; z-index: 20; }
+    #sidebarRail::after { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; transition: background 0.15s; }
+    #sidebarRail:hover::after { background: var(--tblr-primary); }
+    #entryContent { flex: 1; min-width: 0; transition: flex 0.2s ease-linear; }
+    @media (max-width: 991.98px) { .entry-row { flex-direction: column; } #entrySidebar { display: none; } }
+    .command-center { background: rgba(4,32,69,0.025); border-radius: 10px; padding: 14px 16px 16px; border: 1px solid rgba(4,32,69,0.06); margin-bottom: 1.5rem; }
+    .command-center > .card { border: 1px solid rgba(4,32,69,0.10); }
+    .command-center > .card:first-child { margin-bottom: 10px !important; }
+
+    /* ── Wishlist Insights page-specific widgets ── */
+    /* Goal progress rows (Volume vs Goals card) */
+    .goal-row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(4,32,69,0.06); }
+    .goal-row:last-child { border-bottom: none; }
+    .goal-row .goal-name { width: 120px; flex-shrink: 0; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--tblr-secondary, #626976); }
+    .goal-row .goal-vals { width: 175px; flex-shrink: 0; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--tblr-body-color, #1e293b); }
+    .goal-row .goal-vals .goal-target { color: var(--tblr-secondary, #94a3b8); }
+    .goal-row .goal-bar { flex: 1; min-width: 0; }
+    .goal-row .goal-ach { width: 52px; flex-shrink: 0; text-align: right; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .goal-row .goal-ach.beat { color: #2fb344; }
+    .goal-row .goal-ach.miss { color: #f76707; }
+    /* Pacing stat block */
+    .pacing-stat { text-align: center; }
+    .pacing-stat .pacing-value { font-size: 1.1rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--tblr-body-color, #1e293b); line-height: 1.2; }
+    .pacing-stat .pacing-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--tblr-secondary, #626976); margin-bottom: 2px; }
+    .pacing-stat .pacing-sub { font-size: 11px; color: var(--tblr-secondary, #626976); margin-top: 2px; }
+    /* Channel small-multiple trend cards */
+    .sm-chart-wrap { position: relative; height: 170px; }
+    .sm-kpis { display: flex; align-items: flex-start; gap: 8px; font-size: 11px; color: var(--tblr-secondary, #626976); font-variant-numeric: tabular-nums; margin-top: 6px; }
+    .sm-kpis strong { color: var(--tblr-body-color, #1e293b); }
+    .sm-kpis .sm-flag-bad { color: #f76707; font-weight: 700; }
+    .sm-kpis .sm-flag-good { color: #2fb344; font-weight: 700; }
+    .sm-kpis .sm-row-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--tblr-secondary, #94a3b8); width: 64px; flex-shrink: 0; padding-top: 1px; }
+    .sm-kpis .sm-metrics { display: flex; flex-wrap: wrap; gap: 3px 12px; flex: 1; min-width: 0; }
+    .sm-kpis .sm-metrics > span { white-space: nowrap; }
+    .sm-kpis + .sm-kpis { border-top: 1px solid rgba(4,32,69,0.06); padding-top: 6px; }
+  </style>
+</head>
+<body class="page layout-fluid">
+
+    <!-- Navbar -->
+  <header class="navbar navbar-expand-md d-print-none" style="background: var(--tblr-primary); box-shadow: none;">
+    <div class="container-xl">
+      <a href="#" class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
+        <img src="https://tracks.secondstage.io/vite/assets/tracks-home-logo-C086m-iW.png" alt="TRACKS" class="navbar-brand-image">
+      </a>
+      <span class="badge bg-white text-primary ms-n2" style="font-size:10px; font-weight:700; letter-spacing:0.3px;">2.0 UI/UX Concept</span>
+    </div>
+  </header>
+  <!-- Second navbar (main navigation, matches TRACKS layout) -->
+  <header class="navbar-expand-md">
+    <div class="collapse navbar-collapse show" id="navbar-menu">
+      <div class="navbar">
+        <div class="container-xl">
+          <div class="row flex-fill align-items-center">
+            <div class="col">
+              <ul class="navbar-nav">
+                <li class="nav-item active">
+                  <a class="nav-link" href="#">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-device-gamepad-2"></i></span>
+                    <span class="nav-link-title">My Games</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-chart-funnel"></i></span>
+                    <span class="nav-link-title">Attribution Tracking</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-article"></i></span>
+                    <span class="nav-link-title">FAQ</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-book-2"></i></span>
+                    <span class="nav-link-title">Glossary</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">
+                    <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-file-code-2"></i></span>
+                    <span class="nav-link-title">Documentation</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+<div class="page-wrapper">
+    <div class="page-body">
+      <div class="container-xl">
+        <div class="entry-row">
+          <!-- Entry sidebar (matches col-lg-2 in tracks/app/views/games/entry.html.erb) -->
+          <div id="entrySidebar">
+            <div class="sidebar-page-header d-flex align-items-center justify-content-between">
+              <a href="#" class="sidebar-back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                <span>My Games</span>
+              </a>
+              <a href="#" id="sidebarCollapseToggle" onclick="toggleSidebar(); return false;" data-title="Expand" title="Toggle sidebar (Cmd+B)">
+                <i class="ti ti-chevron-left" id="sidebarToggleIcon"></i>
+              </a>
+            </div>
+            <nav class="nav nav-pills nav-vertical" style="font-size:13px;">
+              <li class="nav-item"><a class="nav-link" href="nativedash-poc-v3-prelaunch.html" data-title="Overview"><i class="ti ti-layout-dashboard me-2"></i><span>Overview</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="periodcomparison-v1.html" data-title="Period Comparison"><i class="ti ti-arrows-diff me-2"></i><span>Period Comparison</span></a></li>
+              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Growth</span></li>
+              <li class="nav-item"><a class="nav-link" href="installsua-v1.html" data-title="Installs & UA"><i class="ti ti-device-gamepad-2 me-2"></i><span>Installs &amp; UA</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="wishlistinsights-v1.html" data-title="Wishlist Insights"><i class="ti ti-heart me-2"></i><span>Wishlist Insights</span></a></li>
+              <li class="nav-item"><a class="nav-link active" href="#" data-title="Preorder Insights"><i class="ti ti-shopping-cart me-2"></i><span>Preorder Insights</span></a></li>
+              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Game</span></li>
+              <li class="nav-item"><a class="nav-link" href="playerlifecycle-v1.html" data-title="Player Lifecycle"><i class="ti ti-refresh me-2"></i><span>Player Lifecycle</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="monetizationltv-v1.html" data-title="Monetization & LTV"><i class="ti ti-coin me-2"></i><span>Monetization & LTV</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="steaminsights-v1.html" data-title="Steam Insights"><i class="ti ti-brand-steam me-2"></i><span>Steam Insights</span></a></li>
+              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Media & Web</span></li>
+              <li class="nav-item"><a class="nav-link" href="performancemedia-v1.html" data-title="Performance Overview"><i class="ti ti-chart-bar me-2"></i><span>Performance Overview</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="awarenesstracker-v1.html" data-title="Awareness Tracker"><i class="ti ti-eye me-2"></i><span>Awareness Tracker</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="creativeinsights-v1.html" data-title="Creative Performance"><i class="ti ti-palette me-2"></i><span>Creative Performance</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="audienceinsights-v1.html" data-title="Audience Insights"><i class="ti ti-users me-2"></i><span>Audience Insights</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="influencerdirectbuy-v1.html" data-title="Influencer & Direct Buy"><i class="ti ti-speakerphone me-2"></i><span>Influencer & Direct Buy</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="websiteanalytics-v1.html" data-title="Website Analytics"><i class="ti ti-world-www me-2"></i><span>Website Analytics</span></a></li>
+              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Brand</span></li>
+              <li class="nav-item"><a class="nav-link" href="brandhealth-v1.html" data-title="Brand Health"><i class="ti ti-star me-2"></i><span>Brand Health</span></a></li>
+              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Company</span></li>
+              <li class="nav-item"><a class="nav-link" href="sustainability-v1.html" data-title="Sustainability"><i class="ti ti-leaf me-2"></i><span>Sustainability</span></a></li>
+            </nav>
+            <div id="sidebarRail" onclick="toggleSidebar()"></div>
+          </div>
+          <!-- Content area (flexes to fill remaining space) -->
+          <div id="entryContent">
+
+      <!-- Dashboard Tab -->
+      <div id="dashboardTab">
+
+        <!-- Game header strip: logo + developer/publisher (page chrome, deliberately not a card) -->
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div class="d-flex align-items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" aria-label="Urban Brawl" style="height:56px; width:auto; display:block;">
+              <defs>
+                <linearGradient id="urbanGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#1e293b"/>
+                  <stop offset="100%" stop-color="#3d3d5c"/>
+                </linearGradient>
+                <linearGradient id="brawlGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#FF0249"/>
+                  <stop offset="50%" stop-color="#ff2070"/>
+                  <stop offset="100%" stop-color="#FF0249"/>
+                </linearGradient>
+              </defs>
+              <rect x="20" y="12" width="360" height="2" fill="url(#brawlGrad)" opacity="0.7" rx="1"/>
+              <text x="200" y="52" text-anchor="middle" font-family="Impact, 'Arial Black', sans-serif" font-size="42" font-weight="900" letter-spacing="12" fill="url(#urbanGrad)">URBAN</text>
+              <text x="200" y="98" text-anchor="middle" font-family="Impact, 'Arial Black', sans-serif" font-size="52" font-weight="900" letter-spacing="8" fill="url(#brawlGrad)">BRAWL</text>
+              <rect x="20" y="106" width="360" height="2" fill="url(#brawlGrad)" opacity="0.7" rx="1"/>
+            </svg>
+            <div style="width:1px; height:38px; background:rgba(4,32,69,0.15); flex-shrink:0;"></div>
+            <div style="font-size:22px; font-weight:700; color: var(--tblr-body-color, #1e293b); line-height:1.2;">Preorder Insights <span class="info-tip tip-right" style="vertical-align: 3px; padding: 0; margin-left: 8px;"><span style="display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--tblr-primary, #FF0249); background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.06); border: 1px solid rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.2); border-radius: 999px; padding: 2px 9px; line-height: 1.4;">Modelled<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span><span class="tip-text" style="min-width: 280px; font-weight: 400; text-transform: none; letter-spacing: normal;">Preorder figures on this page are <strong>modelled</strong> from UTM-tagged paid traffic, web analytics and Steam data &mdash; not a direct Steam API count. Console storefronts not included.</span></span></div>
+          </div>
+          <div class="d-flex align-items-center gap-1">
+            <a href="#" class="btn btn-sm btn-ghost-secondary p-2" title="Settings" aria-label="Settings"><i class="ti ti-adjustments-alt" style="font-size:18px;"></i></a>
+            <a href="#" class="btn btn-sm btn-ghost-secondary p-2" title="Tools" aria-label="Tools"><i class="ti ti-tool" style="font-size:18px;"></i></a>
+            <a href="#" class="btn btn-sm btn-ghost-secondary p-2" title="Members" aria-label="Members"><i class="ti ti-users-group" style="font-size:18px;"></i></a>
+          </div>
+        </div>
+
+        <!-- Filter bar (slim) — shadow appears only while stuck (see sentinel observer) -->
+        <div id="filterStickySentinel" style="height:1px;"></div>
+        <div class="card mb-3 brand-filter-card">
+          <div class="card-body py-2 px-3">
+            <div class="d-flex flex-nowrap align-items-center gap-2 filter-row-compact">
+              <!-- Desktop-only filter indicator -->
+              <span class="filter-card-label d-none d-md-inline-flex">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                Filters
+              </span>
+          <!-- Mobile: filter toggle + toggle group always visible -->
+              <button type="button" class="btn btn-sm btn-outline-secondary filter-toggle-btn align-items-center gap-1" onclick="var d=document.getElementById('filterDrawer');d.classList.toggle('show');this.querySelector('.ti').classList.toggle('ti-chevron-down');this.querySelector('.ti').classList.toggle('ti-chevron-up');">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                Filters
+                <span class="filter-active-count has-filters" id="filterCount">1</span>
+                <i class="ti ti-chevron-down" style="font-size:14px;"></i>
+              </button>
+              <!-- Date filters (left side) -->
+              <div class="d-flex align-items-center gap-2 flex-shrink-0 filter-dates">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted flex-shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <div class="dropdown flex-shrink-0">
+                  <button class="btn btn-sm btn-outline-secondary dropdown-toggle filter-active" data-bs-toggle="dropdown">Beat: Launch</button>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item active" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue='Beat: '+this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Launch</a>
+                    <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue='Beat: '+this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Always On</a>
+                    <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue='Beat: '+this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Seasonal</a>
+                  </div>
+                </div>
+                <div class="btn-group btn-group-sm flex-shrink-0" role="group" aria-label="Quick date range">
+                  <button type="button" class="btn btn-outline-secondary">7D</button>
+                  <button type="button" class="btn btn-outline-secondary">30D</button>
+                  <button type="button" class="btn btn-outline-secondary">90D</button>
+                  <button type="button" class="btn btn-primary">All</button>
+                </div>
+                <div class="dropdown flex-shrink-0">
+                  <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                    10 Nov – 26 Feb
+                  </button>
+                  <div class="dropdown-menu p-3" style="min-width:280px;">
+                    <label class="form-label mb-1">Start</label>
+                    <input type="date" class="form-control form-control-sm mb-2" value="2025-11-10">
+                    <label class="form-label mb-1">End</label>
+                    <input type="date" class="form-control form-control-sm mb-2" value="2026-02-26">
+                    <button class="btn btn-sm btn-primary w-100">Apply</button>
+                  </div>
+                </div>
+              </div>
+              <!-- Collapsible filter drawer (always open on desktop via display:contents) -->
+              <div class="filter-drawer" id="filterDrawer">
+                <!-- Dimension filters -->
+                <div class="d-flex align-items-center gap-2 flex-nowrap filter-dims ms-auto" style="min-width:0;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted flex-shrink-0 d-none d-md-block"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                  <div class="dropdown flex-shrink-0">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">Geo</button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item active" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Geo</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">DE</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">AT</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">CH</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">FR</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">UK</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">NL</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">IT</a>
+                    </div>
+                  </div>
+                  <div class="dropdown flex-shrink-0">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">Channel</button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item active" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Channel</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Meta</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Google Search</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">YouTube</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">PMax</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Reddit</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">X</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Creator</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Direct</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">MediaHouse</a>
+                    </div>
+                  </div>
+                  <div class="dropdown flex-shrink-0">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">Strategy</button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item active" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Strategy</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Consideration</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Conversion</a>
+                    </div>
+                  </div>
+                  <div class="dropdown flex-shrink-0">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">Objective</button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item active" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Objective</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Gameplay</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">High Impact</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Leads</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Purchase</a>
+                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Traffic</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="filter-dim-sep d-none d-md-block" style="border-left:1.5px solid rgba(4,32,69,0.15); align-self:stretch; margin:2px 6px;"></div>
+              <div class="btn-group btn-group-sm flex-shrink-0" role="group" aria-label="View mode">
+                <button type="button" class="btn btn-primary" title="All traffic combined (paid + organic) — default on this dashboard" onclick="this.parentNode.querySelectorAll('.btn').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-outline-secondary')});this.classList.remove('btn-outline-secondary');this.classList.add('btn-primary')">Total</button>
+                <button type="button" class="btn btn-outline-secondary" title="Only paid-media driven metrics" onclick="this.parentNode.querySelectorAll('.btn').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-outline-secondary')});this.classList.remove('btn-outline-secondary');this.classList.add('btn-primary')">Paid</button>
+                <button type="button" class="btn btn-outline-secondary" title="Only organic / unpaid metrics" onclick="this.parentNode.querySelectorAll('.btn').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-outline-secondary')});this.classList.remove('btn-outline-secondary');this.classList.add('btn-primary')">Organic</button>
+              </div>
+              <span class="info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Filter every metric on the dashboard by traffic source.<br><strong>Total:</strong> everything (paid + organic combined).<br><strong>Paid:</strong> only paid-media driven values.<br><strong>Organic:</strong> only organic / unpaid values.</span></span>
+              <button type="button" class="btn btn-sm btn-ghost-secondary align-items-center flex-shrink-0" id="filterReset" style="padding:4px 6px; line-height:1;" title="Reset all filters">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- ═══ PREORDER HEALTH (quiet hero): the stage after wishlists ═══ -->
+        <div class="card mt-5 mb-3" id="poIntelCard">
+          <div class="card-status-top bg-primary"></div>
+          <div class="card-body">
+            <div class="d-flex flex-wrap" style="row-gap: 14px;">
+              <div style="flex: 3 1 0; min-width: 315px;">
+                <div class="hero-group-label">Volume</div>
+                <div class="row g-2">
+                  <div class="col-4">
+                <div class="kpi kpi-neutral score-tile">
+                  <div class="kpi-label"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-label="Steam" style="vertical-align:-1px;"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></svg> Steam PreOrders <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Modelled from UTM-tagged paid traffic, web analytics and Steam data.<br>Not a direct Steam API count. Console storefronts not included.</span></span></div>
+                  <div class="kpi-value">4.218</div>
+                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +312</span><span>last 7 days</span></div>
+                </div>
+              </div>
+                  <div class="col-4">
+                <div class="kpi kpi-neutral score-tile">
+                  <div class="kpi-label">Paid PreOrders</div>
+                  <div class="kpi-value">1.480</div>
+                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&darr; 9,8%</span><span>CPPO 197,39&thinsp;&euro; &middot; 7d</span></div>
+                </div>
+              </div>
+                  <div class="col-4">
+                <div class="kpi kpi-neutral score-tile">
+                  <div class="kpi-label">Organic Share <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Preorders not attributed to paid media. Prelaunch preorders skew organic &mdash;<br>paid media builds the wishlist pool that converts at announce/launch beats.</span></span></div>
+                  <div class="kpi-value">64,9%</div>
+                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +1,2pp</span><span>2.738 preorders</span></div>
+                </div>
+              </div>
+                </div>
+              </div>
+              <div style="flex: 2 1 0; min-width: 215px; border-left: 1px solid rgba(4,32,69,0.1); padding-left: 12px; margin-left: 12px;">
+                <div class="hero-group-label">Conversion</div>
+                <div class="row g-2">
+                  <div class="col-6">
+                <div class="kpi kpi-beat-soft score-tile">
+                  <div class="kpi-label">WL &rarr; PO Conversion <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Preorders as a share of total wishlists (224.525) &mdash; the key prelaunch<br>conversion. Typically accelerates sharply at launch-adjacent beats.</span></span></div>
+                  <div class="kpi-value">1,88%</div>
+                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 25,3%</span><span>vs goal 1,50%</span></div>
+                </div>
+              </div>
+                  <div class="col-6">
+                <div class="kpi kpi-beat-soft score-tile">
+                  <div class="kpi-label">PreOrders CR <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Preorders per tracked Steam store visit (980K visits in period).</span></span></div>
+                  <div class="kpi-value">0,43%</div>
+                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 22,9%</span><span>vs goal 0,35%</span></div>
+                </div>
+              </div>
+                </div>
+              </div>
+              <div style="flex: 1 1 0; min-width: 115px; border-left: 1px solid rgba(4,32,69,0.1); padding-left: 12px; margin-left: 12px;">
+                <div class="hero-group-label">Efficiency</div>
+                <div class="row g-2">
+                  <div class="col-12">
+                <div class="kpi kpi-beat-soft score-tile">
+                  <div class="kpi-label"><span style="text-transform:none;">eCPPO</span> <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Effective cost per preorder &mdash; total paid-media cost divided by ALL preorders<br>(paid + organic). At prelaunch volumes this is the honest efficiency read;<br>paid-only CPPO rests on small numbers.</span></span></div>
+                  <div class="kpi-value">69,26&thinsp;&euro;</div>
+                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 13,4%</span><span>vs goal 80,00&thinsp;&euro;</span></div>
+                </div>
+              </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Preorder velocity — the hero visual -->
+          <div class="card-body border-top pt-3">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">PreOrder Velocity</span>
+              <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Daily preorder additions split paid / organic (stacked bars, left axis)<br>and cumulative total (line, right axis).<br>Toggle CPPO / eCPPO via the legend to overlay efficiency.</span></span>
+              <div class="dropdown flex-shrink-0">
+                <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end">
+                  <button class="dropdown-item" id="poVelocityPngBtn">PNG Image</button>
+                  <button class="dropdown-item" id="poVelocityCsvBtn">CSV Spreadsheet</button>
+                </div>
+              </div>
+            </div>
+            <div id="poVelocityLegend" class="chart-legend d-flex flex-wrap gap-2"></div>
+            <div class="chart-wrapper" style="height:280px">
+              <canvas id="poVelocityChart"></canvas>
+              <div id="poVelocityTooltipEl" class="chart-tooltip opacity-0"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ PREORDER CONVERSION FUNNEL (extends the wishlist chain by one stage) ═══ -->
+        <div class="section-heading">
+          <h3 class="section-heading-title">Preorder Conversion Funnel</h3>
+          <p class="section-heading-subtitle">Follows the path from first touch to preorder &mdash; each stage&rsquo;s conversion shows where the chain leaks and where fixing it pays most. Use the Total / Paid / Organic toggle above to isolate the paid and organic paths.</p>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="d-flex align-items-stretch flex-nowrap gap-1 lp-funnel">
+              <div class="card flex-fill">
+                <div class="card-status-top" style="background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.2);"></div>
+                <div class="card-body p-2 text-center">
+                  <div class="text-secondary small fw-bold text-uppercase" style="letter-spacing:.4px;">Impressions</div>
+                  <div class="fs-3 fw-bold">207,2M</div>
+                  <div class="text-secondary" style="font-size:10px;">ad views</div>
+                </div>
+              </div>
+              <div class="d-flex flex-column align-items-center justify-content-center text-secondary px-1" style="min-width:48px;">
+                <span class="small text-uppercase fw-semibold" style="font-size:9px; letter-spacing:.3px;">CTR</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="my-1 text-primary"><polyline points="9 18 15 12 9 6"/></svg>
+                <span class="fw-bold text-secondary">1,08%</span>
+              </div>
+              <div class="card flex-fill">
+                <div class="card-status-top" style="background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.4);"></div>
+                <div class="card-body p-2 text-center">
+                  <div class="text-secondary small fw-bold text-uppercase" style="letter-spacing:.4px;">Clicks</div>
+                  <div class="fs-3 fw-bold">2,25M</div>
+                </div>
+              </div>
+              <div class="d-flex flex-column align-items-center justify-content-center text-secondary px-1" style="min-width:48px;">
+                <span class="small text-uppercase fw-semibold" style="font-size:9px; letter-spacing:.3px;">LP Rate</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="my-1 text-primary"><polyline points="9 18 15 12 9 6"/></svg>
+                <span class="fw-bold text-secondary">78%</span>
+              </div>
+              <div class="card flex-fill">
+                <div class="card-status-top" style="background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.55);"></div>
+                <div class="card-body p-2 text-center">
+                  <div class="text-secondary small fw-bold text-uppercase" style="letter-spacing:.4px;">LP Visits</div>
+                  <div class="fs-3 fw-bold">1,76M</div>
+                </div>
+              </div>
+              <div class="d-flex flex-column align-items-center justify-content-center text-secondary px-1" style="min-width:56px;">
+                <span class="small text-uppercase fw-semibold" style="font-size:9px; letter-spacing:.3px;">LP &rarr; Steam 23,4%</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="my-1 text-primary"><polyline points="9 18 15 12 9 6"/></svg>
+                <span class="fw-bold text-secondary" style="font-size:10px;">+ organic &amp; direct</span>
+              </div>
+              <div class="card flex-fill">
+                <div class="card-status-top" style="background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.7);"></div>
+                <div class="card-body p-2 text-center">
+                  <div class="text-secondary small fw-bold text-uppercase" style="letter-spacing:.4px;">Steam Visits</div>
+                  <div class="fs-3 fw-bold">980K</div>
+                  <div class="text-secondary" style="font-size:10px;">412K paid + 568K organic &amp; direct</div>
+                </div>
+              </div>
+              <div class="d-flex flex-column align-items-center justify-content-center text-secondary px-1" style="min-width:48px;">
+                <span class="small text-uppercase fw-semibold" style="font-size:9px; letter-spacing:.3px;">WL CVR</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="my-1 text-primary"><polyline points="9 18 15 12 9 6"/></svg>
+                <span class="fw-bold text-secondary">22,9%</span>
+              </div>
+              <div class="card flex-fill">
+                <div class="card-status-top" style="background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.85);"></div>
+                <div class="card-body p-2 text-center">
+                  <div class="text-secondary small fw-bold text-uppercase" style="letter-spacing:.4px;">Wishlists</div>
+                  <div class="fs-3 fw-bold">224,5K</div>
+                  <div class="text-secondary" style="font-size:10px;">modelled</div>
+                </div>
+              </div>
+              <div class="d-flex flex-column align-items-center justify-content-center text-secondary px-1" style="min-width:52px;">
+                <span class="small text-uppercase fw-semibold" style="font-size:9px; letter-spacing:.3px;">WL &rarr; PO</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="my-1 text-primary"><polyline points="9 18 15 12 9 6"/></svg>
+                <span class="fw-bold text-secondary">1,88%</span>
+              </div>
+              <div class="card flex-fill">
+                <div class="card-status-top" style="background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 1.0);"></div>
+                <div class="card-body p-2 text-center">
+                  <div class="text-secondary small fw-bold text-uppercase" style="letter-spacing:.4px;">PreOrders</div>
+                  <div class="fs-3 fw-bold">4.218</div>
+                  <div class="text-secondary" style="font-size:10px;">modelled &middot; 35% paid</div>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3 pt-3 border-top small text-secondary">
+              <div class="d-flex align-items-center flex-wrap gap-2">
+                <span class="text-uppercase fw-semibold" style="font-size:10px; letter-spacing:.4px;">Composition:</span>
+                <span>Paid path <strong class="text-body">1.480</strong></span>
+                <span>&middot; Organic &amp; direct <strong class="text-body">2.738</strong></span>
+              </div>
+              <div class="d-flex align-items-center flex-wrap gap-2">
+                <span class="badge bg-secondary-lt">CPPO <strong class="ms-1">197,39&thinsp;&euro;</strong></span>
+                <span class="badge bg-secondary-lt">eCPPO <strong class="ms-1">69,26&thinsp;&euro;</strong></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ WEEKLY PROGRESSION (right cadence for small preorder counts) ═══ -->
+        <div class="card mb-3">
+          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">PreOrders Weekly Progression</span>
+            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Weekly preorder additions split paid / organic + blended eCPPO line.<br>Weekly cadence smooths the small daily counts into a readable trend.</span></span>
+            <div class="dropdown ms-1">
+              <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg>
+              </button>
+              <div class="dropdown-menu dropdown-menu-end">
+                <button class="dropdown-item" id="poWeeklyPngBtn">PNG Image</button>
+                <button class="dropdown-item" id="poWeeklyCsvBtn">CSV Spreadsheet</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="poWeeklyLegend" class="chart-legend d-flex flex-wrap gap-2"></div>
+            <div class="chart-wrapper" style="height:240px">
+              <canvas id="poWeeklyChart"></canvas>
+              <div id="poWeeklyTooltipEl" class="chart-tooltip opacity-0"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ DAILY PREORDER PERFORMANCE ═══ -->
+        <div class="card mb-3">
+          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Daily PreOrder Performance</span>
+            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Day-by-day chain for the last 14 flight days &mdash; delivery, Steam path<br>(incl. wishlists) and preorder outcome. Zero-spend days omitted. Click any header to sort.</span></span>
+            <div class="dropdown ms-1">
+              <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg>
+              </button>
+              <div class="dropdown-menu dropdown-menu-end">
+                <button class="dropdown-item" id="poDailyCsvBtn">CSV Spreadsheet</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body p-0" style="border-bottom-left-radius: inherit; border-bottom-right-radius: inherit; overflow: hidden;">
+            <div class="table-responsive geo-hscroll" style="max-height: 360px; overflow: auto; font-variant-numeric: tabular-nums; border-bottom-left-radius: inherit; border-bottom-right-radius: inherit;">
+              <table class="table wt mb-0 wt-sticky-head wt-freeze-first" id="poDailyTable"></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ PREORDER BREAKDOWN ═══ -->
+        <div class="section-heading">
+          <h3 class="section-heading-title">PreOrder Breakdown</h3>
+          <p class="section-heading-subtitle">The full chain by market and channel &mdash; including organic sources, ranked by eCPPO (the reliable read at low preorder volumes) &mdash; showing where preorders are earned cheapest.</p>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary); margin-right:14px;">PreOrder Breakdown</span>
+            <ul class="nav nav-tabs breakdown-tabs mb-0 flex-shrink-0" id="poBreakdownTabs" role="tablist" style="border-bottom:0;">
+              <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#poTabGeo" role="tab" data-dim="geo">by market</a></li>
+              <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#poTabChannel" role="tab" data-dim="channel">by channel</a></li>
+            </ul>
+            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Cost &rarr; delivery &rarr; Steam path &rarr; preorders per dimension.<br>Organic channels show dashes for paid metrics. Paid-only CPPO rests on<br>small per-row counts &mdash; eCPPO is the honest comparison column.</span></span>
+            <div class="dropdown ms-1">
+              <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg>
+              </button>
+              <div class="dropdown-menu dropdown-menu-end">
+                <button class="dropdown-item" id="poBreakdownPngBtn">Chart PNG</button>
+                <button class="dropdown-item" id="poBreakdownCsvBtn">CSV Spreadsheet</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="tab-content" id="poBreakdownPanes"></div>
+          </div>
+        </div>
+
+        <!-- ═══ EXPLORE DEEPER ═══ -->
+        <div class="section-heading">
+          <h3 class="section-heading-title">Explore deeper</h3>
+          <p class="section-heading-subtitle">Related views for this campaign.</p>
+        </div>
+
+        <div class="row row-deck row-cards mb-3 explore-grid">
+          <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="nativedash-poc-v3-prelaunch.html" class="card h-100 card-link">
+              <div class="card-body d-flex align-items-start gap-3">
+                <span class="explore-icon"><i class="ti ti-layout-dashboard"></i></span>
+                <div class="flex-fill">
+                  <div class="fw-semibold">Overview</div>
+                  <div class="text-secondary small">Game &amp; campaign health at a glance</div>
+                </div>
+                <i class="ti ti-chevron-right text-secondary"></i>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="wishlistinsights-v1.html" class="card h-100 card-link">
+              <div class="card-body d-flex align-items-start gap-3">
+                <span class="explore-icon"><i class="ti ti-heart"></i></span>
+                <div class="flex-fill">
+                  <div class="fw-semibold">Wishlist Insights</div>
+                  <div class="text-secondary small">The pool preorders convert from</div>
+                </div>
+                <i class="ti ti-chevron-right text-secondary"></i>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="performancemedia-v1.html" class="card h-100 card-link">
+              <div class="card-body d-flex align-items-start gap-3">
+                <span class="explore-icon"><i class="ti ti-chart-bar"></i></span>
+                <div class="flex-fill">
+                  <div class="fw-semibold">Performance Overview</div>
+                  <div class="text-secondary small">Full media-buy detail &amp; pacing</div>
+                </div>
+                <i class="ti ti-chevron-right text-secondary"></i>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="creativeinsights-v1.html" class="card h-100 card-link">
+              <div class="card-body d-flex align-items-start gap-3">
+                <span class="explore-icon"><i class="ti ti-palette"></i></span>
+                <div class="flex-fill">
+                  <div class="fw-semibold">Creative Insights</div>
+                  <div class="text-secondary small">Creative quality &amp; ad fatigue</div>
+                </div>
+                <i class="ti ti-chevron-right text-secondary"></i>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- ═══ DATA CONTEXT FOOTER ═══ -->
+        <div class="d-flex align-items-center justify-content-between mt-5 mb-4 px-2 py-3" style="border-top:1px solid rgba(4,32,69,0.1); font-size:0.75rem; color:var(--tblr-secondary,#626976);">
+          <div class="d-flex align-items-center gap-3 flex-wrap">
+            <span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1" style="vertical-align:-1px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Last sync: Mar 3, 2026 09:14 CET</span>
+          </div>
+          <div class="d-flex align-items-center gap-2 flex-shrink-0">
+            <span class="d-inline-flex align-items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#2fb344" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5" fill="#2fb344"/></svg>Live</span>
+          </div>
+        </div>
+
+      </div><!-- /dashboardTab -->
+
+          </div><!-- /entryContent -->
+        </div><!-- /entry-row -->
+      </div><!-- /container-xl -->
+    </div><!-- /page-body -->
+
+    <!-- Footer -->
+    <footer class="footer footer-transparent d-print-none">
+      <div class="container-xl">
+        <div class="text-secondary text-center">
+          POC built with <a href="https://tabler.io" class="link-secondary">Tabler</a> &amp; <a href="https://www.chartjs.org" class="link-secondary">Chart.js</a>
+        </div>
+      </div>
+    </footer>
+  </div><!-- /page-wrapper -->
+
+  <script>
+    // ─── Mock data (Urban Brawl preorder view; totals locked to narrative:
+    //     292.138 € spend · 1.480 paid PO (CPPO 197,39) + 2.738 organic = 4.218 total (v3 hero) · eCPPO 69,26) ──
+    function generateDates(start, end) {
+      const dates = [];
+      const cur = new Date(start);
+      const stop = new Date(end);
+      while (cur <= stop) {
+        dates.push(new Date(cur).toISOString().split('T')[0]);
+        cur.setDate(cur.getDate() + 1);
+      }
+      return dates;
+    }
+    const allLabels = generateDates('2025-11-10', '2026-02-26');
+
+    let seed = 42;
+    function seededRandom() {
+      seed = (seed * 16807 + 0) % 2147483647;
+      return (seed - 1) / 2147483646;
+    }
+
+    const poCost = allLabels.map((dateStr, i) => {
+      seed = 99 + i;
+      let val;
+      if (i < 14) {
+        seed = 99 + i * 7; seededRandom(); seededRandom();
+        const dow = new Date(dateStr).getDay();
+        const base = 10500 - i * 250;
+        val = base + (seededRandom() - 0.5) * 3000;
+        if (dow === 0 || dow === 6) val *= 0.65;
+      } else if (i < 21) {
+        const t = (i - 14) / 7;
+        val = 7000 - t * 3500 + (seededRandom() - 0.5) * 600;
+      } else {
+        val = 3000 + (seededRandom() - 0.5) * 400;
+        const promos = [
+          { start: 30, duration: 7, boost: 3500 },
+          { start: 55, duration: 5, boost: 2500 },
+          { start: 78, duration: 6, boost: 2000 },
+          { start: 95, duration: 4, boost: 3000 },
+        ];
+        for (const p of promos) {
+          if (i >= p.start && i < p.start + p.duration) {
+            const mid = p.duration / 2;
+            const dist = Math.abs((i - p.start) - mid);
+            val += p.boost * (1 - dist / mid * 0.4);
+          }
+        }
+      }
+      return Math.max(0, Math.round(val * 0.867));
+    });
+    (function() {
+      const scale = 292138 / poCost.reduce((a, b) => a + b, 0);
+      for (let i = 0; i < poCost.length; i++) poCost[i] = Math.round(poCost[i] * scale);
+    })();
+
+    function deriveFromCost(ratioPerEuro, opts = {}) {
+      const { weekendDip = 0.2, noiseFactor = 0.08, seedOffset = 0 } = opts;
+      seed = 200 + seedOffset;
+      return allLabels.map((dateStr, i) => {
+        const date = new Date(dateStr);
+        const dow = date.getDay();
+        let val = poCost[i] * ratioPerEuro;
+        if (dow === 0 || dow === 6) val *= (1 - weekendDip);
+        const weekCycle = Math.sin((dow - 1) / 6 * Math.PI);
+        val *= (1 + weekCycle * 0.06);
+        val += (seededRandom() - 0.5) * val * noiseFactor;
+        return Math.max(0, Math.round(val));
+      });
+    }
+
+    const poImp    = deriveFromCost(709, { weekendDip: 0.18, noiseFactor: 0.06, seedOffset: 1 });
+    const poClicks = deriveFromCost(7.7, { weekendDip: 0.20, noiseFactor: 0.08, seedOffset: 3 });
+    const poLP     = poClicks.map(c => Math.round(c * 0.78));
+    // Wishlist daily (same model as the wishlist page, normalized to 224.525 total)
+    const wlPaidD  = deriveFromCost(0.338, { weekendDip: 0.15, noiseFactor: 0.12, seedOffset: 5 });
+    (function() { const sc = 98650 / wlPaidD.reduce((a, b) => a + b, 0); for (let i = 0; i < wlPaidD.length; i++) wlPaidD[i] = Math.round(wlPaidD[i] * sc); })();
+    const wlOrgD = wlPaidD.map((p, i) => {
+      seed = 7000 + i * 11; seededRandom(); seededRandom();
+      let v = p * (1.02 + seededRandom() * 0.5);
+      if (i >= 30 && i <= 33) v += 1400 + seededRandom() * 1600;
+      if (i >= 55 && i <= 57) v += 600 + seededRandom() * 700;
+      return v;
+    });
+    (function() { const sc = 125875 / wlOrgD.reduce((a, b) => a + b, 0); for (let i = 0; i < wlOrgD.length; i++) wlOrgD[i] = Math.round(wlOrgD[i] * sc); })();
+    const wlTotD = wlPaidD.map((p, i) => p + wlOrgD[i]);
+    const svPaidD = poLP.map((lp, i) => { seed = 7500 + i * 13; seededRandom(); seededRandom(); return Math.round(lp * (0.20 + seededRandom() * 0.07)); });
+    const svTotD  = svPaidD.map((sv, i) => sv + Math.round(wlOrgD[i] / 0.222));
+
+    // Daily preorders: paid ~13,6/day avg + organic ~25/day; organic spikes at awards & promo beats; normalized to exact totals
+    const poPaidRaw = deriveFromCost(0.00507, { weekendDip: 0.12, noiseFactor: 0.30, seedOffset: 21 });
+    const poPaid = poPaidRaw.slice();
+    (function() { const sc = 1480 / poPaid.reduce((a, b) => a + b, 0); for (let i = 0; i < poPaid.length; i++) poPaid[i] = Math.round(poPaid[i] * sc); })();
+    const poOrgRaw = poPaid.map((p, i) => {
+      seed = 9100 + i * 17; seededRandom(); seededRandom();
+      let v = p * (1.2 + seededRandom() * 1.2);
+      if (i >= 30 && i <= 33) v += 30 + seededRandom() * 45; // The Game Awards buzz
+      if (i >= 95 && i <= 99) v += 18 + seededRandom() * 25; // late-Feb launch-approach beat
+      return v;
+    });
+    const poOrg = poOrgRaw.slice();
+    (function() { const sc = 2738 / poOrg.reduce((a, b) => a + b, 0); for (let i = 0; i < poOrg.length; i++) poOrg[i] = Math.round(poOrg[i] * sc); })();
+    const poTotD = poPaid.map((p, i) => p + poOrg[i]);
+    const poCumul = [];
+    (function() { let t = 0; poTotD.forEach(v => { t += v; poCumul.push(t); }); })();
+    const dCPPO  = poCost.map((c, i) => poPaid[i] > 0 ? c / poPaid[i] : null);
+    const dECPPO = poCost.map((c, i) => poTotD[i] > 0 ? c / poTotD[i] : null);
+
+    // ─── Helpers ──────────────────────────────────────────────────────
+    function fmt(n) { return n.toLocaleString('de-DE'); }
+    const euroT  = v => fmt(Math.round(v)) + ' €';
+    const euro2  = v => v.toFixed(2).replace('.', ',') + ' €';
+    const pct1   = v => v.toFixed(1).replace('.', ',') + '%';
+    const pct2   = v => v.toFixed(2).replace('.', ',') + '%';
+    const compact = v => v >= 1e6 ? (v / 1e6).toFixed(1).replace('.', ',') + 'M' : v >= 1e3 ? (v / 1e3).toFixed(1).replace('.', ',') + 'K' : fmt(v);
+
+    function makeGradient(ctx, canvas, color) {
+      const g = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      g.addColorStop(0, color);
+      g.addColorStop(1, 'rgba(255,255,255,0)');
+      return g;
+    }
+    function makeTrendCrosshair(scaleId) {
+      return {
+        id: 'ch_' + scaleId,
+        afterDraw(chart) {
+          if (chart.tooltip && chart.tooltip.opacity > 0) {
+            const c = chart.ctx;
+            const x = chart.tooltip.caretX;
+            const scale = chart.scales[scaleId] || Object.values(chart.scales).find(s => s.position === 'left' && s.id !== 'x');
+            if (!scale) return;
+            c.save(); c.beginPath(); c.setLineDash([4, 4]);
+            c.moveTo(x, scale.top); c.lineTo(x, scale.bottom);
+            c.lineWidth = 1; c.strokeStyle = 'rgba(0,0,0,0.25)'; c.stroke(); c.restore();
+          }
+        }
+      };
+    }
+    function makeTrendTooltip(elId, formatters) {
+      return function(context) {
+        const { chart, tooltip } = context;
+        const el = document.getElementById(elId);
+        if (tooltip.opacity === 0) { el.classList.add('opacity-0'); return; }
+        el.classList.remove('opacity-0');
+        if (tooltip.body) {
+          const date = new Date(tooltip.title[0]);
+          const dateStr = isNaN(date) ? tooltip.title[0] : date.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+          let html = '<div class="card"><div class="card-body p-2"><div class="fw-bold mb-1">' + dateStr + '</div><hr class="my-1">';
+          tooltip.dataPoints.forEach(dp => {
+            const color = dp.dataset.borderColor || dp.dataset.backgroundColor;
+            const fmtFn = formatters && formatters[dp.dataset.label] ? formatters[dp.dataset.label] : (v => fmt(v));
+            html += '<div class="tooltip-row"><span class="tooltip-dot" style="background:' + color + '"></span><span class="tooltip-label text-secondary">' + dp.dataset.label + '</span><span class="tooltip-value">' + fmtFn(dp.parsed.y) + '</span></div>';
+          });
+          html += '</div></div>';
+          el.innerHTML = html;
+        }
+        const { offsetLeft, offsetTop } = chart.canvas;
+        const tipW = el.offsetWidth;
+        let left = offsetLeft + tooltip.caretX + 14;
+        if (left + tipW > chart.canvas.offsetLeft + chart.width) left = offsetLeft + tooltip.caretX - tipW - 14;
+        el.style.left = left + 'px';
+        el.style.top = (offsetTop + tooltip.caretY - el.offsetHeight / 2) + 'px';
+      };
+    }
+    const trendXTicks = {
+      maxRotation: 45, autoSkip: true, maxTicksLimit: 14, font: { size: 11 }, color: '#999',
+      callback(value, index) { const d = new Date(allLabels[index]); return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }); }
+    };
+    function downloadChartPng(canvasId, tooltipId, filename) {
+      if (tooltipId) document.getElementById(tooltipId).classList.add('opacity-0');
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = document.getElementById(canvasId).toDataURL('image/png');
+      link.click();
+    }
+    function downloadChartCsv(chart, filename) {
+      const header = ['Date', ...chart.data.datasets.map(ds => ds.label)];
+      const rows = chart.data.labels.map((label, i) => [label, ...chart.data.datasets.map(ds => ds.data[i])].join(','));
+      const blob = new Blob([[header.join(','), ...rows].join('\n')], { type: 'text/csv' });
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = URL.createObjectURL(blob);
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+    function downloadTableCsv(tableEl, filename) {
+      const rows = [];
+      tableEl.querySelectorAll('thead tr, tbody tr, tfoot tr').forEach(tr => {
+        const cells = [];
+        tr.querySelectorAll('th, td').forEach(cell => {
+          if (cell.style.display === 'none') return;
+          let text = cell.textContent.trim().replace(/\s+/g, ' ');
+          if (text.includes(',') || text.includes('"')) text = '"' + text.replace(/"/g, '""') + '"';
+          cells.push(text);
+        });
+        rows.push(cells.join(','));
+      });
+      const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = URL.createObjectURL(blob);
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    // ═══ PREORDER VELOCITY (hero visual) ═══
+    (function() {
+      const canvas = document.getElementById('poVelocityChart');
+      const ctx = canvas.getContext('2d');
+      const V_COLORS = [
+        { solid: '#f08c00', light: 'rgba(240,140,0,0.70)' },   // Paid PO bars
+        { solid: '#ffd43b', light: 'rgba(255,212,59,0.55)' },  // Organic PO bars
+        { solid: '#fab005', light: 'rgba(250,176,5,0.10)' },   // Cumulative line
+        { solid: '#d63939', light: 'rgba(214,57,57,0.10)' },   // CPPO (hidden)
+        { solid: '#0ca678', light: 'rgba(12,166,120,0.10)' },  // eCPPO (hidden)
+        { solid: 'rgba(32,107,196,0.3)', light: 'rgba(32,107,196,0.15)' }, // Cost (hidden)
+      ];
+      const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: allLabels,
+          datasets: [
+            { label: 'Paid PreOrders', data: poPaid, backgroundColor: V_COLORS[0].light, borderWidth: 0, stack: 'po', yAxisID: 'yDaily', order: 5 },
+            { label: 'Organic PreOrders', data: poOrg, backgroundColor: V_COLORS[1].light, borderWidth: 0, stack: 'po', yAxisID: 'yDaily', order: 5 },
+            { label: 'Cumulative Total', data: poCumul, type: 'line', borderColor: V_COLORS[2].solid, backgroundColor: makeGradient(ctx, canvas, V_COLORS[2].light), fill: true, borderWidth: 2.5, tension: 0.35, pointRadius: 0, pointHoverRadius: 5, pointHoverBorderWidth: 2, pointHoverBackgroundColor: '#fff', yAxisID: 'yCumul', order: 1 },
+            { label: 'CPPO', data: dCPPO, type: 'line', borderColor: V_COLORS[3].solid, backgroundColor: 'transparent', borderWidth: 1.5, borderDash: [4, 3], tension: 0.35, pointRadius: 0, pointHoverRadius: 4, yAxisID: 'yEff', order: 2, hidden: true, spanGaps: true },
+            { label: 'eCPPO', data: dECPPO, type: 'line', borderColor: V_COLORS[4].solid, backgroundColor: 'transparent', borderWidth: 1.5, borderDash: [4, 3], tension: 0.35, pointRadius: 0, pointHoverRadius: 4, yAxisID: 'yEff', order: 3, hidden: true, spanGaps: true },
+            { label: 'Cost', data: poCost, backgroundColor: V_COLORS[5].light, borderColor: V_COLORS[5].solid, borderWidth: 1, yAxisID: 'yCost', order: 6, hidden: true },
+          ]
+        },
+        plugins: [makeTrendCrosshair('yDaily')],
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          animation: { duration: 600, easing: 'easeOutQuart' },
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false, external: makeTrendTooltip('poVelocityTooltipEl', {
+              'Paid PreOrders': v => fmt(v), 'Organic PreOrders': v => fmt(v), 'Cumulative Total': v => fmt(v),
+              'CPPO': v => euro2(v), 'eCPPO': v => euro2(v), 'Cost': v => euroT(v),
+            }) }
+          },
+          scales: {
+            x: { stacked: true, grid: { display: false }, ticks: trendXTicks },
+            yDaily: { stacked: true, position: 'left', min: 0, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 }, color: '#999' }, title: { display: true, text: 'Daily PreOrders', font: { size: 12 } } },
+            yCumul: { position: 'right', min: 0, grid: { drawOnChartArea: false }, ticks: { font: { size: 11 }, color: '#999', callback: v => compact(v) }, title: { display: true, text: 'Cumulative', font: { size: 12 } } },
+            yEff: { position: 'right', display: false, min: 0, grid: { drawOnChartArea: false }, ticks: { font: { size: 11 }, color: '#999', callback: v => compact(v) + ' €' }, title: { display: true, text: '€ / PreOrder', font: { size: 12 } } },
+            yCost: { type: 'linear', position: 'right', display: false, min: 0, max: 12000 },
+          }
+        }
+      });
+      const el = document.getElementById('poVelocityLegend');
+      function render() {
+        el.innerHTML = chart.data.datasets.map((ds, i) => {
+          const hidden = !chart.isDatasetVisible(i);
+          const c = V_COLORS[i];
+          const isBar = i === 0 || i === 1 || i === 5;
+          return '<span class="legend-item ' + (hidden ? 'inactive' : '') + '" data-index="' + i + '" data-type="' + (isBar ? 'bar' : 'line') + '" title="' + (hidden ? 'Click to show ' : 'Click to hide ') + ds.label + '" style="background:' + (hidden ? 'transparent' : c.light) + '; border-color:' + (hidden ? '#ccc' : c.solid) + '"><span class="legend-swatch" style="background:' + c.solid + '"></span>' + ds.label + '</span>';
+        }).join('');
+      }
+      el.addEventListener('click', e => {
+        const item = e.target.closest('.legend-item');
+        if (!item) return;
+        const idx = parseInt(item.dataset.index);
+        chart.setDatasetVisibility(idx, !chart.isDatasetVisible(idx));
+        chart.options.scales.yEff.display = chart.isDatasetVisible(3) || chart.isDatasetVisible(4);
+        chart.update(); render();
+      });
+      render();
+      document.getElementById('poVelocityPngBtn').addEventListener('click', () => downloadChartPng('poVelocityChart', 'poVelocityTooltipEl', 'preorder-velocity.png'));
+      document.getElementById('poVelocityCsvBtn').addEventListener('click', () => downloadChartCsv(chart, 'preorder-velocity.csv'));
+    })();
+
+    // ═══ WEEKLY PROGRESSION ═══
+    (function() {
+      const weeks = [];
+      for (let i = 0; i < allLabels.length; i += 7) {
+        const end = Math.min(i + 7, allLabels.length);
+        const d = new Date(allLabels[i]);
+        weeks.push({
+          label: d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
+          paid: poPaid.slice(i, end).reduce((a, b) => a + b, 0),
+          org:  poOrg.slice(i, end).reduce((a, b) => a + b, 0),
+          cost: poCost.slice(i, end).reduce((a, b) => a + b, 0),
+        });
+      }
+      weeks.forEach(w => { const t = w.paid + w.org; w.ecppo = t > 0 ? w.cost / t : null; });
+      const canvas = document.getElementById('poWeeklyChart');
+      const ctx = canvas.getContext('2d');
+      const W_COLORS = [
+        { solid: '#f08c00', light: 'rgba(240,140,0,0.70)' },
+        { solid: '#ffd43b', light: 'rgba(255,212,59,0.55)' },
+        { solid: '#0ca678', light: 'rgba(12,166,120,0.10)' },
+      ];
+      const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: weeks.map(w => w.label),
+          datasets: [
+            { label: 'Paid PreOrders', data: weeks.map(w => w.paid), backgroundColor: W_COLORS[0].light, stack: 'po', yAxisID: 'y', order: 5 },
+            { label: 'Organic PreOrders', data: weeks.map(w => w.org), backgroundColor: W_COLORS[1].light, stack: 'po', yAxisID: 'y', order: 5 },
+            { label: 'eCPPO', data: weeks.map(w => w.ecppo), type: 'line', borderColor: W_COLORS[2].solid, backgroundColor: 'transparent', borderWidth: 2, borderDash: [4, 3], tension: 0.35, pointRadius: 3, pointBackgroundColor: '#fff', pointBorderColor: W_COLORS[2].solid, yAxisID: 'yEff', order: 1, spanGaps: true },
+          ]
+        },
+        plugins: [makeTrendCrosshair('y')],
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          animation: { duration: 600, easing: 'easeOutQuart' },
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false, external: makeTrendTooltip('poWeeklyTooltipEl', {
+              'Paid PreOrders': v => fmt(v), 'Organic PreOrders': v => fmt(v), 'eCPPO': v => euro2(v),
+            }) }
+          },
+          scales: {
+            x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 }, color: '#999' } },
+            y: { stacked: true, position: 'left', min: 0, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 }, color: '#999' }, title: { display: true, text: 'Weekly PreOrders', font: { size: 12 } } },
+            yEff: { position: 'right', min: 0, grid: { drawOnChartArea: false }, ticks: { font: { size: 11 }, color: '#999', callback: v => fmt(v) + ' €' }, title: { display: true, text: 'eCPPO (€)', font: { size: 12 } } },
+          }
+        }
+      });
+      const el = document.getElementById('poWeeklyLegend');
+      function render() {
+        el.innerHTML = chart.data.datasets.map((ds, i) => {
+          const hidden = !chart.isDatasetVisible(i);
+          const c = W_COLORS[i];
+          return '<span class="legend-item ' + (hidden ? 'inactive' : '') + '" data-index="' + i + '" data-type="' + (i < 2 ? 'bar' : 'line') + '" title="' + (hidden ? 'Click to show ' : 'Click to hide ') + ds.label + '" style="background:' + (hidden ? 'transparent' : c.light) + '; border-color:' + (hidden ? '#ccc' : c.solid) + '"><span class="legend-swatch" style="background:' + c.solid + '"></span>' + ds.label + '</span>';
+        }).join('');
+      }
+      el.addEventListener('click', e => {
+        const item = e.target.closest('.legend-item');
+        if (!item) return;
+        const idx = parseInt(item.dataset.index);
+        chart.setDatasetVisibility(idx, !chart.isDatasetVisible(idx));
+        chart.update(); render();
+      });
+      render();
+      document.getElementById('poWeeklyPngBtn').addEventListener('click', () => downloadChartPng('poWeeklyChart', 'poWeeklyTooltipEl', 'preorder-weekly.png'));
+      document.getElementById('poWeeklyCsvBtn').addEventListener('click', () => downloadChartCsv(chart, 'preorder-weekly.csv'));
+    })();
+
+    // ═══ DAILY PREORDER PERFORMANCE (last 14 days, sortable) ═══
+    (function() {
+      const N = 14;
+      const startIdx = Math.max(0, allLabels.length - N);
+      const days = [];
+      for (let i = startIdx; i < allLabels.length; i++) {
+        const c = poCost[i];
+        if (c === 0) continue;
+        const im = poImp[i], k = poClicks[i], lp = poLP[i], svt = svTotD[i], wl = wlTotD[i];
+        const ppo = poPaid[i], tpo = poTotD[i];
+        days.push({
+          date: allLabels[i], cost: c, imp: im, clk: k, lp, svt, wl, ppo, tpo,
+          cpm: c / im * 1000, cpc: c / k, ctr: k / im * 100,
+          cr: tpo / svt * 100, cppo: ppo > 0 ? c / ppo : null, ecppo: tpo > 0 ? c / tpo : null,
+        });
+      }
+      const tot = days.reduce((a, d) => ({ cost: a.cost + d.cost, imp: a.imp + d.imp, clk: a.clk + d.clk, lp: a.lp + d.lp, svt: a.svt + d.svt, wl: a.wl + d.wl, ppo: a.ppo + d.ppo, tpo: a.tpo + d.tpo }), { cost: 0, imp: 0, clk: 0, lp: 0, svt: 0, wl: 0, ppo: 0, tpo: 0 });
+
+      const dCols = [
+        { key: 'cost',  head: 'Cost',          group: null,    fmtFn: euroT, end: true },
+        { key: 'imp',   head: 'Impressions',   group: 'del',   fmtFn: fmt },
+        { key: 'cpm',   head: 'CPM',           group: 'del',   fmtFn: euro2 },
+        { key: 'clk',   head: 'Clicks',        group: 'del',   fmtFn: fmt },
+        { key: 'cpc',   head: 'CPC',           group: 'del',   fmtFn: euro2 },
+        { key: 'ctr',   head: 'CTR%',          group: 'del',   fmtFn: pct2, end: true },
+        { key: 'lp',    head: 'LP Visits',     group: 'steam', fmtFn: fmt },
+        { key: 'svt',   head: 'Steam Visits',  group: 'steam', fmtFn: fmt },
+        { key: 'wl',    head: 'Wishlists',     group: 'steam', fmtFn: fmt, end: true },
+        { key: 'tpo',   head: 'PreOrders',     group: 'po',    fmtFn: fmt },
+        { key: 'ppo',   head: 'Paid PreOrders', group: 'po',   fmtFn: fmt },
+        { key: 'cr',    head: 'PO CR%',        group: 'po',    fmtFn: pct2 },
+        { key: 'cppo',  head: 'CPPO',          group: 'po',    fmtFn: euro2 },
+        { key: 'ecppo', head: 'eCPPO',         group: 'po',    fmtFn: euro2 },
+      ];
+      const dGroups = { del: ['Delivery', 5], steam: ['Steam Path', 3], po: ['PreOrders', 5] };
+      const dAscDefault = ['cpm', 'cpc', 'cppo', 'ecppo', 'date'];
+      const state = { key: 'date', asc: true };
+
+      function render() {
+        const { key, asc } = state;
+        const sorted = [...days].sort((a, b) => {
+          if (key === 'date') return asc ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date);
+          const av = a[key], bv = b[key];
+          if (av == null && bv == null) return 0;
+          if (av == null) return 1;
+          if (bv == null) return -1;
+          return asc ? av - bv : bv - av;
+        });
+        const isMetric = key !== 'date';
+        const vals = isMetric ? sorted.map(d => d[key]).filter(v => v != null) : [];
+        const minV = Math.min(...vals), maxV = Math.max(...vals), range = maxV - minV || 1;
+
+        const sortTh = (k, head, extra) => {
+          const active = state.key === k;
+          const arrow = active && !state.asc ? '&#x25BC;' : '&#x25B2;';
+          return '<th class="' + (k === 'date' ? 'col-geo-label' : 'text-end') + ' sortable' + (active ? ' sort-active' : '') + (extra || '') + '" data-key="' + k + '"' + (k === 'date' || k === 'cost' ? ' rowspan="2"' : '') + '>' + head + '<span class="sort-icon">' + arrow + '</span></th>';
+        };
+        let h = '<thead><tr class="th-group">' +
+          sortTh('date', 'Date') +
+          sortTh('cost', 'Cost', ' group-end');
+        Object.keys(dGroups).forEach((g, gi, arr) => {
+          h += '<th colspan="' + dGroups[g][1] + '" class="text-center th-group-label' + (gi < arr.length - 1 ? ' group-end' : '') + '">' + dGroups[g][0] + '</th>';
+        });
+        h += '</tr><tr>';
+        dCols.forEach(c => { if (c.group) h += sortTh(c.key, c.head, c.end ? ' group-end' : ''); });
+        h += '</tr></thead><tbody>';
+
+        sorted.forEach(d => {
+          const norm = (isMetric && d[key] != null) ? (asc ? 1 - (d[key] - minV) / range : (d[key] - minV) / range) : 0;
+          const opacity = (0.04 + norm * 0.18).toFixed(2);
+          h += '<tr><td class="col-geo-label" style="white-space:nowrap;">' + d.date + '</td>';
+          dCols.forEach(c => {
+            const v = d[c.key];
+            const hl = c.key === key && isMetric ? ' style="background:rgba(116,182,231,' + opacity + ');"' : '';
+            h += '<td class="text-end' + (c.end ? ' group-end' : '') + '"' + hl + '>' + (v == null ? '<span class="text-secondary">&mdash;</span>' : c.fmtFn(v)) + '</td>';
+          });
+          h += '</tr>';
+        });
+
+        const totRow = {
+          cost: tot.cost, imp: tot.imp, clk: tot.clk, lp: tot.lp, svt: tot.svt, wl: tot.wl, ppo: tot.ppo, tpo: tot.tpo,
+          cpm: tot.cost / tot.imp * 1000, cpc: tot.cost / tot.clk, ctr: tot.clk / tot.imp * 100,
+          cr: tot.tpo / tot.svt * 100, cppo: tot.ppo > 0 ? tot.cost / tot.ppo : null, ecppo: tot.tpo > 0 ? tot.cost / tot.tpo : null,
+        };
+        h += '</tbody><tfoot style="position: sticky; bottom: 0; z-index: 1; background: var(--tblr-bg-surface, #fff);"><tr>' +
+          '<td class="col-geo-label" style="white-space:nowrap;">Grand Total</td>';
+        dCols.forEach(c => { const v = totRow[c.key]; h += '<td class="text-end' + (c.end ? ' group-end' : '') + '">' + (v == null ? '&mdash;' : c.fmtFn(v)) + '</td>'; });
+        h += '</tr></tfoot>';
+
+        const table = document.getElementById('poDailyTable');
+        table.innerHTML = h;
+        table.querySelectorAll('th.sortable').forEach(thEl => {
+          thEl.addEventListener('click', () => {
+            const k = thEl.dataset.key;
+            if (state.key === k) state.asc = !state.asc;
+            else { state.key = k; state.asc = dAscDefault.includes(k); }
+            render();
+          });
+        });
+      }
+      render();
+      document.getElementById('poDailyCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('poDailyTable'), 'daily-preorder-performance.csv'));
+    })();
+
+    // ═══ PREORDER BREAKDOWN — by market / by channel ═══
+    const poDims = {
+      geo: {
+        labelHead: 'Market',
+        rows: [
+          { label: 'US', flag: 'us', color: '#206bc4', cost: 79000, imp: 50600000, clk: 770000, sv: 248000, wl: 56000, po: 1180, ppo: 430 },
+          { label: 'DE', flag: 'de', color: '#f59f00', cost: 62300, imp: 48000000, clk: 525000, sv: 232000, wl: 57500, po: 950, ppo: 350 },
+          { label: 'UK', flag: 'gb', color: '#d63939', cost: 39600, imp: 24600000, clk: 243000, sv: 96000, wl: 23000, po: 420, ppo: 150 },
+          { label: 'FR', flag: 'fr', color: '#f76707', cost: 28400, imp: 24200000, clk: 241000, sv: 102000, wl: 24500, po: 450, ppo: 160 },
+          { label: 'CA', flag: 'ca', color: '#0ca678', cost: 22700, imp: 14800000, clk: 139000, sv: 62000, wl: 14500, po: 260, ppo: 90 },
+          { label: 'JP', flag: 'jp', color: '#ae3ec9', cost: 19800, imp: 10900000, clk: 93000, sv: 44000, wl: 9200, po: 180, ppo: 60 },
+          { label: 'AU', flag: 'au', color: '#845ef7', cost: 17000, imp: 10000000, clk: 89000, sv: 40000, wl: 9000, po: 170, ppo: 55 },
+          { label: 'BR', flag: 'br', color: '#2fb344', cost: 14200, imp: 18300000, clk: 95000, sv: 151000, wl: 24000, po: 480, ppo: 145 },
+          { label: 'ES', flag: 'es', color: '#66757f', cost: 9138, imp: 5800000, clk: 58000, sv: 30000, wl: 6825, po: 128, ppo: 40 },
+        ]
+      },
+      channel: {
+        labelHead: 'Channel',
+        rows: [
+          { label: 'Meta',    color: '#206bc4', cost: 96500, imp: 63500000, clk: 1207000, sv: 168000, wl: 52000, po: 560, ppo: 560 },
+          { label: 'YouTube', color: '#d63939', cost: 68400, imp: 65100000, clk: 423000, sv: 92000, wl: 7000, po: 95, ppo: 95 },
+          { label: 'TikTok',  color: '#000000', cost: 58200, imp: 47700000, clk: 372000, sv: 78000, wl: 23500, po: 290, ppo: 290 },
+          { label: 'Reddit',  color: '#ff4500', cost: 38600, imp: 16100000, clk: 124000, sv: 28000, wl: 8400, po: 115, ppo: 115 },
+          { label: 'PMax',    color: '#f59f00', cost: 21438, imp: 9400000, clk: 86000, sv: 22000, wl: 6300, po: 360, ppo: 360 },
+          { label: 'X',       color: '#66757f', cost: 9000, imp: 6400000, clk: 41000, sv: 8000, wl: 1450, po: 60, ppo: 60 },
+          { label: 'Direct (organic)',   color: '#2fb344', cost: null, imp: null, clk: null, sv: 380000, wl: 89200, po: 1890, ppo: null },
+          { label: 'Search (organic)',   color: '#0ca678', cost: null, imp: null, clk: null, sv: 121000, wl: 22350, po: 540, ppo: null },
+          { label: 'Referrer (organic)', color: '#15aabf', cost: null, imp: null, clk: null, sv: 83000, wl: 14325, po: 308, ppo: null },
+        ]
+      }
+    };
+    const PO_TOTAL = 4218;
+    Object.values(poDims).forEach(dim => {
+      dim.rows.forEach(r => {
+        r.cpm   = (r.imp && r.cost) ? r.cost / r.imp * 1000 : null;
+        r.cpc   = (r.clk && r.cost) ? r.cost / r.clk : null;
+        r.ctr   = (r.imp && r.clk) ? r.clk / r.imp * 100 : null;
+        r.wl2po = (r.wl && r.po) ? r.po / r.wl * 100 : null;
+        r.cr    = (r.sv && r.po) ? r.po / r.sv * 100 : null;
+        r.cppo  = (r.ppo && r.cost) ? r.cost / r.ppo : null;
+        r.ecppo = (r.po && r.cost) ? r.cost / r.po : null;
+        r.share = r.po != null ? r.po / PO_TOTAL * 100 : null;
+      });
+    });
+
+    const poCols = [
+      { key: 'cost',  head: 'Cost',          group: null,    fmtFn: euroT },
+      { key: 'imp',   head: 'Impressions',   group: 'del',   fmtFn: fmt },
+      { key: 'cpm',   head: 'CPM',           group: 'del',   fmtFn: euro2 },
+      { key: 'clk',   head: 'Clicks',        group: 'del',   fmtFn: fmt },
+      { key: 'cpc',   head: 'CPC',           group: 'del',   fmtFn: euro2 },
+      { key: 'ctr',   head: 'CTR%',          group: 'del',   fmtFn: pct2 },
+      { key: 'sv',    head: 'Steam Visits',  group: 'steam', fmtFn: fmt },
+      { key: 'wl',    head: 'Wishlists',     group: 'steam', fmtFn: fmt },
+      { key: 'wl2po', head: 'WL → PO %',    group: 'steam', fmtFn: pct2 },
+      { key: 'po',    head: 'PreOrders',     group: 'po',    fmtFn: fmt },
+      { key: 'ppo',   head: 'Paid PreOrders', group: 'po',   fmtFn: fmt },
+      { key: 'cr',    head: 'PO CR%',        group: 'po',    fmtFn: pct2 },
+      { key: 'cppo',  head: 'CPPO',          group: 'po',    fmtFn: euro2 },
+      { key: 'ecppo', head: 'eCPPO',         group: 'po',    fmtFn: euro2 },
+      { key: 'share', head: '% of Total PO', group: 'po',    fmtFn: pct1 },
+    ];
+    const poGroups = { del: 'Delivery', steam: 'Steam Path', po: 'PreOrders' };
+    const poAscDefault = ['cpm', 'cpc', 'cppo', 'ecppo'];
+    const poSortState = { geo: { key: 'ecppo', asc: true }, channel: { key: 'ecppo', asc: true } };
+    const poCharts = {};
+
+    (function() {
+      const panes = document.getElementById('poBreakdownPanes');
+      Object.keys(poDims).forEach((dim, i) => {
+        const cap = dim.charAt(0).toUpperCase() + dim.slice(1);
+        const pane = document.createElement('div');
+        pane.className = 'tab-pane' + (i === 0 ? ' active' : '');
+        pane.id = 'poTab' + cap;
+        pane.setAttribute('role', 'tabpanel');
+        pane.innerHTML =
+          '<div class="row align-items-center">' +
+          '  <div class="col-lg-3"><div style="position: relative; height: 220px;"><canvas id="poChart' + cap + '"></canvas><div id="poTooltip' + cap + '" class="chart-tooltip opacity-0"></div></div></div>' +
+          '  <div class="col-lg-9"><div class="table-responsive geo-scroll-5 geo-hscroll"><table class="table wt mb-0 wt-sticky-head wt-freeze-first" id="poTable-' + dim + '" data-dim="' + dim + '"></table></div></div>' +
+          '</div>';
+        panes.appendChild(pane);
+      });
+    })();
+
+    function poDoughnutTooltip(tooltipElId, metric, fmtFn) {
+      return function(context) {
+        const { chart, tooltip } = context;
+        const el = document.getElementById(tooltipElId);
+        if (tooltip.opacity === 0) { el.classList.add('opacity-0'); return; }
+        el.classList.remove('opacity-0');
+        if (tooltip.dataPoints && tooltip.dataPoints.length) {
+          const dp = tooltip.dataPoints[0];
+          const total = dp.dataset.data.reduce((a, b) => a + b, 0);
+          const share = ((dp.parsed / total) * 100).toFixed(1);
+          el.innerHTML = '<div class="card"><div class="card-body p-2"><div class="fw-bold mb-1">' + dp.label + '</div><hr class="my-1">' +
+            '<div class="tooltip-row"><span class="tooltip-dot" style="background:' + dp.element.options.backgroundColor + '"></span><span class="tooltip-label text-secondary">' + metric + '</span><span class="tooltip-value">' + fmtFn(dp.parsed) + '</span></div>' +
+            '<div class="tooltip-row"><span class="tooltip-dot" style="background:transparent"></span><span class="tooltip-label text-secondary">Share</span><span class="tooltip-value">' + share + '%</span></div>' +
+            '</div></div>';
+        }
+        const { offsetLeft, offsetTop } = chart.canvas;
+        const tipWidth = el.offsetWidth;
+        let left = offsetLeft + tooltip.caretX + 14;
+        if (left + tipWidth > chart.canvas.offsetLeft + chart.width) left = offsetLeft + tooltip.caretX - tipWidth - 14;
+        el.style.left = left + 'px';
+        el.style.top = (offsetTop + tooltip.caretY - el.offsetHeight / 2) + 'px';
+      };
+    }
+
+    function poGroupEndKeys() {
+      const groups = ['del', 'steam', 'po'];
+      const ends = new Set(['cost']);
+      groups.forEach((g, gi) => {
+        if (gi === groups.length - 1) return;
+        const groupCols = poCols.filter(c => c.group === g);
+        ends.add(groupCols[groupCols.length - 1].key);
+      });
+      return ends;
+    }
+
+    function poRenderTable(dim) {
+      const { key, asc } = poSortState[dim];
+      const isText = key === 'label';
+      const rows = [...poDims[dim].rows].sort((a, b) => {
+        const av = a[key], bv = b[key];
+        if (av == null && bv == null) return 0;
+        if (av == null) return 1;
+        if (bv == null) return -1;
+        if (isText) return asc ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
+        return asc ? av - bv : bv - av;
+      });
+      const vals = isText ? [] : rows.map(r => r[key]).filter(v => v != null);
+      const minV = Math.min(...vals), maxV = Math.max(...vals), range = maxV - minV || 1;
+      const ends = poGroupEndKeys();
+      const sort = poSortState[dim];
+      const groupCounts = {};
+      poCols.forEach(c => { if (c.group) groupCounts[c.group] = (groupCounts[c.group] || 0) + 1; });
+
+      let h = '<thead><tr class="th-group">';
+      h += '<th rowspan="2" class="col-geo-label sortable' + (sort.key === 'label' ? ' sort-active' : '') + '" data-key="label">' + poDims[dim].labelHead + '<span class="sort-icon">' + (sort.key === 'label' && !sort.asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
+      h += '<th rowspan="2" class="text-end sortable group-end' + (sort.key === 'cost' ? ' sort-active' : '') + '" data-key="cost">Cost<span class="sort-icon">' + (sort.key === 'cost' && !sort.asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
+      Object.keys(poGroups).forEach((g, gi, arr) => {
+        h += '<th colspan="' + groupCounts[g] + '" class="text-center th-group-label' + (gi < arr.length - 1 ? ' group-end' : '') + '">' + poGroups[g] + '</th>';
+      });
+      h += '</tr><tr>';
+      poCols.forEach(c => {
+        if (!c.group) return;
+        const active = sort.key === c.key;
+        const arrow = active && !sort.asc ? '&#x25BC;' : '&#x25B2;';
+        h += '<th class="text-end sortable' + (active ? ' sort-active' : '') + (ends.has(c.key) ? ' group-end' : '') + '" data-key="' + c.key + '">' + c.head + '<span class="sort-icon">' + arrow + '</span></th>';
+      });
+      h += '</tr></thead><tbody>';
+
+      rows.forEach(r => {
+        const rawV = r[key];
+        const norm = (isText || rawV == null) ? 0 : (asc ? 1 - (rawV - minV) / range : (rawV - minV) / range);
+        const opacity = (0.04 + norm * 0.18).toFixed(2);
+        const bold = norm > 0.9 ? ' font-weight:600;' : '';
+        const dot = '<span class="d-inline-block rounded-circle me-2" style="width:10px; height:10px; background:' + r.color + '; vertical-align:middle;"></span>';
+        const flag = r.flag ? '<span class="flag flag-' + r.flag + ' me-1"></span>' : '';
+        h += '<tr><td class="col-geo-label" style="white-space:nowrap;">' + dot + flag + r.label + '</td>';
+        poCols.forEach(c => {
+          const v = r[c.key];
+          const hl = (c.key === key && !isText) ? ' style="background:rgba(116,182,231,' + opacity + ');' + bold + '"' : '';
+          h += '<td class="text-end' + (ends.has(c.key) ? ' group-end' : '') + '"' + hl + '>' + (v == null ? '<span class="text-secondary">&mdash;</span>' : c.fmtFn(v)) + '</td>';
+        });
+        h += '</tr>';
+      });
+      h += '</tbody>';
+
+      const table = document.getElementById('poTable-' + dim);
+      table.innerHTML = h;
+      table.querySelectorAll('th.sortable').forEach(thEl => {
+        thEl.addEventListener('click', () => {
+          const k = thEl.dataset.key;
+          const st = poSortState[dim];
+          if (st.key === k) st.asc = !st.asc;
+          else { st.key = k; st.asc = poAscDefault.includes(k) || k === 'label'; }
+          poRenderTable(dim);
+        });
+      });
+
+      const additive = ['cost', 'imp', 'clk', 'sv', 'wl', 'po', 'ppo'];
+      const pieKey = additive.includes(key) ? key : 'po';
+      const cm = poCols.find(c => c.key === pieKey);
+      const chartRows = rows.filter(r => r[pieKey] != null && r[pieKey] > 0);
+      const cap = dim.charAt(0).toUpperCase() + dim.slice(1);
+      const chart = poCharts[dim];
+      if (chart) {
+        chart.data.labels = chartRows.map(r => r.label);
+        chart.data.datasets[0].data = chartRows.map(r => r[pieKey]);
+        chart.data.datasets[0].backgroundColor = chartRows.map(r => r.color);
+        chart.options.plugins.tooltip.external = poDoughnutTooltip('poTooltip' + cap, cm.head, cm.fmtFn);
+        chart.update();
+      }
+    }
+
+    Object.keys(poDims).forEach(dim => {
+      const cap = dim.charAt(0).toUpperCase() + dim.slice(1);
+      poCharts[dim] = new Chart(document.getElementById('poChart' + cap), {
+        type: 'doughnut',
+        data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false, external: () => {} } } }
+      });
+      poRenderTable(dim);
+    });
+    document.querySelectorAll('#poBreakdownTabs a[data-bs-toggle="tab"]').forEach(tab => {
+      tab.addEventListener('shown.bs.tab', (e) => {
+        const pane = document.querySelector(e.target.getAttribute('href'));
+        if (pane) pane.querySelectorAll('canvas').forEach(c => { const inst = Chart.getChart(c); if (inst) inst.resize(); });
+      });
+    });
+    function poActiveDim() {
+      const link = document.querySelector('#poBreakdownTabs .nav-link.active');
+      return link ? link.dataset.dim : 'geo';
+    }
+    document.getElementById('poBreakdownPngBtn').addEventListener('click', () => {
+      const dim = poActiveDim();
+      const cap = dim.charAt(0).toUpperCase() + dim.slice(1);
+      downloadChartPng('poChart' + cap, 'poTooltip' + cap, 'preorder-breakdown-' + dim + '.png');
+    });
+    document.getElementById('poBreakdownCsvBtn').addEventListener('click', () => {
+      const dim = poActiveDim();
+      downloadTableCsv(document.getElementById('poTable-' + dim), 'preorder-breakdown-' + dim + '.csv');
+    });
+
+    /* ═══ SIDEBAR TOGGLE ═══ */
+    function toggleSidebar() {
+      const sidebar = document.getElementById('entrySidebar');
+      const collapsed = sidebar.classList.toggle('collapsed');
+      document.getElementById('sidebarCollapseToggle').setAttribute('data-title', collapsed ? 'Expand' : 'Collapse');
+      setTimeout(() => {
+        document.querySelectorAll('canvas').forEach(c => {
+          const chart = Chart.getChart(c);
+          if (chart) chart.resize();
+        });
+      }, 250);
+    }
+    document.addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'b') { e.preventDefault(); toggleSidebar(); }
+    });
+
+    /* ═══ FILTER RESET VISIBILITY ═══ */
+    function updateResetVisibility() {
+      const resetBtn = document.getElementById('filterReset');
+      if (!resetBtn) return;
+      let hasActive = false;
+      document.querySelectorAll('.brand-filter-card .form-select').forEach(sel => {
+        if (sel.selectedIndex !== 0) hasActive = true;
+      });
+      if (hasActive) { resetBtn.classList.remove('d-none'); resetBtn.classList.add('d-inline-flex'); }
+    }
+    document.querySelectorAll('.brand-filter-card .form-select').forEach(sel => {
+      sel.addEventListener('change', updateResetVisibility);
+    });
+    updateResetVisibility();
+  </script>
+  <script>
+    // Sticky-state shadow: elevation cue only while the filter bar is actually pinned
+    (function() {
+      const bar = document.querySelector('.brand-filter-card');
+      const sentinel = document.getElementById('filterStickySentinel');
+      if (!bar || !sentinel || !('IntersectionObserver' in window)) return;
+      new IntersectionObserver(([e]) => {
+        bar.classList.toggle('is-stuck', !e.isIntersecting);
+      }, { rootMargin: '-9px 0px 0px 0px' }).observe(sentinel);
+    })();
+  </script>
+</body>
+</html>
