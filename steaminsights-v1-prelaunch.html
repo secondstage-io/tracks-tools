@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Revenue &amp; LTV (DLC) — TRACKS Native Dashboard</title>
+  <title>Steam Insights (Prelaunch) — TRACKS Native Dashboard</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.6.0/dist/tabler-icons.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/js/tabler.min.js"></script>
@@ -283,7 +283,11 @@
     /* Hero scorecard tiles (status-only) + chart lens chips (selection) — split 2026-06-05 */
     .score-tile { padding: 10px 12px 9px; }
     .score-tile .kpi-value { font-size: 1.15rem; }
+    .mention-link:hover { color: var(--tblr-primary, #FF0249) !important; }
     .hero-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--tblr-secondary, #626976); margin-bottom: 6px; }
+    .hero-stats-lead .kpi-value { font-size: 1.45rem; line-height: 1.15; }
+    .trend-ctrl-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--tblr-secondary, #626976); white-space: nowrap; }
+    .trend-ctrl-sep { width: 1px; align-self: stretch; min-height: 20px; background: rgba(4,32,69,0.12); margin: 0 4px; }
     .lens-chips { display: flex; flex-wrap: wrap; gap: 6px; }
     .lens-chip { font-size: 11px; font-weight: 600; letter-spacing: 0.3px; padding: 3px 12px; border-radius: 999px; border: 1px solid rgba(4,32,69,0.15); background: transparent; color: var(--tblr-secondary, #626976); cursor: pointer; transition: color 0.15s, background 0.15s, border-color 0.15s; line-height: 1.5; }
     .lens-chip:hover { border-color: var(--tblr-primary, #FF0249); color: var(--tblr-primary, #FF0249); }
@@ -467,14 +471,14 @@
             </div>
             <nav class="nav nav-pills nav-vertical" style="font-size:13px;">
               <li class="nav-item"><a class="nav-link" href="nativedash-poc-v3-prelaunch.html" data-title="Overview"><i class="ti ti-layout-dashboard me-2"></i><span>Overview</span></a></li>
-              <li class="nav-item"><a class="nav-link" href="steaminsights-v1.html" data-title="Steam Insights"><i class="ti ti-brand-steam me-2"></i><span>Steam Insights</span></a></li>
+              <li class="nav-item"><a class="nav-link active" href="#" data-title="Steam Insights"><i class="ti ti-brand-steam me-2"></i><span>Steam Insights</span></a></li>
               <li class="nav-item"><a class="nav-link" href="periodcomparison-v1.html" data-title="Period Comparison"><i class="ti ti-arrows-diff me-2"></i><span>Period Comparison</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Growth</span></li>
               <li class="nav-item"><a class="nav-link" href="installsua-v1.html" data-title="Installs & UA"><i class="ti ti-device-gamepad-2 me-2"></i><span>Installs &amp; UA</span></a></li>
               <li class="nav-item"><a class="nav-link" href="wishlistinsights-v1.html" data-title="Wishlist Insights"><i class="ti ti-heart me-2"></i><span>Wishlist Insights</span></a></li>
               <li class="nav-item"><a class="nav-link" href="preorderinsights-v1.html" data-title="Preorder Insights"><i class="ti ti-shopping-cart me-2"></i><span>Preorder Insights</span></a></li>
               <li class="nav-item"><a class="nav-link" href="playerlifecycle-v1.html" data-title="Player Lifecycle"><i class="ti ti-refresh me-2"></i><span>Player Lifecycle</span></a></li>
-              <li class="nav-item"><a class="nav-link active" href="monetizationltv-v1.html" data-title="Revenue & LTV"><i class="ti ti-coin me-2"></i><span>Revenue &amp; LTV</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="monetizationltv-v1.html" data-title="Revenue & LTV"><i class="ti ti-coin me-2"></i><span>Revenue &amp; LTV</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Media & Web</span></li>
               <li class="nav-item"><a class="nav-link" href="performancemedia-v1.html" data-title="Performance Overview"><i class="ti ti-chart-bar me-2"></i><span>Performance Overview</span></a></li>
               <li class="nav-item"><a class="nav-link" href="awarenesstracker-v1.html" data-title="Awareness Tracker"><i class="ti ti-eye me-2"></i><span>Awareness Tracker</span></a></li>
@@ -516,7 +520,7 @@
               <rect x="20" y="106" width="360" height="2" fill="url(#brawlGrad)" opacity="0.7" rx="1"/>
             </svg>
             <div style="width:1px; height:38px; background:rgba(4,32,69,0.15); flex-shrink:0;"></div>
-            <div style="font-size:22px; font-weight:700; color: var(--tblr-body-color, #1e293b); line-height:1.2;">Revenue &amp; LTV <span class="info-tip tip-right" style="vertical-align: 3px; padding: 0; margin-left: 8px;"><span style="display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--tblr-primary, #FF0249); background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.06); border: 1px solid rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.2); border-radius: 999px; padding: 2px 9px; line-height: 1.4;">Modelled<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span><span class="tip-text" style="min-width: 280px; font-weight: 400; text-transform: none; letter-spacing: normal;">Revenue figures on this page are <strong>modelled</strong>: storefront-reported gross, minus refunds, platform fees and taxes, linked to TRACKS attribution. Console storefronts report with a 2&ndash;5 day lag &mdash; recent days mature over time.</span></span></div>
+            <div style="font-size:22px; font-weight:700; color: var(--tblr-body-color, #1e293b); line-height:1.2;">Steam Insights <span class="info-tip tip-right" style="vertical-align: 3px; padding: 0; margin-left: 8px;"><span style="display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--tblr-primary, #FF0249); background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.06); border: 1px solid rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.2); border-radius: 999px; padding: 2px 9px; line-height: 1.4;">Estimated<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span><span class="tip-text" style="min-width: 290px; font-weight: 400; text-transform: none; letter-spacing: normal;">Before release, Steam exposes only followers and the Popular&nbsp;Upcoming rank. Figures here are <strong>independent estimates</strong> from the 2S Steam DB &mdash; followers&times;12 (wishlists), each with a confidence band &mdash; cross-checked against the TRACKS modelled wishlists where they exist. No reviews, owners or sales until launch.</span></span></div>
           </div>
           <div class="d-flex align-items-center gap-1">
             <a href="#" class="btn btn-sm btn-ghost-secondary p-2" title="Settings" aria-label="Settings"><i class="ti ti-adjustments-alt" style="font-size:18px;"></i></a>
@@ -542,24 +546,16 @@
                 <span class="filter-active-count has-filters" id="filterCount">1</span>
                 <i class="ti ti-chevron-down" style="font-size:14px;"></i>
               </button>
-              <!-- Date filters (left side) -->
-              <div class="btn-group btn-group-sm flex-shrink-0" role="group" aria-label="Revenue scope">
-                <button type="button" class="btn btn-outline-secondary" title="Base game + DLC & add-ons combined" onclick="location.href='monetizationltv-v1.html'">All Revenue</button>
-                <button type="button" class="btn btn-outline-secondary" title="Edition sales only (Standard / Deluxe / Ultimate)" onclick="location.href='monetizationltv-v1-base.html'">Base</button>
-                <button type="button" class="btn btn-primary" title="DLC & add-on content only — re-frames the page around attach, per-DLC performance and DLC campaigns. Datasets switch, never blend.">DLC</button>
+              <!-- Phase selector (dataset switch — navigates between phase pages, never blends) -->
+              <div class="btn-group btn-group-sm flex-shrink-0" role="group" aria-label="Campaign phase">
+                <button type="button" class="btn btn-primary" title="Prelaunch window (Nov 10 – Feb 26) — followers & wishlist build, regional interest, demo & Next Fest; no reviews / owners / players yet">Prelaunch</button>
+                <button type="button" class="btn btn-outline-secondary" title="Post-launch (from Feb 26) — reviews, owners, players, pricing & discounts" onclick="location.href='steaminsights-v1.html'">Launch</button>
               </div>
-              <span class="info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Revenue scope &mdash; datasets switch, never blend (like Game&thinsp;|&thinsp;Demo on Installs &amp; UA).<br><strong>All Revenue:</strong> base game + DLC &amp; add-ons (default; blended LTV needs both).<br><strong>Base:</strong> edition sales only.<br><strong>DLC:</strong> add-on content only &mdash; per-DLC trends, attach by cohort age, DLC campaign ROAS.</span></span>
               <div class="filter-dim-sep d-none d-md-block" style="border-left:1.5px solid rgba(4,32,69,0.15); align-self:stretch; margin:2px 6px;"></div>
+              <!-- Date filters (left side) -->
               <div class="d-flex align-items-center gap-2 flex-shrink-0 filter-dates">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted flex-shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                <div class="dropdown flex-shrink-0">
-                  <button class="btn btn-sm btn-outline-secondary dropdown-toggle filter-active" data-bs-toggle="dropdown">Beat: Launch</button>
-                  <div class="dropdown-menu">
-                    <a class="dropdown-item active" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue='Beat: '+this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Launch</a>
-                    <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue='Beat: '+this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Always On</a>
-                    <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue='Beat: '+this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Seasonal</a>
-                  </div>
-                </div>
+                
                 <div class="btn-group btn-group-sm flex-shrink-0" role="group" aria-label="Quick date range">
                   <button type="button" class="btn btn-outline-secondary">7D</button>
                   <button type="button" class="btn btn-outline-secondary">30D</button>
@@ -568,13 +564,13 @@
                 </div>
                 <div class="dropdown flex-shrink-0">
                   <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                    26 Feb – 8 Apr
+                    10 Nov – 26 Feb
                   </button>
                   <div class="dropdown-menu p-3" style="min-width:280px;">
                     <label class="form-label mb-1">Start</label>
-                    <input type="date" class="form-control form-control-sm mb-2" value="2026-02-26">
+                    <input type="date" class="form-control form-control-sm mb-2" value="2025-11-10">
                     <label class="form-label mb-1">End</label>
-                    <input type="date" class="form-control form-control-sm mb-2" value="2026-04-08">
+                    <input type="date" class="form-control form-control-sm mb-2" value="2026-02-26">
                     <button class="btn btn-sm btn-primary w-100">Apply</button>
                   </div>
                 </div>
@@ -582,55 +578,17 @@
               <!-- Collapsible filter drawer (always open on desktop via display:contents) -->
               <div class="filter-drawer" id="filterDrawer">
                 <!-- Dimension filters -->
-                <div class="d-flex align-items-center gap-2 flex-nowrap filter-dims ms-auto" style="min-width:0;">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted flex-shrink-0 d-none d-md-block"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-                  <div class="dropdown flex-shrink-0">
-                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">Geo</button>
-                    <div class="dropdown-menu">
-                      <a class="dropdown-item active" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Geo</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">DE</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">AT</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">CH</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">FR</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">UK</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">NL</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">IT</a>
-                    </div>
-                  </div>
-                  <div class="dropdown flex-shrink-0">
-                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">Channel</button>
-                    <div class="dropdown-menu">
-                      <a class="dropdown-item active" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Channel</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Meta</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Google Search</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">YouTube</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">PMax</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Reddit</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">X</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Creator</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Direct</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">MediaHouse</a>
-                    </div>
-                  </div>
-                  <div class="dropdown flex-shrink-0">
-                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">Platform</button>
-                    <div class="dropdown-menu">
-                      <a class="dropdown-item active" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Platform</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Steam</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">PlayStation</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Xbox</a>
-                      <a class="dropdown-item" href="#" onclick="var b=this.closest('.dropdown').querySelector('.dropdown-toggle');b.firstChild.nodeValue=this.textContent+' ';this.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(x=>x.classList.remove('active'));this.classList.add('active');return false;">Epic</a>
-                    </div>
-                  </div>
-                </div>
+                
               </div>
-              <div class="filter-dim-sep d-none d-md-block" style="border-left:1.5px solid rgba(4,32,69,0.15); align-self:stretch; margin:2px 6px;"></div>
-              <div class="btn-group btn-group-sm flex-shrink-0" role="group" aria-label="View mode">
-                <button type="button" class="btn btn-primary" title="All traffic combined (paid + organic) — default on this dashboard" onclick="this.parentNode.querySelectorAll('.btn').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-outline-secondary')});this.classList.remove('btn-outline-secondary');this.classList.add('btn-primary')">Total</button>
-                <button type="button" class="btn btn-outline-secondary" title="Only paid-media driven metrics" onclick="this.parentNode.querySelectorAll('.btn').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-outline-secondary')});this.classList.remove('btn-outline-secondary');this.classList.add('btn-primary')">Paid</button>
-                <button type="button" class="btn btn-outline-secondary" title="Only organic / unpaid metrics" onclick="this.parentNode.querySelectorAll('.btn').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-outline-secondary')});this.classList.remove('btn-outline-secondary');this.classList.add('btn-primary')">Organic</button>
+              <div class="ms-auto d-flex align-items-center gap-2 flex-shrink-0" style="font-size: 12px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#1b2838" xmlns="http://www.w3.org/2000/svg" aria-label="Steam" class="flex-shrink-0"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></svg>
+                <span style="font-weight: 700; color: var(--tblr-body-color); white-space: nowrap;" class="d-none d-md-inline">Urban Brawl on Steam</span>
+                <span style="font-size: 11px; font-weight: 600; color: var(--tblr-secondary); background: rgba(4,32,69,0.05); border-radius: 999px; padding: 1px 9px; white-space: nowrap;" class="d-none d-lg-inline">App 2148920</span>
+                <a href="#" class="d-inline-flex align-items-center gap-1 flex-shrink-0" style="font-size: 12px; font-weight: 600; color: #1b2838; border: 1px solid rgba(27,40,56,0.3); border-radius: 6px; padding: 3px 10px; text-decoration: none; white-space: nowrap;" title="Open the Urban Brawl store page on Steam">
+                  Store Page
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
               </div>
-              <span class="info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Filter every metric on the dashboard by traffic source.<br><strong>Total:</strong> everything (paid + organic combined).<br><strong>Paid:</strong> only paid-media driven values.<br><strong>Organic:</strong> only organic / unpaid values.</span></span>
               <button type="button" class="btn btn-sm btn-ghost-secondary align-items-center flex-shrink-0" id="filterReset" style="padding:4px 6px; line-height:1;" title="Reset all filters">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
               </button>
@@ -639,137 +597,197 @@
 
         </div>
 
-        <!-- ═══ MONETIZATION & LTV — DLC SCOPE (add-on content only) ═══ -->
-        <div class="card mt-5 mb-3" id="mlIntelCard">
+        <!-- ═══ STEAM INSIGHTS — quiet hero: community + reviews + players, vs competitors ═══ -->
+        <div class="card mt-5 mb-3" id="siIntelCard">
           <div class="card-status-top bg-primary"></div>
-        <div class="card-body">
-          <div class="d-flex flex-wrap align-items-start" style="row-gap:16px;">
-            <div style="flex: 2 1 0; min-width: 300px;">
-              <div class="hero-group-label">Add-on Attach &middot; DLC &amp; add-ons</div>
-              <div class="d-flex align-items-baseline gap-2" style="margin-top:8px;"><div style="font-size:2.5rem; font-weight:800; line-height:1; color: var(--tblr-body-color, #1e293b); font-variant-numeric:tabular-nums;">9,2%</div><span class="kpi-delta up" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:3px 9px; border-radius:6px; font-size:13px; font-weight:700;">&uarr; +0,6pp &middot; 7d</span></div>
-              <div style="font-size:14px; font-weight:600; color: var(--tblr-body-color, #1e293b); margin-top:16px;">13.095 of 142.350 players own an add-on &middot; ARPPU 16,69&thinsp;&euro;</div><div style="font-size:12px; color: var(--tblr-secondary, #626976); margin-top:8px; line-height:1.55;">No DLC campaigns have run yet &mdash; <strong>ROAS appears when Season&nbsp;2 launches</strong>. Attach grows with cohort age.<span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Add-on owners &divide; all players &mdash; the premium title&rsquo;s post-purchase growth lever; climbs as cohorts mature (see attach curve).</span></span></div>
-            </div>
-            <div style="flex: 3 1 0; min-width: 340px;">
-              <div class="hero-group-label">Gross &rarr; Net revenue &middot; DLC &amp; add-ons</div>
-              <div class="chart-wrapper" style="height:210px"><canvas id="mlWaterfall"></canvas><div id="mlWfTip" class="chart-tooltip opacity-0"></div></div>
+          <div class="card-body hero-stats-lead">
+<div class="d-flex flex-wrap" style="row-gap: 14px;">
+              <div style="flex: 1 1 0; min-width: 215px;">
+                <div class="hero-group-label">Community</div>
+                <div class="row g-2">
+                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Followers <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Steam community members following the Coming&nbsp;Soon page (daily snapshot, 2S Steam DB).</span></span></div><div class="kpi-value">18.700</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +1.240</span><span>last 7 days</span></div></div></div>
+                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Est. Wishlists <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Independent estimate: followers &times; 12, band 202K&ndash;258K.<br>TRACKS models 224.525 wishlists (Wishlist Insights) &mdash; the estimate brackets it.</span></span></div><div class="kpi-value">224,4K</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +14,9K</span><span>last 7 days</span></div></div></div>
+                </div>
+              </div>
+              <div style="flex: 1 1 0; min-width: 215px; border-left: 1px solid rgba(4,32,69,0.1); padding-left: 12px; margin-left: 12px;">
+                <div class="hero-group-label">Store Interest</div>
+                <div class="row g-2">
+                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Wishlist Rank <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Position in Steam&rsquo;s &ldquo;Popular Upcoming&rdquo; list (wishlist-velocity ranked).<br>A top-50 finish into launch week is the prelaunch visibility goal.</span></span></div><div class="kpi-value">#14</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +6 spots</span><span>Popular Upcoming</span></div></div></div>
+                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Daily WL Adds <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Net new wishlists per day (est. from follower growth &times; 12).<br>Median of the last 7 days; peaks on trailer drops &amp; Next&nbsp;Fest.</span></span></div><div class="kpi-value">2.060</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +18,2%</span><span>median, last 7 days</span></div></div></div>
+                </div>
+              </div>
+              <div style="flex: 1 1 0; min-width: 215px; border-left: 1px solid rgba(4,32,69,0.1); padding-left: 12px; margin-left: 12px;">
+                <div class="hero-group-label">Launch</div>
+                <div class="row g-2">
+                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Days to Launch <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Days until the announced global release date.</span></span></div><div class="kpi-value">1</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(4,32,69,0.06); color:var(--tblr-secondary,#626976); padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">Feb 26</span><span>2026 &middot; global</span></div></div></div>
+                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Price <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Planned launch price (EUR list). Regional pricing set on the store page &mdash; see Planned Prices below.</span></span></div><div class="kpi-value">39,99&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(4,32,69,0.06); color:var(--tblr-secondary,#626976); padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">Standard</span><span>Deluxe / Ultimate too</span></div></div></div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="border-top mt-3 pt-3"><div class="row g-2"><div class="col"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Net Revenue</div><div class="kpi-value">128,5K&thinsp;&euro;</div><div class="kpi-sub" style="margin-top:4px;">DLC &amp; add-ons</div></div></div><div class="col"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Gross Bookings</div><div class="kpi-value">218,5K&thinsp;&euro;</div><div class="kpi-sub" style="margin-top:4px;">at list prices</div></div></div><div class="col"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Add-on Owners</div><div class="kpi-value">13.095</div><div class="kpi-sub" style="margin-top:4px;">of 142.350</div></div></div><div class="col"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">ARPPU</div><div class="kpi-value">16,69&thinsp;&euro;</div><div class="kpi-sub" style="margin-top:4px;">among owners</div></div></div><div class="col"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Refund Rate</div><div class="kpi-value">0,8%</div><div class="kpi-sub" style="margin-top:4px;">rarely refunded</div></div></div></div></div>
-        </div>
-        </div>
-
-        <!-- ═══ REVENUE OVER TIME ═══ -->
-        <div class="section-heading"><h3 class="section-heading-title">Revenue Over Time</h3>
-          <p class="section-heading-subtitle">How DLC net revenue accrues &mdash; the launch spike is Season-Pass-with-game purchases; afterwards add-on revenue builds with the player base, the opposite shape of base revenue.</p></div>
-        <div class="card mb-3"><div class="card-body">
+          <div class="card-body border-top pt-3">
             <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
-              <span style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--tblr-secondary, #626976);">Daily DLC Net Revenue by Item</span>
-              <span class="info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">The launch spike is Season-Pass purchases alongside the game; afterwards DLC revenue<br>builds with the player base instead of decaying with the install curve &mdash; the opposite<br>shape of base-game revenue. Future content drops will add new spikes.</span></span>
-              <div id="mlRevLegend" class="chart-legend d-flex flex-wrap gap-2 flex-fill"></div>
+              <span style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--tblr-secondary, #626976);">Est. Wishlists &mdash; net adds vs competitors</span>
+              <span class="info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Shown as <strong>net wishlist change since Nov 10</strong> &mdash; the franchises&rsquo; follower stock is 25&times;<br>larger in absolute terms, so net adds are the comparable prelaunch signal. Competitor<br>steps are sale windows (Black Friday, Winter, Lunar) converting followers to wishlists.</span></span>
+              <div id="siTrendLegend" class="chart-legend d-flex flex-wrap gap-2 flex-fill"></div>
               <div class="dropdown flex-shrink-0">
                 <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
                 <div class="dropdown-menu dropdown-menu-end">
-                  <button class="dropdown-item" id="mlRevPngBtn">PNG Image</button>
-                  <button class="dropdown-item" id="mlRevCsvBtn">CSV Spreadsheet</button>
+                  <button class="dropdown-item" id="siTrendPngBtn">PNG Image</button>
+                  <button class="dropdown-item" id="siTrendCsvBtn">CSV Spreadsheet</button>
                 </div>
               </div>
             </div>
             <div class="chart-wrapper" style="height:260px">
-              <canvas id="mlRevChart"></canvas>
-              <div id="mlRevTooltipEl" class="chart-tooltip opacity-0"></div>
+              <canvas id="siTrendChart"></canvas>
+              <div id="siTrendTooltipEl" class="chart-tooltip opacity-0"></div>
             </div>
+            <!-- Estimates methodology (visible, not tip-only) -->
             <div class="d-flex align-items-start gap-2 mt-3" style="background: rgba(4,32,69,0.03); border: 1px solid rgba(4,32,69,0.08); border-radius: 8px; padding: 10px 14px; font-size: 12px; line-height: 1.55; color: var(--tblr-body-color, #1e293b);">
               <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0" style="margin-top:2px; color: var(--tblr-secondary);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
               <div>
-                <strong>Scope: DLC &amp; Add-ons.</strong> This view covers add-on content only. <strong>No DLC campaigns have run yet</strong> &mdash; when dedicated content-drop campaigns launch (Season 2), this view carries their cost, attach uplift and ROAS. Figures remain modelled net revenue.
-              </div>
-            </div>
-        </div></div>
-
-        <!-- ═══ CATALOGUE ═══ -->
-        <div class="section-heading">
-          <h3 class="section-heading-title">Catalogue</h3>
-          <p class="section-heading-subtitle">Every live add-on with its attach and revenue &mdash; the per-item view that shows which content earns its production cost and what the next drop should look like.</p>
-        </div>
-
-        <div class="row row-deck row-cards mb-3">
-          <div class="col-lg-8">
-            <div class="card h-100">
-              <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Add-on Catalogue</span><span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Attach rate = buyers of this item &divide; all players. Net applies platform fees and taxes.<br>Click any column to sort.</span></span><div class="dropdown ms-1"><button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button><div class="dropdown-menu dropdown-menu-end"><button class="dropdown-item" id="mlCatCsvBtn">CSV Spreadsheet</button></div></div></div>
-              <div class="card-body p-0">
-                <div class="table-responsive" style="font-variant-numeric: tabular-nums;"><table class="table wt mb-0" id="mlCatTable"></table></div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-4">
-            <div class="card h-100">
-              <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Net Revenue Split</span><span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Share of DLC net revenue per item.</span></span><div class="dropdown ms-1"><button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button><div class="dropdown-menu dropdown-menu-end"><button class="dropdown-item" id="mlCatPngBtn">PNG Image</button></div></div></div>
-              <div class="card-body d-flex align-items-center">
-                <div style="position: relative; height: 200px; width: 100%;"><canvas id="mlCatPie"></canvas><div id="mlCatPieTip" class="chart-tooltip opacity-0"></div></div>
+                <strong>How these figures work:</strong> before release Steam exposes only <strong>followers</strong> and the <strong>Popular&nbsp;Upcoming</strong> rank &mdash; there are no reviews, owners or sales yet. &ldquo;Est. Wishlists&rdquo; is an <strong>independent heuristic from the 2S Steam DB</strong> (followers&times;12, with a confidence band), cross-checked against the TRACKS modelled wishlists on Wishlist&nbsp;Insights. The value of this page is the <strong>competitor side</strong> &mdash; how this title&rsquo;s wishlist build stacks up against the franchises into launch week.
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ═══ ATTACH ═══ -->
+        <!-- ═══ COMPETITIVE SNAPSHOT ═══ -->
+        <div class="card mb-3">
+          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Competitive Snapshot</span><span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Latest daily snapshot for every tracked title, side by side. Estimates carry the<br>same heuristics and bands as the hero. Est. Wishlists for long-released titles is a<br>weak signal &mdash; the follower base no longer maps to purchase intent.</span></span><div class="dropdown ms-1"><button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button><div class="dropdown-menu dropdown-menu-end"><button class="dropdown-item" id="siSnapCsvBtn">CSV Spreadsheet</button></div></div></div>
+          <div class="card-body p-0">
+            <div class="table-responsive geo-hscroll" style="font-variant-numeric: tabular-nums;">
+              <table class="table wt mb-0 wt-sticky-head wt-freeze-first" id="siSnapTable"></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ WISHLISTS & FOLLOWERS ═══ -->
         <div class="section-heading">
-          <h3 class="section-heading-title">Attach by Cohort Age</h3>
-          <p class="section-heading-subtitle">How add-on ownership grows the longer a player has owned the game &mdash; the case for the next content drop and for re-engagement beats aimed at older cohorts.</p>
+          <h3 class="section-heading-title">Wishlists &amp; Followers</h3>
+          <p class="section-heading-subtitle">The prelaunch signal that matters most &mdash; how fast wishlists and followers are building into launch week. Wishlists are the pool that converts to day-one sales.</p>
         </div>
 
         <div class="row row-deck row-cards mb-3">
-          <div class="col-lg-5">
+          <div class="col-12">
             <div class="card h-100">
-              <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Attach Curve (D0 &rarr; D30)</span><span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Share of each cohort owning at least one add-on, by days since install,<br>blended across matured cohorts. D0 attach is Season-Pass-with-game purchases.</span></span><div class="dropdown ms-1"><button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button><div class="dropdown-menu dropdown-menu-end"><button class="dropdown-item" id="mlAttPngBtn">PNG Image</button><button class="dropdown-item" id="mlAttCsvBtn">CSV Spreadsheet</button></div></div></div>
+              <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Followers &amp; Wishlist Growth</span><span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Daily net wishlist adds (bars, est. from follower growth &times;12) and the cumulative<br>est. wishlist pool + follower count (lines). The build accelerates on trailer drops,<br>Black&nbsp;Friday, Next&nbsp;Fest and into launch week.</span></span><div class="dropdown ms-1"><button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button><div class="dropdown-menu dropdown-menu-end"><button class="dropdown-item" id="siGrowthPngBtn">PNG Image</button><button class="dropdown-item" id="siGrowthCsvBtn">CSV Spreadsheet</button></div></div></div>
               <div class="card-body">
-                <div class="chart-wrapper" style="height:280px">
-                  <canvas id="mlAttChart"></canvas>
-                  <div id="mlAttTooltipEl" class="chart-tooltip opacity-0"></div>
+                <div id="siGrowthLegend" class="chart-legend d-flex flex-wrap align-items-center gap-2 mb-2"></div>
+                <div class="chart-wrapper" style="height:300px">
+                  <canvas id="siGrowthChart"></canvas>
+                  <div id="siGrowthTooltipEl" class="chart-tooltip opacity-0"></div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- ═══ PRICING ═══ -->
+        <div class="section-heading">
+          <h3 class="section-heading-title">Planned Pricing &amp; Genre Sale Cadence</h3>
+          <p class="section-heading-subtitle">The launch price set across regions, and when the genre goes on sale &mdash; so a Feb&nbsp;26 launch can be timed to avoid colliding with a big competitor discount window.</p>
+        </div>
+
+        <div class="row row-deck row-cards mb-3">
           <div class="col-lg-7">
             <div class="card h-100">
-              <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Attach by Weekly Cohort</span><span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Attach rate at each milestone per install week. Dashes mark cohorts too young to be<br>measured &mdash; they fill in as the cohort matures, they are not zeros.</span></span><div class="dropdown ms-1"><button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button><div class="dropdown-menu dropdown-menu-end"><button class="dropdown-item" id="mlAttCohortCsvBtn">CSV Spreadsheet</button></div></div></div>
+              <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Planned Regional Prices</span><span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Planned launch price per region (41 regions configured; top markets shown).<br>&ldquo;vs Base&rdquo; compares purchasing-power-adjusted regional pricing to the EUR list price<br>&mdash; deep-discount regions are common grey-market key sources. Click any column to sort.</span></span><div class="dropdown ms-1"><button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button><div class="dropdown-menu dropdown-menu-end"><button class="dropdown-item" id="siPriceCsvBtn">CSV Spreadsheet</button></div></div></div>
               <div class="card-body p-0">
-                <div class="table-responsive" style="font-variant-numeric: tabular-nums;">
-                  <table class="table wt mb-0" id="mlAttCohortTable"></table>
+                <div class="table-responsive" style="max-height: 400px; overflow:auto; font-variant-numeric: tabular-nums;">
+                  <table class="table wt mb-0 wt-sticky-head" id="siPriceTable"></table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <div class="card h-100">
+              <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Discount History</span><span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Active competitor discount over time across the prelaunch window. Their sale<br>cadence (Black&nbsp;Friday, Winter, Lunar&nbsp;New&nbsp;Year) marks the windows a Feb&nbsp;26<br>launch should avoid &mdash; Urban&nbsp;Brawl is not yet released, so its line stays at 0%.</span></span><div class="dropdown ms-1"><button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button><div class="dropdown-menu dropdown-menu-end"><button class="dropdown-item" id="siDiscPngBtn">PNG Image</button><button class="dropdown-item" id="siDiscCsvBtn">CSV Spreadsheet</button></div></div></div>
+              <div class="card-body">
+                <div class="chart-wrapper" style="height:280px">
+                  <canvas id="siDiscChart"></canvas>
+                  <div id="siDiscTooltipEl" class="chart-tooltip opacity-0"></div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ═══ BREAKDOWN ═══ -->
+        <!-- ═══ STORE PRESENCE ═══ -->
         <div class="section-heading">
-          <h3 class="section-heading-title">Revenue Breakdown</h3>
-          <p class="section-heading-subtitle">Where DLC revenue lands &mdash; attach skews toward the PC storefronts and high-engagement markets, which is where content-drop campaigns will work hardest.</p>
+          <h3 class="section-heading-title">Store Presence</h3>
+          <p class="section-heading-subtitle">Announcements and patch notes as players see them on the store &mdash; the public update cadence that keeps a title visible in Steam&rsquo;s ecosystem between sales.</p>
         </div>
 
         <div class="card mb-3">
-          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
-            <ul class="nav nav-tabs card-header-tabs breakdown-tabs" data-bs-toggle="tabs" role="tablist" style="margin-bottom:-8px;">
-              <li class="nav-item" role="presentation"><a href="#mlBdPlatform" class="nav-link active" data-bs-toggle="tab" role="tab">by platform</a></li>
-              <li class="nav-item" role="presentation"><a href="#mlBdMarket" class="nav-link" data-bs-toggle="tab" role="tab">by market</a></li>
-            </ul>
-            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">DLC scope. Attach Rate is add-on owners &divide; players on that platform / in that market.<br>Click any column to sort.</span></span><div class="dropdown ms-1"><button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button><div class="dropdown-menu dropdown-menu-end"><button class="dropdown-item" id="mlBdCsvBtn">Table CSV</button></div></div>
-          </div>
+          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;"><span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Announcements &amp; Patch Notes</span><span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Community announcements from the Steam news feed (ISteamNews).<br>Titles link to the store post.</span></span><div class="dropdown ms-1"><button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button><div class="dropdown-menu dropdown-menu-end"><button class="dropdown-item" id="siNewsCsvBtn">CSV Spreadsheet</button></div></div></div>
           <div class="card-body p-0">
-            <div class="tab-content">
-              <div class="tab-pane active show" id="mlBdPlatform" role="tabpanel">
-                <div class="table-responsive" style="font-variant-numeric: tabular-nums;"><table class="table wt mb-0 wt-sticky-head" id="mlBdPlatformTable"></table></div>
-              </div>
-              <div class="tab-pane" id="mlBdMarket" role="tabpanel">
-                <div class="table-responsive" style="font-variant-numeric: tabular-nums;"><table class="table wt mb-0 wt-sticky-head" id="mlBdMarketTable"></table></div>
-              </div>
+            <div class="table-responsive" style="font-variant-numeric: tabular-nums;">
+              <table class="table wt mb-0" id="siNewsTable"></table>
             </div>
+          </div>
+        </div>
+
+        <!-- ═══ EXPLORE DEEPER ═══ -->
+        <div class="section-heading">
+          <h3 class="section-heading-title">Explore deeper</h3>
+          <p class="section-heading-subtitle">Related views for this campaign.</p>
+        </div>
+
+        <div class="row row-deck row-cards mb-3 explore-grid">
+          <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="wishlistinsights-v1.html" class="card h-100 card-link">
+              <div class="card-body d-flex align-items-start gap-3">
+                <span class="explore-icon"><i class="ti ti-heart"></i></span>
+                <div class="flex-fill">
+                  <div class="fw-semibold">Wishlist Insights</div>
+                  <div class="text-secondary small">First-party modelled wishlists &amp; velocity</div>
+                </div>
+                <i class="ti ti-chevron-right text-secondary"></i>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="preorderinsights-v1.html" class="card h-100 card-link">
+              <div class="card-body d-flex align-items-start gap-3">
+                <span class="explore-icon"><i class="ti ti-shopping-cart"></i></span>
+                <div class="flex-fill">
+                  <div class="fw-semibold">Preorder Insights</div>
+                  <div class="text-secondary small">Wishlists converting to preorders</div>
+                </div>
+                <i class="ti ti-chevron-right text-secondary"></i>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="awarenesstracker-v1.html" class="card h-100 card-link">
+              <div class="card-body d-flex align-items-start gap-3">
+                <span class="explore-icon"><i class="ti ti-eye"></i></span>
+                <div class="flex-fill">
+                  <div class="fw-semibold">Awareness Tracker</div>
+                  <div class="text-secondary small">Upper-funnel reach driving the follows</div>
+                </div>
+                <i class="ti ti-chevron-right text-secondary"></i>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="brandhealth-v1.html" class="card h-100 card-link">
+              <div class="card-body d-flex align-items-start gap-3">
+                <span class="explore-icon"><i class="ti ti-star"></i></span>
+                <div class="flex-fill">
+                  <div class="fw-semibold">Brand Health</div>
+                  <div class="text-secondary small">The same competitors, in social</div>
+                </div>
+                <i class="ti ti-chevron-right text-secondary"></i>
+              </div>
+            </a>
           </div>
         </div>
 
         <!-- ═══ DATA CONTEXT FOOTER ═══ -->
         <div class="d-flex align-items-center justify-content-between border-top pt-3 mt-4 mb-3" style="font-size:12px; color: var(--tblr-secondary);">
-          <span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1" style="vertical-align:-1px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Last sync: Mar 3, 2026 09:14 CET &middot; Scope: DLC &amp; Add-ons &middot; modelled net revenue</span>
+          <span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1" style="vertical-align:-1px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Last sync: Feb 26, 2026 02:00 UTC &middot; 2S Steam DB daily snapshot &middot; prelaunch estimates: followers&times;12 (wishlists), wishlist-rank from Popular Upcoming</span>
           <span class="d-inline-flex align-items-center gap-2"><span style="width:8px; height:8px; border-radius:50%; background:#2fb344; display:inline-block;"></span> Live</span>
         </div>
 
@@ -791,7 +809,10 @@
 
 
   <script>
-    // ─── Mock data — DLC & ADD-ONS scope. Gross 218,5K €, net 128,5K €, owners 13.095 (9,2%). ──
+    // ─── Mock data — 2S Steam DB daily snapshots, Nov 10 2025 – Apr 8 2026 (150 days).
+    //     Urban Brawl + competitors. Estimates: followers×12 / Boxleiter / CCU multiples.
+    //     Cross-checks: followers at launch 18,7K ×12 = 224,4K ≈ TRACKS modelled 224,5K wishlists;
+    //     est. owners band 113K–203K brackets actual 142.350 units; ccu×28 = 120,7K ≈ real MAU 118,6K. ──
     function generateDates(start, end) {
       const dates = [];
       const cur = new Date(start);
@@ -802,17 +823,17 @@
       }
       return dates;
     }
-    const allLabels = generateDates('2026-02-26', '2026-04-08');
+    const allLabels = generateDates('2025-11-10', '2026-02-26');
     const days = allLabels.length;
+    const LAUNCH = allLabels.indexOf('2026-02-26');
     let seed = 42;
     function seededRandom() {
       seed = (seed * 16807 + 0) % 2147483647;
       return (seed - 1) / 2147483646;
     }
     function fmt(n) { return n.toLocaleString('de-DE'); }
-    const euroT = v => fmt(Math.round(v)) + ' €';
-    const euro2 = v => v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
-    const euroK = v => (v / 1000).toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + 'K €';
+    const num1 = v => v.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const num2 = v => v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const pct1 = v => v.toFixed(1).replace('.', ',') + '%';
     const compact = v => v >= 1e6 ? (v / 1e6).toFixed(1).replace('.', ',') + 'M' : v >= 1e3 ? (v / 1e3).toFixed(1).replace('.', ',') + 'K' : fmt(Math.round(v));
     function makeTrendCrosshair(scaleId) {
@@ -831,7 +852,7 @@
         }
       };
     }
-    function makeTrendTooltip(elId, formatters, titleFn) {
+    function makeTrendTooltip(elId, formatters) {
       return function(context) {
         const { chart, tooltip } = context;
         const el = document.getElementById(elId);
@@ -839,8 +860,8 @@
         el.classList.remove('opacity-0');
         if (tooltip.body) {
           let dateStr = tooltip.title[0];
-          if (titleFn) dateStr = titleFn(dateStr);
-          else { const d = new Date(dateStr); if (!isNaN(d)) dateStr = d.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }); }
+          const d = new Date(dateStr);
+          if (!isNaN(d)) dateStr = d.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
           let h = '<div class="card"><div class="card-body p-2"><div class="fw-bold mb-1">' + dateStr + '</div><hr class="my-1">';
           tooltip.dataPoints.forEach(dp => {
             const color = dp.dataset.borderColor || dp.dataset.backgroundColor;
@@ -923,44 +944,66 @@
     }
 
 
-    // ─── Daily DLC net by item: SP launch spike then base-driven build; others steady ──
-    function dlcSeries(total, seedOff, launchSpike) {
-      const raw = [];
+    // ─── Per-title daily series ── (LAUNCH index comes from the shared helpers)
+    const GAMES = [
+      { key: 'ub', label: 'Urban Brawl',    solid: '#FF0249', light: 'rgba(255,2,73,0.08)' },
+      { key: 'sf', label: 'Street Fighter', solid: '#206bc4', light: 'rgba(32,107,196,0.08)' },
+      { key: 'tk', label: 'Tekken',         solid: '#f59f00', light: 'rgba(245,159,0,0.08)' },
+    ];
+    function series(fn, seedOff) {
+      const out = [];
       for (let i = 0; i < days; i++) {
         seed = seedOff + i * 11; seededRandom();
-        let v = 0.55 + i * 0.045;             // builds with the player base
-        if (launchSpike && i < 4) v += 4.2 - i; // pass-with-game purchases
-        const dow = new Date(allLabels[i]).getDay();
-        if (dow === 6 || dow === 0) v *= 1.15;
-        v *= 0.8 + seededRandom() * 0.4;
-        raw.push(v);
+        out.push(fn(i, seededRandom()));
       }
-      const sc = total / raw.reduce((a, b) => a + b, 0);
-      return raw.map(v => Math.round(v * sc));
+      return out;
     }
-    const spNet  = dlcSeries(109900, 300, true);   // Season 1 Character Pass
-    const ccNet  = dlcSeries(13500, 600, false);   // Color & Costume Pack
-    const ostNet = dlcSeries(5100, 900, false);    // Original Soundtrack
-    const cumNet = (function() { const out = []; let s = 0; for (let i = 0; i < days; i++) { s += spNet[i] + ccNet[i] + ostNet[i]; out.push(s); } return out; })();
+    // followers → est. wishlists (×12); franchises huge & nearly flat
+    const folUB = series((i, r) => {
+      let v = 6200 + 12500 * Math.pow(Math.min(i, LAUNCH) / LAUNCH, 1.35);
+      if (i >= 17 && i <= 21) v += 300;
+      if (i >= LAUNCH) v = 18700 + 8210 * (1 - Math.exp(-(i - LAUNCH) / 16));
+      return Math.round(v * (0.998 + r * 0.004));
+    }, 300);
+    const folSF = series((i, r) => Math.round((710000 + i * 16) * (0.9995 + r * 0.001)), 500);
+    const folTK = series((i, r) => Math.round((495000 + i * 21) * (0.9995 + r * 0.001)), 700);
+    const wlDelta = fol => fol.map(v => (v - fol[0]) * 12);
+    // est. sales (Boxleiter owner estimate): UB starts at launch; competitor steps = sale windows
+    const ownUB = series((i, r) => i < LAUNCH ? null : Math.round(167000 * (1 - Math.exp(-(i - LAUNCH) / 14)) * (0.985 + r * 0.03)), 2100);
+    const ownSF = series((i, r) => {
+      let v = 3776000 + i * 180;
+      if (i >= 122) v += Math.min((i - 121) * 6000, 48000);  // spring sale conversion
+      if (i >= 144) v += (i - 143) * 2500;                    // current promo
+      return Math.round(v * (0.9998 + r * 0.0004));
+    }, 2300);
+    const ownTK = series((i, r) => {
+      let v = 2462000 + i * 150;
+      if (i >= 136) v += Math.min((i - 135) * 4000, 30000);   // sale window
+      return Math.round(v * (0.9998 + r * 0.0004));
+    }, 2500);
+    const ownDelta = arr => {
+      const base = arr.find(v => v != null) || 0;
+      return arr.map(v => v == null ? null : v - base);
+    };
+    const METRICS = {
+      wishlists: { label: 'Est. Wishlists — net change since Nov 10', data: { ub: wlDelta(folUB), sf: wlDelta(folSF), tk: wlDelta(folTK) } },
+      sales:     { label: 'Est. Sales — net change since Nov 10',     data: { ub: ownDelta(ownUB), sf: ownDelta(ownSF), tk: ownDelta(ownTK) } },
+    };
+    const deltaFmt = v => v == null ? '—' : (v >= 0 ? '+' : '') + compact(v);
 
-    // ═══ HERO: daily DLC net by item ═══
+    // ═══ HERO: competitive wishlist trend (prelaunch — single metric) ═══
     (function() {
-      const C = [
-        { solid: '#FF0249', light: 'rgba(255,2,73,0.35)' },
-        { solid: '#ae3ec9', light: 'rgba(174,62,201,0.55)' },
-        { solid: '#f59f00', light: 'rgba(245,159,0,0.5)' },
-        { solid: '#206bc4', light: 'rgba(32,107,196,0.10)' },
-      ];
-      const chart = new Chart(document.getElementById('mlRevChart').getContext('2d'), {
-        type: 'bar',
+      const chart = new Chart(document.getElementById('siTrendChart').getContext('2d'), {
+        type: 'line',
         data: {
           labels: allLabels,
-          datasets: [
-            { label: 'Season 1 Character Pass', data: spNet, backgroundColor: C[0].light, stack: 'dlc', order: 5 },
-            { label: 'Color & Costume Pack', data: ccNet, backgroundColor: C[1].light, stack: 'dlc', order: 5 },
-            { label: 'Original Soundtrack', data: ostNet, backgroundColor: C[2].light, stack: 'dlc', order: 5 },
-            { label: 'Cumulative Net', data: cumNet, type: 'line', borderColor: C[3].solid, backgroundColor: 'transparent', borderWidth: 2, borderDash: [4, 3], tension: 0.35, pointRadius: 0, pointHoverRadius: 4, yAxisID: 'yCum', order: 1 },
-          ]
+          datasets: GAMES.map(g => ({
+            label: g.label,
+            data: METRICS.wishlists.data[g.key],
+            borderColor: g.solid, backgroundColor: 'transparent',
+            borderWidth: g.key === 'ub' ? 2.5 : 1.8,
+            tension: 0.35, pointRadius: 0, pointHoverRadius: 4, spanGaps: false,
+          }))
         },
         plugins: [makeTrendCrosshair('y')],
         options: {
@@ -969,23 +1012,20 @@
           interaction: { mode: 'index', intersect: false },
           plugins: {
             legend: { display: false },
-            tooltip: { enabled: false, external: makeTrendTooltip('mlRevTooltipEl', {
-              'Season 1 Character Pass': v => euroT(v), 'Color & Costume Pack': v => euroT(v), 'Original Soundtrack': v => euroT(v), 'Cumulative Net': v => euroK(v),
-            }) }
+            tooltip: { enabled: false, external: makeTrendTooltip('siTrendTooltipEl', Object.fromEntries(GAMES.map(g => [g.label, deltaFmt]))) }
           },
           scales: {
-            x: { stacked: true, grid: { display: false }, ticks: trendXTicks },
-            y: { stacked: true, position: 'left', min: 0, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 }, color: '#999', callback: v => compact(v) }, title: { display: true, text: 'Net € / day', font: { size: 12 } } },
-            yCum: { position: 'right', min: 0, grid: { drawOnChartArea: false }, ticks: { font: { size: 11 }, color: '#999', callback: v => compact(v) }, title: { display: true, text: 'Cumulative Net €', font: { size: 12 } } },
+            x: { grid: { display: false }, ticks: trendXTicks },
+            y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 }, color: '#999', callback: v => deltaFmt(v) }, title: { display: true, text: METRICS.wishlists.label, font: { size: 12 } } },
           }
         }
       });
-      const el = document.getElementById('mlRevLegend');
+      const el = document.getElementById('siTrendLegend');
       function renderLegend() {
         el.innerHTML = chart.data.datasets.map((ds, i) => {
           const hidden = !chart.isDatasetVisible(i);
-          const c = C[i];
-          return '<span class="legend-item ' + (hidden ? 'inactive' : '') + '" data-index="' + i + '" data-type="' + (i < 3 ? 'bar' : 'line') + '" title="' + (hidden ? 'Click to show ' : 'Click to hide ') + ds.label + '" style="background:' + (hidden ? 'transparent' : c.light) + '; border-color:' + (hidden ? '#ccc' : c.solid) + '"><span class="legend-swatch" style="background:' + c.solid + '"></span>' + ds.label + '</span>';
+          const g = GAMES[i];
+          return '<span class="legend-item ' + (hidden ? 'inactive' : '') + '" data-index="' + i + '" data-type="line" title="' + (hidden ? 'Click to show ' : 'Click to hide ') + ds.label + '" style="background:' + (hidden ? 'transparent' : g.light) + '; border-color:' + (hidden ? '#ccc' : g.solid) + '"><span class="legend-swatch" style="background:' + g.solid + '"></span>' + ds.label + '</span>';
         }).join('');
       }
       el.addEventListener('click', e => {
@@ -996,70 +1036,151 @@
         chart.update(); renderLegend();
       });
       renderLegend();
-      document.getElementById('mlRevPngBtn').addEventListener('click', () => downloadChartPng('mlRevChart', 'mlRevTooltipEl', 'daily-dlc-net-revenue.png'));
-      document.getElementById('mlRevCsvBtn').addEventListener('click', () => downloadChartCsv(chart, 'daily-dlc-net-revenue.csv'));
+      document.getElementById('siTrendPngBtn').addEventListener('click', () => downloadChartPng('siTrendChart', 'siTrendTooltipEl', 'steam-wishlist-trend.png'));
+      document.getElementById('siTrendCsvBtn').addEventListener('click', () => downloadChartCsv(chart, 'steam-wishlist-trend.csv'));
     })();
 
-    // ═══ HERO: gross → net waterfall ═══
-    (function(){
-      const el = document.getElementById('mlWaterfall'); if (!el) return;
-      const steps = [
-        { label:'Gross', range:[0,218.5], color:'rgba(47,179,68,0.85)', delta:218.5 },
-        { label:'− Refunds', range:[216.8,218.5], color:'rgba(214,57,57,0.85)', delta:-1.7 },
-        { label:'− Fees & Tax', range:[128.5,216.8], color:'rgba(247,103,7,0.85)', delta:-88.3 },
-        { label:'Net', range:[0,128.5], color:'#FF0249', delta:128.5 } ];
-      new Chart(el.getContext('2d'), { type:'bar',
-        data:{ labels:steps.map(s=>s.label), datasets:[{ data:steps.map(s=>s.range), backgroundColor:steps.map(s=>s.color), borderRadius:4, barPercentage:0.72 }] },
-        options:{ responsive:true, maintainAspectRatio:false, animation:{duration:500},
-          plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>{const d=steps[c.dataIndex].delta; return (d<0?'−':'')+Math.abs(d).toFixed(1).replace('.',',')+'K €';} } } },
-          scales:{ x:{ grid:{display:false}, ticks:{ font:{size:11}, color:'#999' } },
-                   y:{ min:0, grid:{ color:'rgba(0,0,0,0.04)' }, ticks:{ font:{size:11}, color:'#999', callback:v=> v.toFixed(0)+'K' } } } } });
-    })();
-
-    // ═══ CATALOGUE ═══
+    // ═══ COMPETITIVE SNAPSHOT (prelaunch — community & wishlist build) ═══
     (function() {
       const rows = [
-        { label: 'Season 1 Character Pass', color: '#FF0249', released: 'Feb 26 (launch)', price: 19.99, units: 9350 },
-        { label: 'Color & Costume Pack',    color: '#ae3ec9', released: 'Feb 26 (launch)', price: 7.99,  units: 2870 },
-        { label: 'Original Soundtrack',     color: '#f59f00', released: 'Mar 12',          price: 9.99,  units: 875 },
+        { label: 'Urban Brawl',    color: '#FF0249', released: 'Feb 26, 2026', price: '39,99 €', fol: 18700,  wl: '224,4K', wlday: '2.060', rank: '#14' },
+        { label: 'Street Fighter', color: '#206bc4', released: 'Jun 2, 2023',  price: '59,99 €', fol: 712400, wl: '8,55M',  wlday: '~310',  rank: '—' },
+        { label: 'Tekken',         color: '#f59f00', released: 'Jan 26, 2024', price: '69,99 €', fol: 498200, wl: '5,98M',  wlday: '~240',  rank: '—' },
       ];
-      rows.forEach(r => {
-        r.attach = r.units / 142350 * 100;
-        r.gross = Math.round(r.price * r.units);
-        r.net = Math.round(r.gross * 0.588);
+      let h = '<thead><tr class="th-group">';
+      h += '<th rowspan="2" class="col-geo-label">Title</th>';
+      h += '<th colspan="3" class="text-center th-group-label group-end">Store</th>';
+      h += '<th colspan="3" class="text-center th-group-label group-end">Community</th>';
+      h += '<th colspan="1" class="text-center th-group-label">Visibility</th>';
+      h += '</tr><tr>';
+      ['Status', 'Release', 'Price', 'Followers', 'Est. Wishlists', 'WL / day (7d)', 'Popular Upcoming'].forEach((hd, i) => {
+        h += '<th class="text-end' + ([2, 5].includes(i) ? ' group-end' : '') + '">' + hd + '</th>';
       });
-      new Chart(document.getElementById('mlCatPie'), {
-        type: 'doughnut',
-        data: { labels: rows.map(r => r.label), datasets: [{ data: rows.map(r => r.net), backgroundColor: rows.map(r => r.color), borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false, external: doughnutTooltip('mlCatPieTip', 'Net Revenue', v => euroK(v)) } } }
-      });
-      let h = '<thead><tr><th>Add-on</th><th>Released</th><th class="text-end">Price</th><th class="text-end">Units</th><th class="text-end">Attach %</th><th class="text-end">Gross</th><th class="text-end">Net</th></tr></thead><tbody>';
-      rows.forEach(r => {
+      h += '</tr></thead><tbody>';
+      rows.forEach((r, idx) => {
         const dot = '<span class="d-inline-block rounded-circle me-2" style="width:10px; height:10px; background:' + r.color + '; vertical-align:middle;"></span>';
-        h += '<tr><td style="white-space:nowrap;">' + dot + r.label + '</td><td style="white-space:nowrap;">' + r.released + '</td><td class="text-end">' + euro2(r.price) + '</td><td class="text-end">' + fmt(r.units) + '</td><td class="text-end">' + r.attach.toFixed(1).replace('.', ',') + '%</td><td class="text-end">' + euroK(r.gross) + '</td><td class="text-end">' + euroK(r.net) + '</td></tr>';
+        const bold = idx === 0 ? ' fw-bold' : '';
+        const statusBadge = idx === 0
+          ? '<span style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.3px; color:#f76707; background:rgba(247,103,7,0.10); border-radius:999px; padding:1px 8px;">Coming Soon</span>'
+          : '<span class="text-secondary">Released</span>';
+        h += '<tr class="' + bold + '"><td class="col-geo-label" style="white-space:nowrap;">' + dot + r.label + '</td>';
+        h += '<td class="text-end" style="white-space:nowrap;">' + statusBadge + '</td>';
+        h += '<td class="text-end" style="white-space:nowrap;">' + r.released + '</td>';
+        h += '<td class="text-end group-end">' + r.price + '</td>';
+        h += '<td class="text-end">' + fmt(r.fol) + '</td>';
+        h += '<td class="text-end">' + r.wl + '</td>';
+        h += '<td class="text-end group-end">' + r.wlday + '</td>';
+        h += '<td class="text-end">' + r.rank + '</td>';
+        h += '</tr>';
       });
-      const t = rows.reduce((a, r) => ({ units: a.units + r.units, gross: a.gross + r.gross, net: a.net + r.net }), { units: 0, gross: 0, net: 0 });
-      h += '</tbody><tfoot><tr><td>Total</td><td></td><td></td><td class="text-end">' + fmt(t.units) + '</td><td class="text-end">9,2%</td><td class="text-end">' + euroK(t.gross) + '</td><td class="text-end">' + euroK(t.net) + '</td></tr></tfoot>';
-      document.getElementById('mlCatTable').innerHTML = h;
-      document.getElementById('mlCatCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('mlCatTable'), 'dlc-catalogue.csv'));
-      document.getElementById('mlCatPngBtn').addEventListener('click', () => downloadChartPng('mlCatPie', 'mlCatPieTip', 'dlc-net-split.png'));
+      h += '</tbody>';
+      document.getElementById('siSnapTable').innerHTML = h;
+      document.getElementById('siSnapCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('siSnapTable'), 'competitive-snapshot.csv'));
     })();
 
-    // ═══ ATTACH CURVE ═══
+    // ═══ FOLLOWERS & WISHLIST GROWTH ═══
     (function() {
-      const labels = [];
-      const att = [];
-      for (let d = 0; d <= 30; d++) {
-        labels.push('D' + d);
-        att.push(+(1.9 + 9.0 * (1 - Math.exp(-d / 14))).toFixed(1));
+      const cumWL = folUB.map(v => v * 12);
+      const dailyWL = folUB.map((v, i) => i === 0 ? 0 : Math.max(0, Math.round((v - folUB[i-1]) * 12)));
+      const colors = ['#FF0249', '#ae3ec9', '#206bc4'];
+      const chart = new Chart(document.getElementById('siGrowthChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: allLabels,
+          datasets: [
+            { type: 'bar', label: 'Daily Wishlist Adds', data: dailyWL, backgroundColor: 'rgba(255,2,73,0.32)', borderColor: '#FF0249', borderWidth: 1, yAxisID: 'yAdds', order: 3 },
+            { type: 'line', label: 'Cumulative Est. Wishlists', data: cumWL, borderColor: '#ae3ec9', backgroundColor: 'transparent', borderWidth: 2.5, tension: 0.35, pointRadius: 0, pointHoverRadius: 4, yAxisID: 'yCum', order: 1 },
+            { type: 'line', label: 'Followers', data: folUB.slice(), borderColor: '#206bc4', backgroundColor: 'transparent', borderWidth: 1.8, borderDash: [5, 4], tension: 0.35, pointRadius: 0, pointHoverRadius: 4, yAxisID: 'yFol', order: 2 },
+          ]
+        },
+        plugins: [makeTrendCrosshair('yAdds')],
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false, external: makeTrendTooltip('siGrowthTooltipEl', { 'Daily Wishlist Adds': v => fmt(v), 'Cumulative Est. Wishlists': v => compact(v), 'Followers': v => fmt(v) }) }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: trendXTicks },
+            yAdds: { position: 'left', grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 }, color: '#999', callback: v => fmt(v) }, title: { display: true, text: 'Daily wishlist adds', font: { size: 12 } } },
+            yCum: { position: 'right', grid: { display: false }, ticks: { font: { size: 11 }, color: '#999', callback: v => compact(v) }, title: { display: true, text: 'Cumulative wishlists', font: { size: 12 } } },
+            yFol: { display: false },
+          }
+        }
+      });
+      const el = document.getElementById('siGrowthLegend');
+      function renderLegend() {
+        el.innerHTML = chart.data.datasets.map((ds, i) => {
+          const hidden = !chart.isDatasetVisible(i);
+          const c = colors[i];
+          return '<span class="legend-item ' + (hidden ? 'inactive' : '') + '" data-index="' + i + '"><span class="legend-swatch" style="background:' + c + '"></span>' + ds.label + '</span>';
+        }).join('');
       }
-      att[30] = 9.7; // matured-cohort blend
-      const chart = new Chart(document.getElementById('mlAttChart').getContext('2d'), {
+      el.addEventListener('click', e => { const it = e.target.closest('.legend-item'); if (!it) return; const idx = +it.dataset.index; chart.setDatasetVisibility(idx, !chart.isDatasetVisible(idx)); chart.update(); renderLegend(); });
+      renderLegend();
+      document.getElementById('siGrowthPngBtn').addEventListener('click', () => downloadChartPng('siGrowthChart', 'siGrowthTooltipEl', 'wishlist-growth.png'));
+      document.getElementById('siGrowthCsvBtn').addEventListener('click', () => downloadChartCsv(chart, 'wishlist-growth.csv'));
+    })();
+
+    // ═══ REGIONAL PRICES ═══
+    (function() {
+      const rows = [
+        { label: 'Eurozone',       cur: 'EUR', price: '39,99 €',   eur: 39.99, vs: 0 },
+        { label: 'United States',  cur: 'USD', price: '$39.99',    eur: 36.80, vs: -8.0 },
+        { label: 'United Kingdom', cur: 'GBP', price: '£33.50',    eur: 39.10, vs: -2.2 },
+        { label: 'Japan',          cur: 'JPY', price: '¥5.900',    eur: 36.30, vs: -9.2 },
+        { label: 'Canada',         cur: 'CAD', price: 'C$51.99',   eur: 35.20, vs: -12.0 },
+        { label: 'Australia',      cur: 'AUD', price: 'A$59.95',   eur: 36.60, vs: -8.5 },
+        { label: 'South Korea',    cur: 'KRW', price: '₩45.000',   eur: 30.50, vs: -23.7 },
+        { label: 'China',          cur: 'CNY', price: '¥188',      eur: 24.10, vs: -39.7 },
+        { label: 'Brazil',         cur: 'BRL', price: 'R$129,99',  eur: 23.40, vs: -41.5 },
+        { label: 'Türkiye',        cur: 'USD', price: '$24.99',    eur: 23.00, vs: -42.5 },
+      ];
+      const state = { key: 'eur', asc: false };
+      function render() {
+        const { key, asc } = state;
+        const isText = key === 'label' || key === 'cur' || key === 'price';
+        const sorted = [...rows].sort((a, b) => isText ? (asc ? String(a[key]).localeCompare(String(b[key])) : String(b[key]).localeCompare(String(a[key]))) : (asc ? a[key] - b[key] : b[key] - a[key]));
+        let h = '<thead><tr>';
+        [['label', 'Region', false], ['cur', 'Currency', false], ['price', 'Store Price', true], ['eur', '&asymp; EUR', true], ['vs', 'vs Base', true]].forEach(([k, hd, end]) => {
+          const active = key === k;
+          h += '<th class="' + (end ? 'text-end ' : '') + 'sortable' + (active ? ' sort-active' : '') + '" data-key="' + k + '">' + hd + '<span class="sort-icon">' + (active && !asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
+        });
+        h += '</tr></thead><tbody>';
+        sorted.forEach(r => {
+          const vsHtml = r.vs === 0 ? '<span class="text-secondary">base</span>' : '<span style="color:' + (r.vs < -25 ? '#f76707' : 'var(--tblr-secondary)') + ';">' + r.vs.toFixed(1).replace('.', ',') + '%</span>';
+          h += '<tr><td style="white-space:nowrap;">' + r.label + '</td><td>' + r.cur + '</td><td class="text-end">' + r.price + '</td><td class="text-end">' + r.eur.toFixed(2).replace('.', ',') + ' €</td><td class="text-end">' + vsHtml + '</td></tr>';
+        });
+        h += '</tbody>';
+        const table = document.getElementById('siPriceTable');
+        table.innerHTML = h;
+        table.querySelectorAll('th.sortable').forEach(thEl => {
+          thEl.addEventListener('click', () => {
+            const k = thEl.dataset.key;
+            if (state.key === k) state.asc = !state.asc;
+            else { state.key = k; state.asc = ['label', 'cur'].includes(k); }
+            render();
+          });
+        });
+      }
+      render();
+      document.getElementById('siPriceCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('siPriceTable'), 'regional-prices.csv'));
+    })();
+
+    // ═══ DISCOUNT HISTORY ═══
+    (function() {
+      const discUB = allLabels.map(() => 0); // Urban Brawl not released yet
+      const discSF = allLabels.map((d, i) => (i >= 17 && i <= 21) ? 40 : ((i >= 39 && i <= 53) ? 50 : ((i >= 87 && i <= 94) ? 30 : 0))); // Black Friday / Winter / Lunar New Year
+      const discTK = allLabels.map((d, i) => (i >= 17 && i <= 21) ? 25 : ((i >= 39 && i <= 53) ? 34 : ((i >= 87 && i <= 94) ? 25 : 0)));
+      const chart = new Chart(document.getElementById('siDiscChart').getContext('2d'), {
         type: 'line',
         data: {
-          labels,
+          labels: allLabels,
           datasets: [
-            { label: 'Attach Rate', data: att, borderColor: '#FF0249', backgroundColor: 'rgba(255,2,73,0.06)', fill: true, borderWidth: 2.5, tension: 0.3, pointRadius: labels.map((l, i) => [0, 7, 14, 30].includes(i) ? 3.5 : 0), pointBackgroundColor: '#FF0249' },
+            { label: 'Urban Brawl', data: discUB, borderColor: '#FF0249', backgroundColor: 'transparent', borderWidth: 2.5, stepped: true, pointRadius: 0, pointHoverRadius: 4 },
+            { label: 'Street Fighter', data: discSF, borderColor: '#206bc4', backgroundColor: 'rgba(32,107,196,0.06)', fill: true, borderWidth: 1.8, stepped: true, pointRadius: 0, pointHoverRadius: 4 },
+            { label: 'Tekken', data: discTK, borderColor: '#f59f00', backgroundColor: 'rgba(245,159,0,0.06)', fill: true, borderWidth: 1.8, stepped: true, pointRadius: 0, pointHoverRadius: 4 },
           ]
         },
         plugins: [makeTrendCrosshair('y')],
@@ -1067,142 +1188,38 @@
           responsive: true, maintainAspectRatio: false,
           interaction: { mode: 'index', intersect: false },
           plugins: {
-            legend: { display: false },
-            tooltip: { enabled: false, external: makeTrendTooltip('mlAttTooltipEl', {
-              'Attach Rate': v => pct1(v),
-            }, t => t + ' after install') }
+            legend: { position: 'bottom', labels: { boxWidth: 10, boxHeight: 10, font: { size: 10 }, color: '#666' } },
+            tooltip: { enabled: false, external: makeTrendTooltip('siDiscTooltipEl', Object.fromEntries(GAMES.map(g => [g.label, v => v + '%']))) }
           },
           scales: {
-            x: { grid: { display: false }, ticks: { autoSkip: true, maxTicksLimit: 11, font: { size: 11 }, color: '#999' } },
-            y: { min: 0, max: 12, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 }, color: '#999', callback: v => v + '%' }, title: { display: true, text: 'Own ≥1 add-on', font: { size: 12 } } },
+            x: { grid: { display: false }, ticks: trendXTicks },
+            y: { min: 0, max: 75, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 }, color: '#999', callback: v => v + '%' }, title: { display: true, text: 'Active discount', font: { size: 12 } } },
           }
         }
       });
-      document.getElementById('mlAttPngBtn').addEventListener('click', () => downloadChartPng('mlAttChart', 'mlAttTooltipEl', 'attach-curve.png'));
-      document.getElementById('mlAttCsvBtn').addEventListener('click', () => downloadChartCsv(chart, 'attach-curve.csv'));
+      document.getElementById('siDiscPngBtn').addEventListener('click', () => downloadChartPng('siDiscChart', 'siDiscTooltipEl', 'discount-history.png'));
+      document.getElementById('siDiscCsvBtn').addEventListener('click', () => downloadChartCsv(chart, 'discount-history.csv'));
     })();
 
-    // ═══ ATTACH BY WEEKLY COHORT (maturity-guarded) ═══
+    // ═══ ANNOUNCEMENTS ═══
     (function() {
-      const cohorts = [
-        { week: 'Feb 26 – Mar 4', size: 58420, d0: 2.4, d7: 6.1, d14: 8.3, d30: 11.2 },
-        { week: 'Mar 5 – 11',     size: 24180, d0: 2.0, d7: 5.8, d14: 7.9, d30: 10.4 },
-        { week: 'Mar 12 – 18',    size: 16890, d0: 1.8, d7: 5.5, d14: 7.5, d30: null },
-        { week: 'Mar 19 – 25',    size: 14020, d0: 1.7, d7: 5.3, d14: 7.2, d30: null },
-        { week: 'Mar 26 – Apr 1', size: 15110, d0: 1.6, d7: 5.1, d14: null, d30: null },
-        { week: 'Apr 2 – 8',      size: 13730, d0: 1.5, d7: null, d14: null, d30: null },
+      const rows = [
+        { date: '2026-02-25', title: 'Urban Brawl launches tomorrow — last call to wishlist', feed: 'Community Announcement' },
+        { date: '2026-02-18', title: 'Pre-orders now live — Standard, Deluxe & Ultimate editions', feed: 'Community Announcement' },
+        { date: '2026-02-09', title: 'Steam Next Fest — the Urban Brawl demo is live', feed: 'Event' },
+        { date: '2026-01-15', title: 'Roster reveal — two new fighters join the lineup', feed: 'Community Announcement' },
+        { date: '2025-12-19', title: 'Wishlist milestone — 150,000 and climbing. Thank you!', feed: 'Community Announcement' },
+        { date: '2025-12-12', title: 'Release date announced — February 26, 2026', feed: 'Community Announcement' },
+        { date: '2025-11-10', title: 'Urban Brawl revealed — wishlist now on Steam', feed: 'Community Announcement' },
       ];
-      const cols = ['d0', 'd7', 'd14', 'd30'];
-      const heads = ['Day 0', 'Day 7', 'Day 14', 'Day 30'];
-      const maxPer = {}, minPer = {};
-      cols.forEach(c => {
-        maxPer[c] = Math.max(...cohorts.map(r => r[c] || 0));
-        minPer[c] = Math.min(...cohorts.filter(r => r[c] != null).map(r => r[c]));
-      });
-      let h = '<thead><tr class="th-group"><th rowspan="2">Install Week</th><th rowspan="2" class="text-end group-end">Installs</th><th colspan="4" class="text-center th-group-label">Own &ge;1 add-on after &hellip;</th></tr><tr>';
-      heads.forEach(hd => { h += '<th class="text-end">' + hd + '</th>'; });
-      h += '</tr></thead><tbody>';
-      cohorts.forEach(r => {
-        h += '<tr><td style="white-space:nowrap;">' + r.week + '</td><td class="text-end group-end">' + fmt(r.size) + '</td>';
-        cols.forEach(c => {
-          if (r[c] == null) {
-            h += '<td class="text-end"><span class="text-secondary" title="Cohort not yet old enough to measure this milestone">&mdash;</span></td>';
-          } else {
-            const range = maxPer[c] - minPer[c] || 1;
-            const alpha = (0.05 + ((r[c] - minPer[c]) / range) * 0.28).toFixed(2);
-            h += '<td class="text-end" style="background:rgba(47,179,68,' + alpha + ');">' + pct1(r[c]) + '</td>';
-          }
-        });
-        h += '</tr>';
+      let h = '<thead><tr><th style="width:110px;">Date</th><th>Title</th><th style="width:220px;">Feed</th></tr></thead><tbody>';
+      rows.forEach(r => {
+        h += '<tr><td style="white-space:nowrap;">' + r.date + '</td><td><a href="#" class="mention-link" style="color: var(--tblr-body-color); font-weight:500; text-decoration:none;">' + r.title + '</a></td><td><span style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.4px; color: var(--tblr-secondary);">' + r.feed + '</span></td></tr>';
       });
       h += '</tbody>';
-      document.getElementById('mlAttCohortTable').innerHTML = h;
-      document.getElementById('mlAttCohortCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('mlAttCohortTable'), 'attach-by-cohort.csv'));
+      document.getElementById('siNewsTable').innerHTML = h;
+      document.getElementById('siNewsCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('siNewsTable'), 'announcements.csv'));
     })();
-
-    // ═══ BREAKDOWN (DLC scope) ═══
-    const mlBd = {
-      platform: {
-        tableId: 'mlBdPlatformTable', dim: 'Platform',
-        rows: [
-          { label: 'Steam',       color: '#1b2838', players: 89680, owners: 9870, gross: 146900, net: 86400 },
-          { label: 'PlayStation', color: '#0070d1', players: 28470, owners: 2010, gross: 39300, net: 23100 },
-          { label: 'Xbox',        color: '#107c10', players: 21350, owners: 1020, gross: 27500, net: 16200 },
-          { label: 'Epic',        color: '#2a2a2a', players: 2850,  owners: 195,  gross: 4800,  net: 2800 },
-          { label: 'Nintendo Switch', greyed: true },
-        ]
-      },
-      market: {
-        tableId: 'mlBdMarketTable', dim: 'Market',
-        rows: [
-          { label: 'US', flag: 'us', players: 54900, owners: 5140, gross: 85400, net: 50200 },
-          { label: 'DE', flag: 'de', players: 20400, owners: 1890, gross: 31100, net: 18300 },
-          { label: 'UK', flag: 'gb', players: 15700, owners: 1430, gross: 23600, net: 13900 },
-          { label: 'JP', flag: 'jp', players: 11000, owners: 1280, gross: 20600, net: 12100 },
-          { label: 'FR', flag: 'fr', players: 12600, owners: 1070, gross: 17700, net: 10400 },
-          { label: 'CA', flag: 'ca', players: 9400,  owners: 840,  gross: 13900, net: 8200 },
-          { label: 'BR', flag: 'br', players: 14100, owners: 420,  gross: 7000,  net: 4100 },
-          { label: 'Others',         players: 18800, owners: 1125, gross: 18500, net: 11300 },
-        ]
-      }
-    };
-    const mlBdState = {};
-    function renderMlBd(key) {
-      const cfg = mlBd[key];
-      const state = mlBdState[key] || (mlBdState[key] = { key: 'net', asc: false });
-      const live = cfg.rows.filter(r => !r.greyed);
-      live.forEach(r => { r.attach = r.owners / r.players * 100; });
-      const cols = [
-        { key: 'players', head: 'Players', fmtFn: fmt },
-        { key: 'owners',  head: 'Add-on Owners', fmtFn: fmt },
-        { key: 'attach',  head: 'Attach Rate', fmtFn: pct1, end: true },
-        { key: 'gross',   head: 'Gross', fmtFn: euroK },
-        { key: 'net',     head: 'Net Revenue', fmtFn: euroK },
-      ];
-      const { key: sk, asc } = state;
-      const isText = sk === 'label';
-      const sorted = [...live].sort((a, b) => isText ? (asc ? a.label.localeCompare(b.label) : b.label.localeCompare(a.label)) : (asc ? a[sk] - b[sk] : b[sk] - a[sk]));
-      const vals = isText ? [] : sorted.map(r => r[sk]);
-      const minV = Math.min(...vals), maxV = Math.max(...vals), range = maxV - minV || 1;
-      let h = '<thead><tr>';
-      h += '<th class="sortable' + (sk === 'label' ? ' sort-active' : '') + '" data-key="label">' + cfg.dim + '<span class="sort-icon">' + (sk === 'label' && !asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
-      cols.forEach(c => {
-        const active = sk === c.key;
-        h += '<th class="text-end sortable' + (active ? ' sort-active' : '') + (c.end ? ' group-end' : '') + '" data-key="' + c.key + '">' + c.head + '<span class="sort-icon">' + (active && !asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
-      });
-      h += '</tr></thead><tbody>';
-      sorted.forEach(r => {
-        const norm = isText ? 0 : (asc ? 1 - (r[sk] - minV) / range : (r[sk] - minV) / range);
-        const opacity = (0.04 + norm * 0.18).toFixed(2);
-        const marker = r.flag ? '<span class="flag flag-' + r.flag + ' me-1"></span>' : (r.color ? '<span class="d-inline-block rounded-circle me-2" style="width:10px; height:10px; background:' + r.color + '; vertical-align:middle;"></span>' : '');
-        h += '<tr><td style="white-space:nowrap;">' + marker + r.label + '</td>';
-        cols.forEach(c => {
-          const hl = (c.key === sk && !isText) ? ' style="background:rgba(116,182,231,' + opacity + ');"' : '';
-          h += '<td class="text-end' + (c.end ? ' group-end' : '') + '"' + hl + '>' + c.fmtFn(r[c.key]) + '</td>';
-        });
-        h += '</tr>';
-      });
-      cfg.rows.filter(r => r.greyed).forEach(r => {
-        h += '<tr style="opacity: 0.45;"><td style="white-space:nowrap;">' + r.label + '</td>' + cols.map(() => '<td class="text-end"><span class="text-secondary">&mdash;</span></td>').join('') + '</tr>';
-      });
-      const t = live.reduce((a, r) => ({ players: a.players + r.players, owners: a.owners + r.owners, gross: a.gross + r.gross, net: a.net + r.net }), { players: 0, owners: 0, gross: 0, net: 0 });
-      h += '</tbody><tfoot><tr><td>Total</td><td class="text-end">' + fmt(t.players) + '</td><td class="text-end">' + fmt(t.owners) + '</td><td class="text-end group-end">' + pct1(t.owners / t.players * 100) + '</td><td class="text-end">' + euroK(t.gross) + '</td><td class="text-end">' + euroK(t.net) + '</td></tr></tfoot>';
-      const table = document.getElementById(cfg.tableId);
-      table.innerHTML = h;
-      table.querySelectorAll('th.sortable').forEach(thEl => {
-        thEl.addEventListener('click', () => {
-          const k = thEl.dataset.key;
-          if (state.key === k) state.asc = !state.asc;
-          else { state.key = k; state.asc = k === 'label'; }
-          renderMlBd(key);
-        });
-      });
-    }
-    Object.keys(mlBd).forEach(renderMlBd);
-    document.getElementById('mlBdCsvBtn').addEventListener('click', () => {
-      const active = document.querySelector('#mlBdPlatform.active') ? 'platform' : 'market';
-      downloadTableCsv(document.getElementById(mlBd[active].tableId), 'dlc-revenue-by-' + active + '.csv');
-    });
 
     /* ═══ SIDEBAR TOGGLE ═══ */
     function toggleSidebar() {

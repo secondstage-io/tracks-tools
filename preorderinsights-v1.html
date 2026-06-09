@@ -30,14 +30,17 @@
     .chart-legend { padding: 4px 0; } /* layout via d-flex flex-wrap gap-2 utilities */
     .chart-legend .legend-item {
       display: inline-flex; align-items: center; gap: 6px;
-      padding: 5px 12px; border-radius: 6px; font-size: 13px; font-weight: 500;
-      cursor: pointer; user-select: none; transition: opacity 0.2s, box-shadow 0.2s;
-      border: 1px solid transparent;
+      padding: 3px 11px 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+      cursor: pointer; user-select: none; transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+      background: var(--tblr-bg-surface-secondary, #f8f9fa) !important;
+      border: 1px solid rgba(4,32,69,0.15) !important;
+      color: var(--tblr-body-color, #1e293b);
     }
-    .chart-legend .legend-item:hover { box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-    .chart-legend .legend-item.inactive { opacity: 0.35; text-decoration: line-through; }
-    .chart-legend .legend-swatch { width: 14px; height: 4px; border-radius: 2px; flex-shrink: 0; }
-    .chart-legend .legend-item[data-type="bar"] .legend-swatch { height: 12px; width: 10px; border-radius: 2px; }
+    .chart-legend .legend-item:hover { border-color: rgba(4,32,69,0.3) !important; box-shadow: none; }
+    .chart-legend .legend-item.inactive { background: transparent !important; border-color: rgba(4,32,69,0.12) !important; color: var(--tblr-secondary, #626976); opacity: 0.6; text-decoration: none; }
+    .chart-legend .legend-swatch { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .chart-legend .legend-item[data-type="bar"] .legend-swatch { height: 9px; width: 9px; border-radius: 50%; }
+    .chart-legend .legend-item.inactive .legend-swatch { background: #ccc !important; }
     .kpi { border-radius: 8px; padding: 14px 16px; height: 100%; }
     .info-tip { position: relative; cursor: help; display: inline-flex; padding: 4px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
     .info-tip:hover { background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.06); }
@@ -281,6 +284,8 @@
     .score-tile { padding: 10px 12px 9px; }
     .score-tile .kpi-value { font-size: 1.15rem; }
     .hero-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--tblr-secondary, #626976); margin-bottom: 6px; }
+    .trend-ctrl-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--tblr-secondary, #626976); white-space: nowrap; }
+    .trend-ctrl-sep { width: 1px; align-self: stretch; min-height: 20px; background: rgba(4,32,69,0.12); margin: 0 4px; }
     /* Command Center wrapper */
     /* AI Insight placeholder */
     .ai-insight { border: 1px solid rgba(132,94,247,0.2); background: rgba(132,94,247,0.03); border-radius: 8px; padding: 12px 16px; font-size: 13px; line-height: 1.6; color: var(--tblr-body-color, #1e293b); }
@@ -460,21 +465,20 @@
             </div>
             <nav class="nav nav-pills nav-vertical" style="font-size:13px;">
               <li class="nav-item"><a class="nav-link" href="nativedash-poc-v3-prelaunch.html" data-title="Overview"><i class="ti ti-layout-dashboard me-2"></i><span>Overview</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="steaminsights-v1.html" data-title="Steam Insights"><i class="ti ti-brand-steam me-2"></i><span>Steam Insights</span></a></li>
               <li class="nav-item"><a class="nav-link" href="periodcomparison-v1.html" data-title="Period Comparison"><i class="ti ti-arrows-diff me-2"></i><span>Period Comparison</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Growth</span></li>
               <li class="nav-item"><a class="nav-link" href="installsua-v1.html" data-title="Installs & UA"><i class="ti ti-device-gamepad-2 me-2"></i><span>Installs &amp; UA</span></a></li>
               <li class="nav-item"><a class="nav-link" href="wishlistinsights-v1.html" data-title="Wishlist Insights"><i class="ti ti-heart me-2"></i><span>Wishlist Insights</span></a></li>
               <li class="nav-item"><a class="nav-link active" href="#" data-title="Preorder Insights"><i class="ti ti-shopping-cart me-2"></i><span>Preorder Insights</span></a></li>
-              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Game</span></li>
               <li class="nav-item"><a class="nav-link" href="playerlifecycle-v1.html" data-title="Player Lifecycle"><i class="ti ti-refresh me-2"></i><span>Player Lifecycle</span></a></li>
-              <li class="nav-item"><a class="nav-link" href="monetizationltv-v1.html" data-title="Monetization & LTV"><i class="ti ti-coin me-2"></i><span>Monetization & LTV</span></a></li>
-              <li class="nav-item"><a class="nav-link" href="steaminsights-v1.html" data-title="Steam Insights"><i class="ti ti-brand-steam me-2"></i><span>Steam Insights</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="monetizationltv-v1.html" data-title="Revenue & LTV"><i class="ti ti-coin me-2"></i><span>Revenue &amp; LTV</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Media & Web</span></li>
               <li class="nav-item"><a class="nav-link" href="performancemedia-v1.html" data-title="Performance Overview"><i class="ti ti-chart-bar me-2"></i><span>Performance Overview</span></a></li>
               <li class="nav-item"><a class="nav-link" href="awarenesstracker-v1.html" data-title="Awareness Tracker"><i class="ti ti-eye me-2"></i><span>Awareness Tracker</span></a></li>
               <li class="nav-item"><a class="nav-link" href="creativeinsights-v1.html" data-title="Creative Performance"><i class="ti ti-palette me-2"></i><span>Creative Performance</span></a></li>
               <li class="nav-item"><a class="nav-link" href="audienceinsights-v1.html" data-title="Audience Insights"><i class="ti ti-users me-2"></i><span>Audience Insights</span></a></li>
-              <li class="nav-item"><a class="nav-link" href="influencerdirectbuy-v1.html" data-title="Influencer & Direct Buy"><i class="ti ti-speakerphone me-2"></i><span>Influencer & Direct Buy</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="influencerdirectbuy-v1.html" data-title="Influencer & Direct Buy"><i class="ti ti-speakerphone me-2"></i><span>Influencer &amp; Direct Buy</span></a></li>
               <li class="nav-item"><a class="nav-link" href="websiteanalytics-v1.html" data-title="Website Analytics"><i class="ti ti-world-www me-2"></i><span>Website Analytics</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Brand</span></li>
               <li class="nav-item"><a class="nav-link" href="brandhealth-v1.html" data-title="Brand Health"><i class="ti ti-star me-2"></i><span>Brand Health</span></a></li>
@@ -640,70 +644,59 @@
         <div class="card mt-5 mb-3" id="poIntelCard">
           <div class="card-status-top bg-primary"></div>
           <div class="card-body">
-            <div class="d-flex flex-wrap" style="row-gap: 14px;">
-              <div style="flex: 3 1 0; min-width: 315px;">
-                <div class="hero-group-label">Volume</div>
-                <div class="row g-2">
-                  <div class="col-4">
-                <div class="kpi kpi-neutral score-tile">
-                  <div class="kpi-label"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-label="Steam" style="vertical-align:-1px;"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></svg> Steam PreOrders <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Modelled from UTM-tagged paid traffic, web analytics and Steam data.<br>Not a direct Steam API count. Console storefronts not included.</span></span></div>
-                  <div class="kpi-value">4.218</div>
-                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +312</span><span>last 7 days</span></div>
+            <div class="d-flex flex-wrap align-items-start" style="row-gap:16px; column-gap:40px;">
+              <div style="flex: 1 1 300px; min-width:280px;">
+                <div class="hero-group-label">Steam PreOrders &middot; modelled</div>
+                <div class="d-flex align-items-baseline gap-2" style="margin-top:8px;">
+                  <div style="font-size:2.5rem; font-weight:800; line-height:1; color:var(--tblr-body-color,#1e293b); font-variant-numeric:tabular-nums; display:inline-flex; align-items:center; gap:9px;"><span style="display:inline-flex; align-self:center;"><svg width="26" height="26" viewBox="0 0 24 24" fill="#1b2838" xmlns="http://www.w3.org/2000/svg" aria-label="Steam"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></svg></span>4.218</div>
+                  <span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:3px 9px; border-radius:6px; font-size:13px; font-weight:700;">&uarr; +312 last 7 days</span>
                 </div>
+                <div style="font-size:12px; color:var(--tblr-secondary,#626976); margin-top:10px; line-height:1.55;">Modelled from UTM-tagged paid traffic + web analytics + Steam data &mdash; console storefronts not included. <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Not a direct Steam API count. Prelaunch preorders are Steam-only here.</span></span></div>
               </div>
-                  <div class="col-4">
-                <div class="kpi kpi-neutral score-tile">
-                  <div class="kpi-label">Paid PreOrders</div>
-                  <div class="kpi-value">1.480</div>
-                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&darr; 9,8%</span><span>CPPO 197,39&thinsp;&euro; &middot; 7d</span></div>
+              <div style="flex: 1 1 330px; min-width:300px;">
+                <div class="hero-group-label">Paid vs organic composition</div>
+                <div class="d-flex justify-content-between align-items-baseline" style="font-size:13px; font-weight:700; margin-top:8px;">
+                  <span style="color:#e8590c;">Paid 1.480 <span style="color:var(--tblr-secondary,#626976); font-weight:500;">&middot; 35,1%</span></span>
+                  <span style="color:#c08a00;">Organic 2.738 <span style="color:var(--tblr-secondary,#626976); font-weight:500;">&middot; 64,9%</span></span>
                 </div>
-              </div>
-                  <div class="col-4">
-                <div class="kpi kpi-neutral score-tile">
-                  <div class="kpi-label">Organic Share <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Preorders not attributed to paid media. Prelaunch preorders skew organic &mdash;<br>paid media builds the wishlist pool that converts at announce/launch beats.</span></span></div>
-                  <div class="kpi-value">64,9%</div>
-                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +1,2pp</span><span>2.738 preorders</span></div>
+                <div style="display:flex; height:18px; border-radius:9px; overflow:hidden; margin-top:7px; background:#eef2f7;">
+                  <div style="width:35.1%; background:#f08c00;" title="Paid 1.480"></div>
+                  <div style="width:64.9%; background:#ffd43b;" title="Organic 2.738"></div>
                 </div>
+                <div style="font-size:11px; color:var(--tblr-secondary,#626976); margin-top:7px; line-height:1.5;">Prelaunch preorders skew organic &mdash; paid builds the wishlist pool that converts at launch beats (&approx;1,8&times; organic per paid). Paid-only CPPO 197,39&thinsp;&euro; rests on small numbers.</div>
               </div>
-                </div>
-              </div>
-              <div style="flex: 2 1 0; min-width: 215px; border-left: 1px solid rgba(4,32,69,0.1); padding-left: 12px; margin-left: 12px;">
-                <div class="hero-group-label">Conversion</div>
-                <div class="row g-2">
-                  <div class="col-6">
+            </div>
+            <div class="border-top mt-3 pt-3">
+              <div class="row g-2">
+                <div class="col-4">
                 <div class="kpi kpi-beat-soft score-tile">
                   <div class="kpi-label">WL &rarr; PO Conversion <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Preorders as a share of total wishlists (224.525) &mdash; the key prelaunch<br>conversion. Typically accelerates sharply at launch-adjacent beats.</span></span></div>
                   <div class="kpi-value">1,88%</div>
                   <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 25,3%</span><span>vs goal 1,50%</span></div>
                 </div>
               </div>
-                  <div class="col-6">
+                <div class="col-4">
                 <div class="kpi kpi-beat-soft score-tile">
                   <div class="kpi-label">PreOrders CR <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Preorders per tracked Steam store visit (980K visits in period).</span></span></div>
                   <div class="kpi-value">0,43%</div>
                   <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 22,9%</span><span>vs goal 0,35%</span></div>
                 </div>
               </div>
-                </div>
-              </div>
-              <div style="flex: 1 1 0; min-width: 115px; border-left: 1px solid rgba(4,32,69,0.1); padding-left: 12px; margin-left: 12px;">
-                <div class="hero-group-label">Efficiency</div>
-                <div class="row g-2">
-                  <div class="col-12">
+                <div class="col-4">
                 <div class="kpi kpi-beat-soft score-tile">
                   <div class="kpi-label"><span style="text-transform:none;">eCPPO</span> <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Effective cost per preorder &mdash; total paid-media cost divided by ALL preorders<br>(paid + organic). At prelaunch volumes this is the honest efficiency read;<br>paid-only CPPO rests on small numbers.</span></span></div>
                   <div class="kpi-value">69,26&thinsp;&euro;</div>
                   <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 13,4%</span><span>vs goal 80,00&thinsp;&euro;</span></div>
                 </div>
               </div>
-                </div>
               </div>
             </div>
           </div>
           <!-- Preorder velocity — the hero visual -->
           <div class="card-body border-top pt-3">
-            <div class="d-flex align-items-center gap-2 mb-2">
+            <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
               <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">PreOrder Velocity</span>
+              <div id="poVelocityLegend" class="chart-legend d-flex flex-wrap align-items-center gap-2"></div>
               <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Daily preorder additions split paid / organic (stacked bars, left axis)<br>and cumulative total (line, right axis).<br>Toggle CPPO / eCPPO via the legend to overlay efficiency.</span></span>
               <div class="dropdown flex-shrink-0">
                 <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download">
@@ -715,7 +708,6 @@
                 </div>
               </div>
             </div>
-            <div id="poVelocityLegend" class="chart-legend d-flex flex-wrap gap-2"></div>
             <div class="chart-wrapper" style="height:280px">
               <canvas id="poVelocityChart"></canvas>
               <div id="poVelocityTooltipEl" class="chart-tooltip opacity-0"></div>
@@ -1229,12 +1221,17 @@
       });
       const el = document.getElementById('poVelocityLegend');
       function render() {
-        el.innerHTML = chart.data.datasets.map((ds, i) => {
+        const pill = i => {
+          const ds = chart.data.datasets[i];
           const hidden = !chart.isDatasetVisible(i);
           const c = V_COLORS[i];
           const isBar = i === 0 || i === 1 || i === 5;
           return '<span class="legend-item ' + (hidden ? 'inactive' : '') + '" data-index="' + i + '" data-type="' + (isBar ? 'bar' : 'line') + '" title="' + (hidden ? 'Click to show ' : 'Click to hide ') + ds.label + '" style="background:' + (hidden ? 'transparent' : c.light) + '; border-color:' + (hidden ? '#ccc' : c.solid) + '"><span class="legend-swatch" style="background:' + c.solid + '"></span>' + ds.label + '</span>';
-        }).join('');
+        };
+        el.innerHTML = [0, 1, 2].map(pill).join('')
+          + '<div class="trend-ctrl-sep d-none d-lg-block"></div>'
+          + '<span class="trend-ctrl-label">Efficiency overlay</span>'
+          + [3, 4, 5].map(pill).join('');
       }
       el.addEventListener('click', e => {
         const item = e.target.closest('.legend-item');

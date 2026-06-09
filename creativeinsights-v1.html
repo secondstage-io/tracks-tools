@@ -30,14 +30,17 @@
     .chart-legend { padding: 4px 0; } /* layout via d-flex flex-wrap gap-2 utilities */
     .chart-legend .legend-item {
       display: inline-flex; align-items: center; gap: 6px;
-      padding: 5px 12px; border-radius: 6px; font-size: 13px; font-weight: 500;
-      cursor: pointer; user-select: none; transition: opacity 0.2s, box-shadow 0.2s;
-      border: 1px solid transparent;
+      padding: 3px 11px 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+      cursor: pointer; user-select: none; transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+      background: var(--tblr-bg-surface-secondary, #f8f9fa) !important;
+      border: 1px solid rgba(4,32,69,0.15) !important;
+      color: var(--tblr-body-color, #1e293b);
     }
-    .chart-legend .legend-item:hover { box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-    .chart-legend .legend-item.inactive { opacity: 0.35; text-decoration: line-through; }
-    .chart-legend .legend-swatch { width: 14px; height: 4px; border-radius: 2px; flex-shrink: 0; }
-    .chart-legend .legend-item[data-type="bar"] .legend-swatch { height: 12px; width: 10px; border-radius: 2px; }
+    .chart-legend .legend-item:hover { border-color: rgba(4,32,69,0.3) !important; box-shadow: none; }
+    .chart-legend .legend-item.inactive { background: transparent !important; border-color: rgba(4,32,69,0.12) !important; color: var(--tblr-secondary, #626976); opacity: 0.6; text-decoration: none; }
+    .chart-legend .legend-swatch { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .chart-legend .legend-item[data-type="bar"] .legend-swatch { height: 9px; width: 9px; border-radius: 50%; }
+    .chart-legend .legend-item.inactive .legend-swatch { background: #ccc !important; }
     .kpi { border-radius: 8px; padding: 14px 16px; height: 100%; }
     .info-tip { position: relative; cursor: help; display: inline-flex; padding: 4px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
     .info-tip:hover { background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.06); }
@@ -281,6 +284,7 @@
     .score-tile { padding: 10px 12px 9px; }
     .score-tile .kpi-value { font-size: 1.15rem; }
     .hero-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--tblr-secondary, #626976); margin-bottom: 6px; }
+    .hero-stats-lead .kpi-value { font-size: 1.45rem; line-height: 1.15; }
     /* Command Center wrapper */
     /* AI Insight placeholder */
     .ai-insight { border: 1px solid rgba(132,94,247,0.2); background: rgba(132,94,247,0.03); border-radius: 8px; padding: 12px 16px; font-size: 13px; line-height: 1.6; color: var(--tblr-body-color, #1e293b); }
@@ -472,21 +476,20 @@
             </div>
             <nav class="nav nav-pills nav-vertical" style="font-size:13px;">
               <li class="nav-item"><a class="nav-link" href="nativedash-poc-v3-prelaunch.html" data-title="Overview"><i class="ti ti-layout-dashboard me-2"></i><span>Overview</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="steaminsights-v1.html" data-title="Steam Insights"><i class="ti ti-brand-steam me-2"></i><span>Steam Insights</span></a></li>
               <li class="nav-item"><a class="nav-link" href="periodcomparison-v1.html" data-title="Period Comparison"><i class="ti ti-arrows-diff me-2"></i><span>Period Comparison</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Growth</span></li>
               <li class="nav-item"><a class="nav-link" href="installsua-v1.html" data-title="Installs & UA"><i class="ti ti-device-gamepad-2 me-2"></i><span>Installs &amp; UA</span></a></li>
               <li class="nav-item"><a class="nav-link" href="wishlistinsights-v1.html" data-title="Wishlist Insights"><i class="ti ti-heart me-2"></i><span>Wishlist Insights</span></a></li>
               <li class="nav-item"><a class="nav-link" href="preorderinsights-v1.html" data-title="Preorder Insights"><i class="ti ti-shopping-cart me-2"></i><span>Preorder Insights</span></a></li>
-              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Game</span></li>
               <li class="nav-item"><a class="nav-link" href="playerlifecycle-v1.html" data-title="Player Lifecycle"><i class="ti ti-refresh me-2"></i><span>Player Lifecycle</span></a></li>
-              <li class="nav-item"><a class="nav-link" href="monetizationltv-v1.html" data-title="Monetization & LTV"><i class="ti ti-coin me-2"></i><span>Monetization & LTV</span></a></li>
-              <li class="nav-item"><a class="nav-link" href="steaminsights-v1.html" data-title="Steam Insights"><i class="ti ti-brand-steam me-2"></i><span>Steam Insights</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="monetizationltv-v1.html" data-title="Revenue & LTV"><i class="ti ti-coin me-2"></i><span>Revenue &amp; LTV</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Media & Web</span></li>
               <li class="nav-item"><a class="nav-link" href="performancemedia-v1.html" data-title="Performance Overview"><i class="ti ti-chart-bar me-2"></i><span>Performance Overview</span></a></li>
               <li class="nav-item"><a class="nav-link" href="awarenesstracker-v1.html" data-title="Awareness Tracker"><i class="ti ti-eye me-2"></i><span>Awareness Tracker</span></a></li>
               <li class="nav-item"><a class="nav-link active" href="#" data-title="Creative Performance"><i class="ti ti-palette me-2"></i><span>Creative Performance</span></a></li>
               <li class="nav-item"><a class="nav-link" href="audienceinsights-v1.html" data-title="Audience Insights"><i class="ti ti-users me-2"></i><span>Audience Insights</span></a></li>
-              <li class="nav-item"><a class="nav-link" href="influencerdirectbuy-v1.html" data-title="Influencer & Direct Buy"><i class="ti ti-speakerphone me-2"></i><span>Influencer & Direct Buy</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="influencerdirectbuy-v1.html" data-title="Influencer & Direct Buy"><i class="ti ti-speakerphone me-2"></i><span>Influencer &amp; Direct Buy</span></a></li>
               <li class="nav-item"><a class="nav-link" href="websiteanalytics-v1.html" data-title="Website Analytics"><i class="ti ti-world-www me-2"></i><span>Website Analytics</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Brand</span></li>
               <li class="nav-item"><a class="nav-link" href="brandhealth-v1.html" data-title="Brand Health"><i class="ti ti-star me-2"></i><span>Brand Health</span></a></li>
@@ -658,7 +661,7 @@
         <!-- ═══ CREATIVE HEALTH (quiet hero): message-delivery quality + completion funnel ═══ -->
         <div class="card mt-5 mb-3" id="crIntelCard">
           <div class="card-status-top bg-primary"></div>
-          <div class="card-body">
+          <div class="card-body hero-stats-lead">
             <div class="d-flex flex-wrap" style="row-gap: 14px;">
               <div style="flex: 2 1 0; min-width: 215px;">
                 <div class="hero-group-label">Cost</div>

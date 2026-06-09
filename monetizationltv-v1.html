@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Monetization &amp; LTV — TRACKS Native Dashboard</title>
+  <title>Revenue &amp; LTV — TRACKS Native Dashboard</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.6.0/dist/tabler-icons.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/js/tabler.min.js"></script>
@@ -30,14 +30,17 @@
     .chart-legend { padding: 4px 0; } /* layout via d-flex flex-wrap gap-2 utilities */
     .chart-legend .legend-item {
       display: inline-flex; align-items: center; gap: 6px;
-      padding: 5px 12px; border-radius: 6px; font-size: 13px; font-weight: 500;
-      cursor: pointer; user-select: none; transition: opacity 0.2s, box-shadow 0.2s;
-      border: 1px solid transparent;
+      padding: 3px 11px 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+      cursor: pointer; user-select: none; transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+      background: var(--tblr-bg-surface-secondary, #f8f9fa) !important;
+      border: 1px solid rgba(4,32,69,0.15) !important;
+      color: var(--tblr-body-color, #1e293b);
     }
-    .chart-legend .legend-item:hover { box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-    .chart-legend .legend-item.inactive { opacity: 0.35; text-decoration: line-through; }
-    .chart-legend .legend-swatch { width: 14px; height: 4px; border-radius: 2px; flex-shrink: 0; }
-    .chart-legend .legend-item[data-type="bar"] .legend-swatch { height: 12px; width: 10px; border-radius: 2px; }
+    .chart-legend .legend-item:hover { border-color: rgba(4,32,69,0.3) !important; box-shadow: none; }
+    .chart-legend .legend-item.inactive { background: transparent !important; border-color: rgba(4,32,69,0.12) !important; color: var(--tblr-secondary, #626976); opacity: 0.6; text-decoration: none; }
+    .chart-legend .legend-swatch { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .chart-legend .legend-item[data-type="bar"] .legend-swatch { height: 9px; width: 9px; border-radius: 50%; }
+    .chart-legend .legend-item.inactive .legend-swatch { background: #ccc !important; }
     .kpi { border-radius: 8px; padding: 14px 16px; height: 100%; }
     .info-tip { position: relative; cursor: help; display: inline-flex; padding: 4px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
     .info-tip:hover { background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.06); }
@@ -464,21 +467,20 @@
             </div>
             <nav class="nav nav-pills nav-vertical" style="font-size:13px;">
               <li class="nav-item"><a class="nav-link" href="nativedash-poc-v3-prelaunch.html" data-title="Overview"><i class="ti ti-layout-dashboard me-2"></i><span>Overview</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="steaminsights-v1.html" data-title="Steam Insights"><i class="ti ti-brand-steam me-2"></i><span>Steam Insights</span></a></li>
               <li class="nav-item"><a class="nav-link" href="periodcomparison-v1.html" data-title="Period Comparison"><i class="ti ti-arrows-diff me-2"></i><span>Period Comparison</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Growth</span></li>
               <li class="nav-item"><a class="nav-link" href="installsua-v1.html" data-title="Installs & UA"><i class="ti ti-device-gamepad-2 me-2"></i><span>Installs &amp; UA</span></a></li>
               <li class="nav-item"><a class="nav-link" href="wishlistinsights-v1.html" data-title="Wishlist Insights"><i class="ti ti-heart me-2"></i><span>Wishlist Insights</span></a></li>
               <li class="nav-item"><a class="nav-link" href="preorderinsights-v1.html" data-title="Preorder Insights"><i class="ti ti-shopping-cart me-2"></i><span>Preorder Insights</span></a></li>
-              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Game</span></li>
               <li class="nav-item"><a class="nav-link" href="playerlifecycle-v1.html" data-title="Player Lifecycle"><i class="ti ti-refresh me-2"></i><span>Player Lifecycle</span></a></li>
-              <li class="nav-item"><a class="nav-link active" href="#" data-title="Monetization & LTV"><i class="ti ti-coin me-2"></i><span>Monetization &amp; LTV</span></a></li>
-              <li class="nav-item"><a class="nav-link" href="steaminsights-v1.html" data-title="Steam Insights"><i class="ti ti-brand-steam me-2"></i><span>Steam Insights</span></a></li>
+              <li class="nav-item"><a class="nav-link active" href="#" data-title="Revenue & LTV"><i class="ti ti-coin me-2"></i><span>Revenue &amp; LTV</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Media & Web</span></li>
               <li class="nav-item"><a class="nav-link" href="performancemedia-v1.html" data-title="Performance Overview"><i class="ti ti-chart-bar me-2"></i><span>Performance Overview</span></a></li>
               <li class="nav-item"><a class="nav-link" href="awarenesstracker-v1.html" data-title="Awareness Tracker"><i class="ti ti-eye me-2"></i><span>Awareness Tracker</span></a></li>
               <li class="nav-item"><a class="nav-link" href="creativeinsights-v1.html" data-title="Creative Performance"><i class="ti ti-palette me-2"></i><span>Creative Performance</span></a></li>
               <li class="nav-item"><a class="nav-link" href="audienceinsights-v1.html" data-title="Audience Insights"><i class="ti ti-users me-2"></i><span>Audience Insights</span></a></li>
-              <li class="nav-item"><a class="nav-link" href="influencerdirectbuy-v1.html" data-title="Influencer & Direct Buy"><i class="ti ti-speakerphone me-2"></i><span>Influencer & Direct Buy</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="influencerdirectbuy-v1.html" data-title="Influencer & Direct Buy"><i class="ti ti-speakerphone me-2"></i><span>Influencer &amp; Direct Buy</span></a></li>
               <li class="nav-item"><a class="nav-link" href="websiteanalytics-v1.html" data-title="Website Analytics"><i class="ti ti-world-www me-2"></i><span>Website Analytics</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Brand</span></li>
               <li class="nav-item"><a class="nav-link" href="brandhealth-v1.html" data-title="Brand Health"><i class="ti ti-star me-2"></i><span>Brand Health</span></a></li>
@@ -514,7 +516,7 @@
               <rect x="20" y="106" width="360" height="2" fill="url(#brawlGrad)" opacity="0.7" rx="1"/>
             </svg>
             <div style="width:1px; height:38px; background:rgba(4,32,69,0.15); flex-shrink:0;"></div>
-            <div style="font-size:22px; font-weight:700; color: var(--tblr-body-color, #1e293b); line-height:1.2;">Monetization &amp; LTV <span class="info-tip tip-right" style="vertical-align: 3px; padding: 0; margin-left: 8px;"><span style="display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--tblr-primary, #FF0249); background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.06); border: 1px solid rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.2); border-radius: 999px; padding: 2px 9px; line-height: 1.4;">Modelled<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span><span class="tip-text" style="min-width: 280px; font-weight: 400; text-transform: none; letter-spacing: normal;">Revenue figures on this page are <strong>modelled</strong>: storefront-reported gross, minus refunds, platform fees and taxes, linked to TRACKS attribution. Console storefronts report with a 2&ndash;5 day lag &mdash; recent days mature over time.</span></span></div>
+            <div style="font-size:22px; font-weight:700; color: var(--tblr-body-color, #1e293b); line-height:1.2;">Revenue &amp; LTV <span class="info-tip tip-right" style="vertical-align: 3px; padding: 0; margin-left: 8px;"><span style="display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--tblr-primary, #FF0249); background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.06); border: 1px solid rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.2); border-radius: 999px; padding: 2px 9px; line-height: 1.4;">Modelled<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span><span class="tip-text" style="min-width: 280px; font-weight: 400; text-transform: none; letter-spacing: normal;">Revenue figures on this page are <strong>modelled</strong>: storefront-reported gross, minus refunds, platform fees and taxes, linked to TRACKS attribution. Console storefronts report with a 2&ndash;5 day lag &mdash; recent days mature over time.</span></span></div>
           </div>
           <div class="d-flex align-items-center gap-1">
             <a href="#" class="btn btn-sm btn-ghost-secondary p-2" title="Settings" aria-label="Settings"><i class="ti ti-adjustments-alt" style="font-size:18px;"></i></a>
@@ -640,38 +642,41 @@
         <!-- ═══ MONETIZATION & LTV — quiet hero: revenue waterfall + player value + return ═══ -->
         <div class="card mt-5 mb-3" id="mlIntelCard">
           <div class="card-status-top bg-primary"></div>
-          <div class="card-body">
-            <div class="d-flex flex-wrap" style="row-gap: 14px;">
-              <div style="flex: 3 1 0; min-width: 315px;">
-                <div class="hero-group-label">Revenue</div>
-                <div class="row g-2">
-                  <div class="col-4"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Net Revenue <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Modelled net: realized gross minus refunds, platform fees and taxes.<br>This is the figure behind the Launch Overview ROAS tile.</span></span></div><div class="kpi-value">4,17M&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +186K</span><span>last 7 days</span></div></div></div>
-                  <div class="col-4"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Gross Bookings <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Storefront-reported gross at realized prices (regional pricing included),<br>before refunds, fees and taxes. 149.680 units sold incl. add-ons.</span></span></div><div class="kpi-value">7,44M&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +331K</span><span>last 7 days</span></div></div></div>
-                  <div class="col-4"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Refund Rate <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Refunded units &divide; units sold (7.330 of 149.680). Steam&rsquo;s 2h/14-day policy<br>drives most refunds; console storefronts are stricter.</span></span></div><div class="kpi-value">4,9%</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&darr; 0,3pp</span><span>last 7 days</span></div></div></div>
-                </div>
+        <div class="card-body">
+          <div class="d-flex flex-wrap align-items-start" style="row-gap:16px;">
+            <div style="flex: 2 1 0; min-width: 300px;">
+              <div class="hero-group-label">Return on Ad Spend &middot; modelled, paid cohort</div>
+              <div class="d-flex align-items-baseline gap-2" style="margin-top:8px;">
+                <div style="font-size:2.5rem; font-weight:800; line-height:1; color:#2fb344; font-variant-numeric:tabular-nums;">8,0&times;</div>
+                <span class="kpi-delta up" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:3px 9px; border-radius:6px; font-size:13px; font-weight:700;">&uarr; vs goal 4,0&times;</span>
               </div>
-              <div style="flex: 3 1 0; min-width: 315px; border-left: 1px solid rgba(4,32,69,0.1); padding-left: 12px; margin-left: 12px;">
-                <div class="hero-group-label">Player Value</div>
-                <div class="row g-2">
-                  <div class="col-4"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">ARPI (net) <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Net revenue per install: 4,17M&thinsp;&euro; &divide; 142.350 installs.<br>Grows over time as add-on purchases mature &mdash; see the LTV cohorts.</span></span></div><div class="kpi-value">29,26&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +0,21</span><span>last 7 days</span></div></div></div>
-                  <div class="col-4"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Add-on Attach <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Players who bought at least one add-on (Season Pass, cosmetics, soundtrack):<br>13.095 of 142.350. The premium title&rsquo;s post-purchase growth lever.</span></span></div><div class="kpi-value">9,2%</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +0,6pp</span><span>last 7 days</span></div></div></div>
-                  <div class="col-4"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">ARPPU Add-ons <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Average add-on spend among players who bought any add-on.</span></span></div><div class="kpi-value">16,69&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +0,32</span><span>last 7 days</span></div></div></div>
-                </div>
-              </div>
-              <div style="flex: 1 1 0; min-width: 115px; border-left: 1px solid rgba(4,32,69,0.1); padding-left: 12px; margin-left: 12px;">
-                <div class="hero-group-label">Return</div>
-                <div class="row g-2">
-                  <div class="col-12"><div class="kpi kpi-beat-soft score-tile"><div class="kpi-label">ROAS <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Modelled net revenue attributed to paid installs &divide; media cost.<br>Identity: ROAS = ARPI &divide; CPI (paid cohort ARPI 32,96&thinsp;&euro; &divide; CPI 4,12&thinsp;&euro;).<br>The paid cohort skews to Deluxe/Ultimate editions, hence the higher ARPI.</span></span></div><div class="kpi-value">8,0&times;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta up" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 100%</span><span>vs goal 4,0&times;</span></div></div></div>
-                </div>
-              </div>
+              <div style="font-size:14px; font-weight:600; color: var(--tblr-body-color, #1e293b); margin-top:16px;">8&thinsp;&euro; net revenue back for every 1&thinsp;&euro; of paid media</div>
+              <div style="font-size:12px; color: var(--tblr-secondary, #626976); margin-top:8px; line-height:1.55;">Paid cohort: <strong>184.500&thinsp;&euro;</strong> media spend &rarr; <strong>1,478M&thinsp;&euro;</strong> modelled net revenue.<br>Identity: ROAS = ARPI 32,96&thinsp;&euro; &divide; CPI 4,12&thinsp;&euro;<span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Modelled net revenue attributed to paid installs &divide; media cost. The paid cohort skews to Deluxe/Ultimate editions, hence ARPI above the blended 29,26&thinsp;&euro;.</span></span></div>
+            </div>
+            <div style="flex: 3 1 0; min-width: 340px;">
+              <div class="hero-group-label">Gross &rarr; Net revenue &middot; where the money lands</div>
+              <div class="chart-wrapper" style="height:210px"><canvas id="mlWaterfall"></canvas><div id="mlWfTip" class="chart-tooltip opacity-0"></div></div>
             </div>
           </div>
-          <div class="card-body border-top pt-3">
+          <div class="border-top mt-3 pt-3">
+            <div class="row g-2">
+              <div class="col"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Net Revenue</div><div class="kpi-value">4,17M&thinsp;&euro;</div><div class="kpi-sub" style="margin-top:4px;">of 7,44M&thinsp;&euro; gross</div></div></div>
+              <div class="col"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">ARPI (net)</div><div class="kpi-value">29,26&thinsp;&euro;</div><div class="kpi-sub" style="margin-top:4px;">blended per install</div></div></div>
+              <div class="col"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Refund Rate</div><div class="kpi-value">4,9%</div><div class="kpi-sub" style="margin-top:4px;">7.330 of 149.680</div></div></div>
+              <div class="col"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Add-on Attach</div><div class="kpi-value">9,2%</div><div class="kpi-sub" style="margin-top:4px;">13.095 players</div></div></div>
+              <div class="col"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">ARPPU Add-ons</div><div class="kpi-value">16,69&thinsp;&euro;</div><div class="kpi-sub" style="margin-top:4px;">among buyers</div></div></div>
+            </div>
+          </div>
+        </div>
+        </div>
+
+        <!-- ═══ REVENUE OVER TIME ═══ -->
+        <div class="section-heading"><h3 class="section-heading-title">Revenue Over Time</h3>
+          <p class="section-heading-subtitle">How net revenue accrues across the launch window &mdash; base-game revenue follows the install curve and decays, add-on revenue builds as the player base matures. The day-by-day detail is in the table below.</p></div>
+        <div class="card mb-3"><div class="card-body">
             <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
               <span style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--tblr-secondary, #626976);">Daily Net Revenue by Source</span>
               <span class="info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Base-game revenue follows the install curve and decays after launch;<br>add-on revenue builds slowly as the player base matures &mdash; the long-term<br>shape of a premium title. The dashed line is the cumulative total.</span></span>
-            </div>
-            <div class="d-flex align-items-center gap-2 flex-wrap">
               <div id="mlRevLegend" class="chart-legend d-flex flex-wrap gap-2 flex-fill"></div>
               <div class="dropdown flex-shrink-0">
                 <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
@@ -692,8 +697,7 @@
                 <strong>How revenue works here:</strong> figures are <strong>modelled net revenue</strong> &mdash; storefront-reported gross at realized prices, minus refunds, platform fees and taxes &mdash; linked to TRACKS attribution so channel-level return can be computed. Console storefronts report with a <strong>2&ndash;5 day lag</strong> and refunds mature over the policy window: recent days will still move. Per-channel revenue follows the same 30-day cohort attribution as CPI.
               </div>
             </div>
-          </div>
-        </div>
+        </div></div>
 
         <!-- ═══ REVENUE DETAIL ═══ -->
         <div class="card mb-3">
@@ -1101,6 +1105,25 @@
       renderLegend();
       document.getElementById('mlRevPngBtn').addEventListener('click', () => downloadChartPng('mlRevChart', 'mlRevTooltipEl', 'daily-net-revenue.png'));
       document.getElementById('mlRevCsvBtn').addEventListener('click', () => downloadChartCsv(chart, 'daily-net-revenue.csv'));
+    })();
+
+    // ═══ HERO: gross → net waterfall ═══
+    (function(){
+      const el = document.getElementById('mlWaterfall'); if (!el) return;
+      const steps = [
+        { label: 'Gross', range: [0, 7.44], color: 'rgba(47,179,68,0.85)', delta: 7.44 },
+        { label: '− Refunds', range: [7.08, 7.44], color: 'rgba(214,57,57,0.85)', delta: -0.36 },
+        { label: '− Fees & Tax', range: [4.17, 7.08], color: 'rgba(247,103,7,0.85)', delta: -2.91 },
+        { label: 'Net', range: [0, 4.17], color: '#FF0249', delta: 4.17 },
+      ];
+      new Chart(el.getContext('2d'), {
+        type: 'bar',
+        data: { labels: steps.map(s=>s.label), datasets: [{ data: steps.map(s=>s.range), backgroundColor: steps.map(s=>s.color), borderRadius: 4, barPercentage: 0.72 }] },
+        options: { responsive:true, maintainAspectRatio:false, animation:{duration:500},
+          plugins: { legend:{display:false}, tooltip:{ callbacks:{ label: c => { const d = steps[c.dataIndex].delta; return (d<0?'−':'')+Math.abs(d).toFixed(2).replace('.',',')+'M €'; } } } },
+          scales: { x:{ grid:{display:false}, ticks:{ font:{size:11}, color:'#999' } },
+                    y:{ min:0, grid:{ color:'rgba(0,0,0,0.04)' }, ticks:{ font:{size:11}, color:'#999', callback: v=> v.toFixed(0)+'M' } } } }
+      });
     })();
 
     // ═══ DAILY REVENUE DETAIL (last 14 days) ═══

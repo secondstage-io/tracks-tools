@@ -30,14 +30,17 @@
     .chart-legend { padding: 4px 0; } /* layout via d-flex flex-wrap gap-2 utilities */
     .chart-legend .legend-item {
       display: inline-flex; align-items: center; gap: 6px;
-      padding: 5px 12px; border-radius: 6px; font-size: 13px; font-weight: 500;
-      cursor: pointer; user-select: none; transition: opacity 0.2s, box-shadow 0.2s;
-      border: 1px solid transparent;
+      padding: 3px 11px 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+      cursor: pointer; user-select: none; transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+      background: var(--tblr-bg-surface-secondary, #f8f9fa) !important;
+      border: 1px solid rgba(4,32,69,0.15) !important;
+      color: var(--tblr-body-color, #1e293b);
     }
-    .chart-legend .legend-item:hover { box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-    .chart-legend .legend-item.inactive { opacity: 0.35; text-decoration: line-through; }
-    .chart-legend .legend-swatch { width: 14px; height: 4px; border-radius: 2px; flex-shrink: 0; }
-    .chart-legend .legend-item[data-type="bar"] .legend-swatch { height: 12px; width: 10px; border-radius: 2px; }
+    .chart-legend .legend-item:hover { border-color: rgba(4,32,69,0.3) !important; box-shadow: none; }
+    .chart-legend .legend-item.inactive { background: transparent !important; border-color: rgba(4,32,69,0.12) !important; color: var(--tblr-secondary, #626976); opacity: 0.6; text-decoration: none; }
+    .chart-legend .legend-swatch { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .chart-legend .legend-item[data-type="bar"] .legend-swatch { height: 9px; width: 9px; border-radius: 50%; }
+    .chart-legend .legend-item.inactive .legend-swatch { background: #ccc !important; }
     .kpi { border-radius: 8px; padding: 14px 16px; height: 100%; }
     .info-tip { position: relative; cursor: help; display: inline-flex; padding: 4px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
     .info-tip:hover { background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.06); }
@@ -282,6 +285,9 @@
     .score-tile .kpi-value { font-size: 1.15rem; }
     .mention-link:hover { color: var(--tblr-primary, #FF0249) !important; }
     .hero-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--tblr-secondary, #626976); margin-bottom: 6px; }
+    .hero-stats-lead .kpi-value { font-size: 1.45rem; line-height: 1.15; }
+    .trend-ctrl-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--tblr-secondary, #626976); white-space: nowrap; }
+    .trend-ctrl-sep { width: 1px; align-self: stretch; min-height: 20px; background: rgba(4,32,69,0.12); margin: 0 4px; }
     .lens-chips { display: flex; flex-wrap: wrap; gap: 6px; }
     .lens-chip { font-size: 11px; font-weight: 600; letter-spacing: 0.3px; padding: 3px 12px; border-radius: 999px; border: 1px solid rgba(4,32,69,0.15); background: transparent; color: var(--tblr-secondary, #626976); cursor: pointer; transition: color 0.15s, background 0.15s, border-color 0.15s; line-height: 1.5; }
     .lens-chip:hover { border-color: var(--tblr-primary, #FF0249); color: var(--tblr-primary, #FF0249); }
@@ -465,21 +471,20 @@
             </div>
             <nav class="nav nav-pills nav-vertical" style="font-size:13px;">
               <li class="nav-item"><a class="nav-link" href="nativedash-poc-v3-prelaunch.html" data-title="Overview"><i class="ti ti-layout-dashboard me-2"></i><span>Overview</span></a></li>
+              <li class="nav-item"><a class="nav-link active" href="#" data-title="Steam Insights"><i class="ti ti-brand-steam me-2"></i><span>Steam Insights</span></a></li>
               <li class="nav-item"><a class="nav-link" href="periodcomparison-v1.html" data-title="Period Comparison"><i class="ti ti-arrows-diff me-2"></i><span>Period Comparison</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Growth</span></li>
               <li class="nav-item"><a class="nav-link" href="installsua-v1.html" data-title="Installs & UA"><i class="ti ti-device-gamepad-2 me-2"></i><span>Installs &amp; UA</span></a></li>
               <li class="nav-item"><a class="nav-link" href="wishlistinsights-v1.html" data-title="Wishlist Insights"><i class="ti ti-heart me-2"></i><span>Wishlist Insights</span></a></li>
               <li class="nav-item"><a class="nav-link" href="preorderinsights-v1.html" data-title="Preorder Insights"><i class="ti ti-shopping-cart me-2"></i><span>Preorder Insights</span></a></li>
-              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Game</span></li>
               <li class="nav-item"><a class="nav-link" href="playerlifecycle-v1.html" data-title="Player Lifecycle"><i class="ti ti-refresh me-2"></i><span>Player Lifecycle</span></a></li>
-              <li class="nav-item"><a class="nav-link" href="monetizationltv-v1.html" data-title="Monetization & LTV"><i class="ti ti-coin me-2"></i><span>Monetization & LTV</span></a></li>
-              <li class="nav-item"><a class="nav-link active" href="#" data-title="Steam Insights"><i class="ti ti-brand-steam me-2"></i><span>Steam Insights</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="monetizationltv-v1.html" data-title="Revenue & LTV"><i class="ti ti-coin me-2"></i><span>Revenue &amp; LTV</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Media & Web</span></li>
               <li class="nav-item"><a class="nav-link" href="performancemedia-v1.html" data-title="Performance Overview"><i class="ti ti-chart-bar me-2"></i><span>Performance Overview</span></a></li>
               <li class="nav-item"><a class="nav-link" href="awarenesstracker-v1.html" data-title="Awareness Tracker"><i class="ti ti-eye me-2"></i><span>Awareness Tracker</span></a></li>
               <li class="nav-item"><a class="nav-link" href="creativeinsights-v1.html" data-title="Creative Performance"><i class="ti ti-palette me-2"></i><span>Creative Performance</span></a></li>
               <li class="nav-item"><a class="nav-link" href="audienceinsights-v1.html" data-title="Audience Insights"><i class="ti ti-users me-2"></i><span>Audience Insights</span></a></li>
-              <li class="nav-item"><a class="nav-link" href="influencerdirectbuy-v1.html" data-title="Influencer & Direct Buy"><i class="ti ti-speakerphone me-2"></i><span>Influencer & Direct Buy</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="influencerdirectbuy-v1.html" data-title="Influencer & Direct Buy"><i class="ti ti-speakerphone me-2"></i><span>Influencer &amp; Direct Buy</span></a></li>
               <li class="nav-item"><a class="nav-link" href="websiteanalytics-v1.html" data-title="Website Analytics"><i class="ti ti-world-www me-2"></i><span>Website Analytics</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Brand</span></li>
               <li class="nav-item"><a class="nav-link" href="brandhealth-v1.html" data-title="Brand Health"><i class="ti ti-star me-2"></i><span>Brand Health</span></a></li>
@@ -541,6 +546,12 @@
                 <span class="filter-active-count has-filters" id="filterCount">1</span>
                 <i class="ti ti-chevron-down" style="font-size:14px;"></i>
               </button>
+              <!-- Phase selector (dataset switch — navigates between phase pages, never blends) -->
+              <div class="btn-group btn-group-sm flex-shrink-0" role="group" aria-label="Campaign phase">
+                <button type="button" class="btn btn-outline-secondary" title="Prelaunch window (Nov 10 – Feb 26) — followers & wishlist build, regional interest, demo & Next Fest; no reviews / owners / players yet" onclick="location.href='steaminsights-v1-prelaunch.html'">Prelaunch</button>
+                <button type="button" class="btn btn-primary" title="Post-launch (from Feb 26) — reviews, owners, players, pricing & discounts">Launch</button>
+              </div>
+              <div class="filter-dim-sep d-none d-md-block" style="border-left:1.5px solid rgba(4,32,69,0.15); align-self:stretch; margin:2px 6px;"></div>
               <!-- Date filters (left side) -->
               <div class="d-flex align-items-center gap-2 flex-shrink-0 filter-dates">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted flex-shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -589,14 +600,14 @@
         <!-- ═══ STEAM INSIGHTS — quiet hero: community + reviews + players, vs competitors ═══ -->
         <div class="card mt-5 mb-3" id="siIntelCard">
           <div class="card-status-top bg-primary"></div>
-          <div class="card-body">
+          <div class="card-body hero-stats-lead">
             <div class="d-flex flex-wrap" style="row-gap: 14px;">
               <div style="flex: 2 1 0; min-width: 215px;">
                 <div class="hero-group-label">Community</div>
                 <div class="row g-2">
                   <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Followers <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Steam community members (daily snapshot, 2S Steam DB Worker E).</span></span></div><div class="kpi-value">26.910</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +840</span><span>last 7 days</span></div></div></div>
-                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Est. Wishlists <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Independent estimate: followers &times; 12, band 242K&ndash;404K.<br>TRACKS modelled 224,5K wishlists at launch from first-party data<br>(Wishlist Insights) &mdash; the estimate brackets it.</span></span></div><div class="kpi-value">322,9K</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +10,1K</span><span>last 7 days</span></div></div></div>
-                                  </div>
+                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Est. Wishlists <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Independent estimate: followers &times; 12, band 242K&ndash;404K.<br>TRACKS modelled 224,5K wishlists at launch (Wishlist Insights) &mdash; the estimate brackets it.</span></span></div><div class="kpi-value">322,9K</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +10,1K</span><span>last 7 days</span></div></div></div>
+                </div>
               </div>
               <div style="flex: 2 1 0; min-width: 215px; border-left: 1px solid rgba(4,32,69,0.1); padding-left: 12px; margin-left: 12px;">
                 <div class="hero-group-label">Reviews</div>
@@ -608,10 +619,10 @@
               <div style="flex: 4 1 0; min-width: 430px; border-left: 1px solid rgba(4,32,69,0.1); padding-left: 12px; margin-left: 12px;">
                 <div class="hero-group-label">Players</div>
                 <div class="row g-2">
-                  <div class="col-6 col-md-3"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Est. Owners <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Boxleiter method (reviews &times; coefficient), band 113K&ndash;203K.<br>Actual net units sold: 142.350 (Monetization &amp; LTV) &mdash; inside the band.<br>A useful sanity check in both directions.</span></span></div><div class="kpi-value">158,2K</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +9,8K</span><span>last 7 days</span></div></div></div>
+                  <div class="col-6 col-md-3"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Est. Owners <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Boxleiter method (reviews &times; coefficient), band 113K&ndash;203K.<br>Actual net units sold: 142.350 (Revenue &amp; LTV) &mdash; inside the band.</span></span></div><div class="kpi-value">158,2K</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +9,8K</span><span>last 7 days</span></div></div></div>
                   <div class="col-6 col-md-3"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">CCU <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Concurrent players (daily snapshot). Peak today: 6.870.</span></span></div><div class="kpi-value">4.310</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(214,57,57,0.12); color:#d63939; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&darr; 6,2%</span><span>last 7 days</span></div></div></div>
-                  <div class="col-6 col-md-3"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Est. DAU <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Independent estimate: CCU &times; 7.<br>Player Lifecycle measures ~30K real DAU from Game Open events &mdash; the heuristic lands on it.</span></span></div><div class="kpi-value">30,2K</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(214,57,57,0.12); color:#d63939; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&darr; 5,8%</span><span>last 7 days</span></div></div></div>
-                  <div class="col-6 col-md-3"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Est. MAU <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Independent estimate: CCU &times; 28.<br>Player Lifecycle measures 118,6K real MAU &mdash; the heuristic lands on it.</span></span></div><div class="kpi-value">120,7K</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +2,1%</span><span>last 7 days</span></div></div></div>
+                  <div class="col-6 col-md-3"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Est. DAU <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Independent estimate: CCU &times; 7. Player Lifecycle measures ~30K real DAU.</span></span></div><div class="kpi-value">30,2K</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(214,57,57,0.12); color:#d63939; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&darr; 5,8%</span><span>last 7 days</span></div></div></div>
+                  <div class="col-6 col-md-3"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Est. MAU <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Independent estimate: CCU &times; 28. Player Lifecycle measures 118,6K real MAU.</span></span></div><div class="kpi-value">120,7K</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +2,1%</span><span>last 7 days</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -624,8 +635,7 @@
                 <button type="button" class="lens-chip active" data-metric="wishlists">Est. Wishlists</button>
                 <button type="button" class="lens-chip" data-metric="sales">Est. Sales</button>
               </div>
-            </div>
-            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <div class="trend-ctrl-sep d-none d-lg-block"></div><span class="trend-ctrl-label">Competitors</span>
               <div id="siTrendLegend" class="chart-legend d-flex flex-wrap gap-2 flex-fill"></div>
               <div class="dropdown flex-shrink-0">
                 <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
@@ -767,7 +777,7 @@
               <div class="card-body d-flex align-items-start gap-3">
                 <span class="explore-icon"><i class="ti ti-coin"></i></span>
                 <div class="flex-fill">
-                  <div class="fw-semibold">Monetization &amp; LTV</div>
+                  <div class="fw-semibold">Revenue &amp; LTV</div>
                   <div class="text-secondary small">Actual units behind the owner estimates</div>
                 </div>
                 <i class="ti ti-chevron-right text-secondary"></i>

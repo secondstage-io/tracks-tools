@@ -30,14 +30,17 @@
     .chart-legend { padding: 4px 0; } /* layout via d-flex flex-wrap gap-2 utilities */
     .chart-legend .legend-item {
       display: inline-flex; align-items: center; gap: 6px;
-      padding: 5px 12px; border-radius: 6px; font-size: 13px; font-weight: 500;
-      cursor: pointer; user-select: none; transition: opacity 0.2s, box-shadow 0.2s;
-      border: 1px solid transparent;
+      padding: 3px 11px 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+      cursor: pointer; user-select: none; transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+      background: var(--tblr-bg-surface-secondary, #f8f9fa) !important;
+      border: 1px solid rgba(4,32,69,0.15) !important;
+      color: var(--tblr-body-color, #1e293b);
     }
-    .chart-legend .legend-item:hover { box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-    .chart-legend .legend-item.inactive { opacity: 0.35; text-decoration: line-through; }
-    .chart-legend .legend-swatch { width: 14px; height: 4px; border-radius: 2px; flex-shrink: 0; }
-    .chart-legend .legend-item[data-type="bar"] .legend-swatch { height: 12px; width: 10px; border-radius: 2px; }
+    .chart-legend .legend-item:hover { border-color: rgba(4,32,69,0.3) !important; box-shadow: none; }
+    .chart-legend .legend-item.inactive { background: transparent !important; border-color: rgba(4,32,69,0.12) !important; color: var(--tblr-secondary, #626976); opacity: 0.6; text-decoration: none; }
+    .chart-legend .legend-swatch { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .chart-legend .legend-item[data-type="bar"] .legend-swatch { height: 9px; width: 9px; border-radius: 50%; }
+    .chart-legend .legend-item.inactive .legend-swatch { background: #ccc !important; }
     .kpi { border-radius: 8px; padding: 14px 16px; height: 100%; }
     .info-tip { position: relative; cursor: help; display: inline-flex; padding: 4px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
     .info-tip:hover { background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.06); }
@@ -281,6 +284,8 @@
     .score-tile { padding: 10px 12px 9px; }
     .score-tile .kpi-value { font-size: 1.15rem; }
     .hero-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--tblr-secondary, #626976); margin-bottom: 6px; }
+    .trend-ctrl-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--tblr-secondary, #626976); white-space: nowrap; }
+    .trend-ctrl-sep { width: 1px; align-self: stretch; min-height: 20px; background: rgba(4,32,69,0.12); margin: 0 4px; }
     .lens-chips { display: flex; flex-wrap: wrap; gap: 6px; }
     .lens-chip { font-size: 11px; font-weight: 600; letter-spacing: 0.3px; padding: 3px 12px; border-radius: 999px; border: 1px solid rgba(4,32,69,0.15); background: transparent; color: var(--tblr-secondary, #626976); cursor: pointer; transition: color 0.15s, background 0.15s, border-color 0.15s; line-height: 1.5; }
     .lens-chip:hover { border-color: var(--tblr-primary, #FF0249); color: var(--tblr-primary, #FF0249); }
@@ -464,15 +469,14 @@
             </div>
             <nav class="nav nav-pills nav-vertical" style="font-size:13px;">
               <li class="nav-item"><a class="nav-link" href="nativedash-poc-v3-prelaunch.html" data-title="Overview"><i class="ti ti-layout-dashboard me-2"></i><span>Overview</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="steaminsights-v1.html" data-title="Steam Insights"><i class="ti ti-brand-steam me-2"></i><span>Steam Insights</span></a></li>
               <li class="nav-item"><a class="nav-link" href="periodcomparison-v1.html" data-title="Period Comparison"><i class="ti ti-arrows-diff me-2"></i><span>Period Comparison</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Growth</span></li>
               <li class="nav-item"><a class="nav-link" href="installsua-v1.html" data-title="Installs & UA"><i class="ti ti-device-gamepad-2 me-2"></i><span>Installs &amp; UA</span></a></li>
               <li class="nav-item"><a class="nav-link" href="wishlistinsights-v1.html" data-title="Wishlist Insights"><i class="ti ti-heart me-2"></i><span>Wishlist Insights</span></a></li>
               <li class="nav-item"><a class="nav-link" href="preorderinsights-v1.html" data-title="Preorder Insights"><i class="ti ti-shopping-cart me-2"></i><span>Preorder Insights</span></a></li>
-              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Game</span></li>
               <li class="nav-item"><a class="nav-link" href="playerlifecycle-v1.html" data-title="Player Lifecycle"><i class="ti ti-refresh me-2"></i><span>Player Lifecycle</span></a></li>
-              <li class="nav-item"><a class="nav-link" href="monetizationltv-v1.html" data-title="Monetization & LTV"><i class="ti ti-coin me-2"></i><span>Monetization & LTV</span></a></li>
-              <li class="nav-item"><a class="nav-link" href="steaminsights-v1.html" data-title="Steam Insights"><i class="ti ti-brand-steam me-2"></i><span>Steam Insights</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="monetizationltv-v1.html" data-title="Revenue & LTV"><i class="ti ti-coin me-2"></i><span>Revenue &amp; LTV</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Media & Web</span></li>
               <li class="nav-item"><a class="nav-link" href="performancemedia-v1.html" data-title="Performance Overview"><i class="ti ti-chart-bar me-2"></i><span>Performance Overview</span></a></li>
               <li class="nav-item"><a class="nav-link" href="awarenesstracker-v1.html" data-title="Awareness Tracker"><i class="ti ti-eye me-2"></i><span>Awareness Tracker</span></a></li>
@@ -643,27 +647,35 @@
         <div class="card mt-5 mb-3" id="idIntelCard">
           <div class="card-status-top bg-primary"></div>
           <div class="card-body">
-            <div class="d-flex flex-wrap" style="row-gap: 14px;">
-              <div style="flex: 3 1 0; min-width: 300px;">
-                <div class="hero-group-label">Program</div>
-                <div class="row g-2">
-                  <div class="col-4"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Total Spend <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">>28.450&thinsp;&euro; Influencer &amp; Creator + 16.442&thinsp;&euro; Media Houses (Direct Buy).<br>Each group keeps its own goals &mdash; never blended.</span></span></div><div class="kpi-value">44.892&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +2.150</span><span>last 7 days</span></div></div></div>
-                  <div class="col-4"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Activated Creators <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Creators with at least one live content piece in the period.</span></span></div><div class="kpi-value">12</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">+2</span><span>this flight</span></div></div></div>
-                  <div class="col-4"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Media Houses <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Publishers and platforms with at least one active direct buy.</span></span></div><div class="kpi-value">9</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">+1</span><span>this flight</span></div></div></div>
+            <div class="d-flex flex-wrap" style="row-gap:16px; column-gap:32px;">
+              <div style="flex: 1 1 0; min-width: 320px;">
+                <div class="hero-group-label">Influencer &amp; Creator</div>
+                <div class="d-flex align-items-baseline gap-2" style="margin-top:8px;">
+                  <div style="font-size:2.5rem; font-weight:800; line-height:1; color:var(--tblr-body-color,#1e293b); font-variant-numeric:tabular-nums;">12</div>
+                  <div style="font-size:15px; font-weight:600; color:var(--tblr-body-color,#1e293b);">Activated creators</div>
+                  <span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">+2 this flight</span>
+                </div>
+                <div style="font-size:12px; color:var(--tblr-secondary,#626976); margin-top:8px;">28.450&thinsp;&euro; spend &middot; 48,3K visits</div>
+                <div class="row g-2 mt-2">
+                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Wishlists <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Modelled wishlists attributed to creator content.</span></span></div><div class="kpi-value">3,4K</div><div class="kpi-sub" style="margin-top:4px;">modelled</div></div></div>
+                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">CPWL <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Cost per modelled wishlist for creator activations.</span></span></div><div class="kpi-value">8,37&thinsp;&euro;</div><div class="kpi-sub" style="margin-top:4px;">per wishlist</div></div></div>
+                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Paid Installs <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">From creator content (video drops, streams).</span></span></div><div class="kpi-value">1.116</div><div class="kpi-sub" style="margin-top:4px;">creator content</div></div></div>
+                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">CPI <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Creator deals are bought for reach and credibility, not install efficiency &mdash;<br>installs here are a bonus, not the buying objective.</span></span></div><div class="kpi-value">25,49&thinsp;&euro;</div><div class="kpi-sub" style="margin-top:4px;">reach, not installs</div></div></div>
                 </div>
               </div>
-              <div style="flex: 2 1 0; min-width: 215px; border-left: 1px solid rgba(4,32,69,0.1); padding-left: 12px; margin-left: 12px;">
-                <div class="hero-group-label">Site Traffic</div>
-                <div class="row g-2">
-                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Web Visits <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">48,3K from creator content + 91,0K from direct-buy placements.</span></span></div><div class="kpi-value">139,3K</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +5,2%</span><span>last 7 days</span></div></div></div>
-                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Web Conversions <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Conversions to a gaming storefront from these channels<br>(720 Influencer + 1.240 Media Houses) &mdash; 1,41% of visits.</span></span></div><div class="kpi-value">1.960</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +96</span><span>last 7 days</span></div></div></div>
+              <div style="flex: 1 1 0; min-width: 320px; border-left: 1px solid rgba(4,32,69,0.1); padding-left: 32px;">
+                <div class="hero-group-label">Direct Buy</div>
+                <div class="d-flex align-items-baseline gap-2" style="margin-top:8px;">
+                  <div style="font-size:2.5rem; font-weight:800; line-height:1; color:var(--tblr-body-color,#1e293b); font-variant-numeric:tabular-nums;">9</div>
+                  <div style="font-size:15px; font-weight:600; color:var(--tblr-body-color,#1e293b);">Activated media houses</div>
+                  <span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">+1 this flight</span>
                 </div>
-              </div>
-              <div style="flex: 2 1 0; min-width: 215px; border-left: 1px solid rgba(4,32,69,0.1); padding-left: 12px; margin-left: 12px;">
-                <div class="hero-group-label">Outcomes</div>
-                <div class="row g-2">
-                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Wishlists <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Modelled wishlists attributed to these channels<br>(3,4K Influencer + 5,8K Media Houses).</span></span></div><div class="kpi-value">9,2K</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +430</span><span>last 7 days</span></div></div></div>
-                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Demo Installs <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">1.116 from creator content + 2.540 from direct buys &mdash; the Discord Quest<br>rewards playing the demo, making it the largest install driver here.<br>CPI is reported per group in the cards below (never blended).</span></span></div><div class="kpi-value">3.656</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +212</span><span>last 7 days</span></div></div></div>
+                <div style="font-size:12px; color:var(--tblr-secondary,#626976); margin-top:8px;">16.442&thinsp;&euro; spend &middot; 91,0K visits</div>
+                <div class="row g-2 mt-2">
+                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Wishlists <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Modelled wishlists attributed to direct-buy placements.</span></span></div><div class="kpi-value">5,8K</div><div class="kpi-sub" style="margin-top:4px;">modelled</div></div></div>
+                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">CPWL <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Cost per modelled wishlist for direct buys.</span></span></div><div class="kpi-value">2,83&thinsp;&euro;</div><div class="kpi-sub" style="margin-top:4px;">per wishlist</div></div></div>
+                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Paid Installs <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">The Discord Quest rewards playing the demo &mdash; the largest install driver here.</span></span></div><div class="kpi-value">2.540</div><div class="kpi-sub" style="margin-top:4px;">Discord Quest</div></div></div>
+                  <div class="col-6"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">CPI <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Quest-driven installs make direct buys highly install-efficient.</span></span></div><div class="kpi-value">6,47&thinsp;&euro;</div><div class="kpi-sub" style="margin-top:4px;">Quest-driven</div></div></div>
                 </div>
               </div>
             </div>
@@ -676,10 +688,9 @@
                 <button type="button" class="lens-chip active" data-metric="visits">Web Visits</button>
                 <button type="button" class="lens-chip" data-metric="conv">Web Conversions</button>
                 <button type="button" class="lens-chip" data-metric="wl">Wishlists</button>
-                <button type="button" class="lens-chip" data-metric="installs">Demo Installs</button>
+                <button type="button" class="lens-chip" data-metric="installs">Paid Installs</button>
               </div>
-            </div>
-            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <div class="trend-ctrl-sep d-none d-lg-block"></div><span class="trend-ctrl-label">Sources</span>
               <div id="idTrendLegend" class="chart-legend d-flex flex-wrap gap-2 flex-fill"></div>
               <div class="dropdown flex-shrink-0">
                 <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
@@ -719,13 +730,13 @@
                   <div class="col-6"><div class="kpi kpi-beat-soft"><div class="kpi-label">CPC</div><div class="kpi-value">0,28&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta up" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 20,0%</span><span>vs goal 0,35&thinsp;&euro;</span></div></div></div>
                   <div class="col-6"><div class="kpi kpi-beat-soft"><div class="kpi-label">Web CR%</div><div class="kpi-value">4,2%</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta up" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 20,0%</span><span>vs goal 3,5%</span></div></div></div>
                   <div class="col-6"><div class="kpi kpi-neutral"><div class="kpi-label">CPWL</div><div class="kpi-value">8,37&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&darr; 6,2%</span><span>last 7 days</span></div></div></div>
-                  <div class="col-6"><div class="kpi kpi-neutral"><div class="kpi-label">Demo CPI <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Creator deals are bought for reach and credibility, not install efficiency &mdash;<br>installs here are a bonus, not the buying objective (see the value card).</span></span></div><div class="kpi-value">25,49&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&darr; 3,1%</span><span>last 7 days</span></div></div></div>
+                  <div class="col-6"><div class="kpi kpi-neutral"><div class="kpi-label">CPI <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Creator deals are bought for reach and credibility, not install efficiency &mdash;<br>installs here are a bonus, not the buying objective (see the value card).</span></span></div><div class="kpi-value">25,49&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&darr; 3,1%</span><span>last 7 days</span></div></div></div>
                 </div>
                 <div class="kpi-compact">
                   <span>Web Visits: <strong>48,3K</strong></span>
                   <span>Web Conversions: <strong>720</strong></span>
                   <span>Wishlists: <strong>3,4K</strong></span>
-                  <span>Demo Installs: <strong>1.116</strong></span>
+                  <span>Paid Installs: <strong>1.116</strong></span>
                   <span>Content Pieces: <strong>31</strong></span>
                 </div>
               </div>
@@ -790,13 +801,13 @@
                   <div class="col-6"><div class="kpi kpi-beat-soft"><div class="kpi-label">CPC</div><div class="kpi-value">0,18&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta up" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 18,2%</span><span>vs goal 0,22&thinsp;&euro;</span></div></div></div>
                   <div class="col-6"><div class="kpi kpi-beat-soft"><div class="kpi-label">Web CR%</div><div class="kpi-value">6,8%</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta up" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 36,0%</span><span>vs goal 5,0%</span></div></div></div>
                   <div class="col-6"><div class="kpi kpi-neutral"><div class="kpi-label">CPWL</div><div class="kpi-value">2,83&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&darr; 8,5%</span><span>last 7 days</span></div></div></div>
-                  <div class="col-6"><div class="kpi kpi-neutral"><div class="kpi-label">Demo CPI <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Driven almost entirely by the Discord Quest, which rewards playing the demo<br>(placement CPI 4,12&thinsp;&euro;) &mdash; see the placement breakdown below.</span></span></div><div class="kpi-value">6,47&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&darr; 4,8%</span><span>last 7 days</span></div></div></div>
+                  <div class="col-6"><div class="kpi kpi-neutral"><div class="kpi-label">CPI <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Driven almost entirely by the Discord Quest, which rewards playing the demo<br>(placement CPI 4,12&thinsp;&euro;) &mdash; see the placement breakdown below.</span></span></div><div class="kpi-value">6,47&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&darr; 4,8%</span><span>last 7 days</span></div></div></div>
                 </div>
                 <div class="kpi-compact">
                   <span>Web Visits: <strong>91,0K</strong></span>
                   <span>Web Conversions: <strong>1.240</strong></span>
                   <span>Wishlists: <strong>5,8K</strong></span>
-                  <span>Demo Installs: <strong>2.540</strong></span>
+                  <span>Paid Installs: <strong>2.540</strong></span>
                   <span>Placements: <strong>9</strong></span>
                 </div>
               </div>
@@ -833,52 +844,43 @@
           </div>
         </div>
 
-        <!-- ═══ MARKETS & DAILY ═══ -->
+        <!-- ═══ OWNED & EARNED MEDIA ═══ -->
         <div class="section-heading">
-          <h3 class="section-heading-title">Markets &amp; Daily Detail</h3>
-          <p class="section-heading-subtitle">Where the visits and wishlists land, and how the flight developed day by day &mdash; volume views only, since deal-level costs cannot honestly be split by market.</p>
+          <h3 class="section-heading-title">Owned &amp; Earned Media</h3>
+          <p class="section-heading-subtitle">Tracked links in owned and earned content &mdash; PR coverage, owned social and newsletters carry no media cost, so they show as volumes and conversions only, never a cost-per.</p>
+        </div>
+        <div class="row row-deck row-cards mb-3">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
+                <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Owned &amp; Earned Breakdown</span>
+                <ul class="nav nav-tabs breakdown-tabs mb-0 ms-3 flex-shrink-0" id="oeTabs" role="tablist" style="border-bottom:0;">
+                  <li class="nav-item"><a class="nav-link active" href="#" role="tab" data-oe="owned" onclick="return false;">by owned media</a></li>
+                  <li class="nav-item"><a class="nav-link" href="#" role="tab" data-oe="earned" onclick="return false;">by earned media</a></li>
+                </ul>
+                <span class="ms-2 info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text"><strong>Owned</strong> = channels we control (newsletters, owned social, link-in-bio).<br><strong>Earned</strong> = third-party coverage (PR features, articles). Both tracked via UTM /<br>short links and carry no media cost &mdash; shown as volumes, never a cost-per.</span></span>
+                <div class="dropdown ms-auto"><button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button><div class="dropdown-menu dropdown-menu-end"><button class="dropdown-item" id="oePngBtn">Chart PNG</button><button class="dropdown-item" id="oeCsvBtn">Table CSV</button></div></div>
+              </div>
+              <div class="card-body">
+                <div class="row g-3 align-items-center">
+                  <div class="col-lg-3"><div style="position: relative; height: 220px;"><canvas id="oeChart"></canvas><div id="oeTooltipEl" class="chart-tooltip opacity-0"></div></div></div>
+                  <div class="col-lg-9"><div class="table-responsive geo-scroll-5 geo-hscroll"><table class="table wt mb-0 wt-sticky-head wt-freeze-first" id="oeTable"></table></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
+                <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Referrer Breakdown</span>
+                <span class="ms-2 info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Inbound traffic from referring domains and emails (HTTP referrer), distinct from the<br>UTM-tagged owned/earned links above &mdash; volumes and conversions only.</span></span>
+                <div class="dropdown ms-auto"><button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button><div class="dropdown-menu dropdown-menu-end"><button class="dropdown-item" id="oeRefCsvBtn">Table CSV</button></div></div>
+              </div>
+              <div class="card-body"><div class="table-responsive"><table class="table wt mb-0 wt-sticky-head" id="oeRefTable"></table></div></div>
+            </div>
+          </div>
         </div>
 
-        <div class="row row-deck row-cards mb-3">
-          <div class="col-lg-6">
-            <div class="card h-100">
-          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
-            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Markets (Volumes)</span>
-            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Visits, conversions and wishlists per market &mdash; no cost columns by design (see the<br>methodology note in the hero): deal-booked costs cannot honestly be split by market.</span></span>
-            <div class="dropdown ms-1">
-              <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
-              <div class="dropdown-menu dropdown-menu-end">
-                <button class="dropdown-item" id="idGeoCsvBtn">CSV Spreadsheet</button>
-              </div>
-            </div>
-          </div>
-          <div class="card-body p-0">
-            <div class="table-responsive" style="max-height: 380px; overflow:auto; font-variant-numeric: tabular-nums;">
-              <table class="table wt mb-0 wt-sticky-head" id="idGeoTable"></table>
-            </div>
-          </div>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="card h-100">
-          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
-            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Daily Detail</span>
-            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Day-by-day volumes for the last 14 flight days, both groups combined.<br>Zero-activity days omitted. Click any header to sort.</span></span>
-            <div class="dropdown ms-1">
-              <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
-              <div class="dropdown-menu dropdown-menu-end">
-                <button class="dropdown-item" id="idDailyCsvBtn">CSV Spreadsheet</button>
-              </div>
-            </div>
-          </div>
-          <div class="card-body p-0">
-            <div class="table-responsive" style="max-height: 380px; overflow:auto; font-variant-numeric: tabular-nums;">
-              <table class="table wt mb-0 wt-sticky-head wt-freeze-first" id="idDailyTable"></table>
-            </div>
-          </div>
-            </div>
-          </div>
-        </div>
 
         <!-- ═══ EXPLORE DEEPER ═══ -->
         <div class="section-heading">
@@ -1132,20 +1134,30 @@
     const mhWl    = deriveSeries(mhVisits, 5800, 1500);
     const infInst = deriveSeries(infVisits, 1116, 1600);
     const mhInst  = deriveSeries(mhVisits, 2540, 1700, true); // the Quest rewards demo play
+    // owned & earned: PR features + newsletter sends + steady owned-social baseline
+    const oeVisits = new Array(days).fill(0);
+    const OE_DROPS = [5, 14, 25, 33, 48, 61, 70, 84, 96, 104];
+    OE_DROPS.forEach((d, k) => { seed = 1300 + k * 17; seededRandom(); seededRandom(); const size = 350 + seededRandom() * 1100; oeVisits[d] += size; if (d + 1 < days) oeVisits[d + 1] += size * 0.3; });
+    for (let i = 0; i < days; i++) { seed = 1500 + i * 5; seededRandom(); oeVisits[i] += 40 + seededRandom() * 60; }
+    (function() { const sc = 6000 / oeVisits.reduce((a, b) => a + b, 0); for (let i = 0; i < days; i++) oeVisits[i] = Math.round(oeVisits[i] * sc); })();
+    const oeConv = deriveSeries(oeVisits, 183, 1800);
+    const oeWl   = deriveSeries(oeVisits, 1008, 1850);
+    const oeInst = deriveSeries(oeVisits, 84, 1900);
 
     // ═══ HERO TREND — chip-switched daily volume by group ═══
     (function() {
       const METRICS = {
-        visits:   { label: 'Web Visits',      inf: infVisits, mh: mhVisits, file: 'daily-web-visits-by-group' },
-        conv:     { label: 'Web Conversions', inf: infConv,   mh: mhConv,   file: 'daily-web-conversions-by-group' },
-        wl:       { label: 'Wishlists',       inf: infWl,     mh: mhWl,     file: 'daily-wishlists-by-group' },
-        installs: { label: 'Demo Installs',   inf: infInst,   mh: mhInst,   file: 'daily-demo-installs-by-group' },
+        visits:   { label: 'Web Visits',      inf: infVisits, mh: mhVisits, oe: oeVisits, file: 'daily-web-visits-by-group' },
+        conv:     { label: 'Web Conversions', inf: infConv,   mh: mhConv,   oe: oeConv,   file: 'daily-web-conversions-by-group' },
+        wl:       { label: 'Wishlists',       inf: infWl,     mh: mhWl,     oe: oeWl,     file: 'daily-wishlists-by-group' },
+        installs: { label: 'Paid Installs',   inf: infInst,   mh: mhInst,   oe: oeInst,   file: 'daily-demo-installs-by-group' },
       };
       let activeMetric = 'visits';
-      function cumOf(m) { const out = []; let s = 0; for (let i = 0; i < days; i++) { s += m.inf[i] + m.mh[i]; out.push(s); } return out; }
+      function cumOf(m) { const out = []; let s = 0; for (let i = 0; i < days; i++) { s += m.inf[i] + m.mh[i] + m.oe[i]; out.push(s); } return out; }
       const C = [
         { solid: '#ae3ec9', light: 'rgba(174,62,201,0.55)' },
         { solid: '#f76707', light: 'rgba(247,103,7,0.45)' },
+        { solid: '#0ca678', light: 'rgba(12,166,120,0.45)' },
         { solid: '#FF0249', light: 'rgba(255,2,73,0.10)' },
       ];
       const canvas = document.getElementById('idTrendChart');
@@ -1156,7 +1168,8 @@
           datasets: [
             { label: 'Creator', data: infVisits.slice(), backgroundColor: C[0].light, stack: 'v', order: 5 },
             { label: 'Direct Buy', data: mhVisits.slice(), backgroundColor: C[1].light, stack: 'v', order: 5 },
-            { label: 'Cumulative Total', data: cumOf(METRICS.visits), type: 'line', borderColor: C[2].solid, backgroundColor: 'transparent', borderWidth: 2, borderDash: [4, 3], tension: 0.35, pointRadius: 0, pointHoverRadius: 4, yAxisID: 'yCum', order: 1 },
+            { label: 'Owned & Earned', data: oeVisits.slice(), backgroundColor: C[2].light, stack: 'v', order: 5 },
+            { label: 'Cumulative Total', data: cumOf(METRICS.visits), type: 'line', borderColor: C[3].solid, backgroundColor: 'transparent', borderWidth: 2, borderDash: [4, 3], tension: 0.35, pointRadius: 0, pointHoverRadius: 4, yAxisID: 'yCum', order: 1 },
           ]
         },
         plugins: [makeTrendCrosshair('y')],
@@ -1167,7 +1180,7 @@
           plugins: {
             legend: { display: false },
             tooltip: { enabled: false, external: makeTrendTooltip('idTrendTooltipEl', {
-              'Creator': v => fmt(v), 'Direct Buy': v => fmt(v), 'Cumulative Total': v => fmt(v),
+              'Creator': v => fmt(v), 'Direct Buy': v => fmt(v), 'Owned & Earned': v => fmt(v), 'Cumulative Total': v => fmt(v),
             }) }
           },
           scales: {
@@ -1182,7 +1195,8 @@
         const m = METRICS[key];
         chart.data.datasets[0].data = m.inf.slice();
         chart.data.datasets[1].data = m.mh.slice();
-        chart.data.datasets[2].data = cumOf(m);
+        chart.data.datasets[2].data = m.oe.slice();
+        chart.data.datasets[3].data = cumOf(m);
         chart.options.scales.y.title.text = m.label + ' / day';
         chart.options.scales.yCum.title.text = 'Cumulative ' + m.label;
         chart.update();
@@ -1194,7 +1208,7 @@
         el.innerHTML = chart.data.datasets.map((ds, i) => {
           const hidden = !chart.isDatasetVisible(i);
           const c = C[i];
-          return '<span class="legend-item ' + (hidden ? 'inactive' : '') + '" data-index="' + i + '" data-type="' + (i < 2 ? 'bar' : 'line') + '" title="' + (hidden ? 'Click to show ' : 'Click to hide ') + ds.label + '" style="background:' + (hidden ? 'transparent' : c.light) + '; border-color:' + (hidden ? '#ccc' : c.solid) + '"><span class="legend-swatch" style="background:' + c.solid + '"></span>' + ds.label + '</span>';
+          return '<span class="legend-item ' + (hidden ? 'inactive' : '') + '" data-index="' + i + '" data-type="' + (i < 3 ? 'bar' : 'line') + '" title="' + (hidden ? 'Click to show ' : 'Click to hide ') + ds.label + '" style="background:' + (hidden ? 'transparent' : c.light) + '; border-color:' + (hidden ? '#ccc' : c.solid) + '"><span class="legend-swatch" style="background:' + c.solid + '"></span>' + ds.label + '</span>';
         }).join('');
       }
       el.addEventListener('click', e => {
@@ -1231,7 +1245,7 @@
         r.cpwl = r.cost / r.wl;
         r.cpi  = r.cost / r.inst;
       });
-      // column groups: Deal | Landing Page | Wishlists | Demo Installs
+      // column groups: Deal | Landing Page | Wishlists | Paid Installs
       const cols = [
         { key: 'cost',   head: 'Cost',        fmtFn: euroT },
         { key: 'pieces', head: 'Pieces',      fmtFn: fmt,  end: true },
@@ -1257,7 +1271,7 @@
         h += '<th colspan="2" class="text-center th-group-label group-end">Deal</th>';
         h += '<th colspan="4" class="text-center th-group-label group-end">Landing Page</th>';
         h += '<th colspan="2" class="text-center th-group-label group-end">Wishlists</th>';
-        h += '<th colspan="2" class="text-center th-group-label">Demo Installs</th>';
+        h += '<th colspan="2" class="text-center th-group-label">Paid Installs</th>';
         h += '</tr><tr>';
         cols.forEach(c => {
           const active = key === c.key;
@@ -1310,6 +1324,83 @@
       render();
       document.getElementById('idCreatorPngBtn').addEventListener('click', () => downloadChartPng('idCreatorChart', 'idCreatorTooltipEl', 'creator-breakdown.png'));
       document.getElementById('idCreatorCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('idCreatorTable'), 'creator-breakdown.csv'));
+    })();
+
+    // ═══ OWNED & EARNED BREAKDOWN ═══
+    (function() {
+      const ROWS = [
+        { label: 'Instagram link-in-bio', type: 'owned',  source: 'Instagram', placement: 'Link in bio', color: '#e8590c', visits: 1450, eng: 38.0, conv: 44, wl: 300, inst: 24 },
+        { label: 'Launch newsletter',     type: 'owned',  source: 'Email',     placement: 'Newsletter',  color: '#ae3ec9', visits: 980,  eng: 52.0, conv: 34, wl: 230, inst: 16 },
+        { label: 'Holiday newsletter',    type: 'owned',  source: 'Email',     placement: 'Newsletter',  color: '#d6336c', visits: 640,  eng: 48.0, conv: 20, wl: 120, inst: 9 },
+        { label: 'Discord pinned post',   type: 'owned',  source: 'Discord',   placement: 'Pinned',      color: '#4263eb', visits: 520,  eng: 60.0, conv: 18, wl: 110, inst: 12 },
+        { label: 'TwentySidedTavern',     type: 'earned', source: 'Article',   placement: 'Feature',     color: '#206bc4', visits: 820,  eng: 44.0, conv: 24, wl: 95,  inst: 9 },
+        { label: 'GamesBeat feature',     type: 'earned', source: 'Article',   placement: 'Feature',     color: '#0ca678', visits: 720,  eng: 41.0, conv: 22, wl: 80,  inst: 8 },
+        { label: 'PAX recap',             type: 'earned', source: 'Article',   placement: 'Recap',       color: '#f59f00', visits: 520,  eng: 39.0, conv: 13, wl: 45,  inst: 4 },
+        { label: 'Fan wiki',              type: 'earned', source: 'Community', placement: 'Wiki',        color: '#15aabf', visits: 350,  eng: 36.0, conv: 8,  wl: 28,  inst: 2 },
+      ];
+      ROWS.forEach(r => { r.cvr = r.conv / r.visits * 100; });
+      const cols = [
+        { key: 'source',    head: 'Source',          text: true },
+        { key: 'placement', head: 'Placement',       text: true, end: true },
+        { key: 'visits',    head: 'Web Visits',      fmtFn: fmt },
+        { key: 'eng',       head: 'Engaged %',       fmtFn: pct2 },
+        { key: 'conv',      head: 'Web Conversions', fmtFn: fmt },
+        { key: 'cvr',       head: 'Web CR%',         fmtFn: pct2, end: true },
+        { key: 'wl',        head: 'Wishlists',       fmtFn: fmt },
+        { key: 'inst',      head: 'Installs',        fmtFn: fmt },
+      ];
+      let activeOe = 'owned';
+      const state = { key: 'visits', asc: false };
+      let chart = null;
+      function render() {
+        const subset = ROWS.filter(r => r.type === activeOe);
+        const { key, asc } = state;
+        const c0 = cols.find(c => c.key === key);
+        const isText = key === 'label' || (c0 && c0.text);
+        const sorted = [...subset].sort((a, b) => isText ? (asc ? String(a[key]).localeCompare(String(b[key])) : String(b[key]).localeCompare(String(a[key]))) : (asc ? a[key] - b[key] : b[key] - a[key]));
+        const ar = key === 'label' ? '' : ' sort-active';
+        let h = '<thead><tr><th class="sortable col-geo-label' + (key === 'label' ? ' sort-active' : '') + '" data-key="label">Link</th>';
+        cols.forEach(c => { h += '<th class="text-end sortable' + (c.end ? ' group-end' : '') + (key === c.key ? ' sort-active' : '') + '" data-key="' + c.key + '">' + c.head + '</th>'; });
+        h += '</tr></thead><tbody>';
+        sorted.forEach(r => {
+          h += '<tr><td class="col-geo-label"><span style="display:inline-block; width:9px; height:9px; border-radius:50%; background:' + r.color + '; margin-right:6px;"></span>' + r.label + '</td>';
+          cols.forEach(c => { h += '<td class="text-end' + (c.end ? ' group-end' : '') + '">' + (c.text ? r[c.key] : c.fmtFn(r[c.key])) + '</td>'; });
+          h += '</tr>';
+        });
+        const tv = subset.reduce((a, r) => a + r.visits, 0), tc = subset.reduce((a, r) => a + r.conv, 0), tw = subset.reduce((a, r) => a + r.wl, 0), ti = subset.reduce((a, r) => a + r.inst, 0);
+        h += '</tbody><tfoot><tr><td class="col-geo-label">Total</td><td></td><td class="group-end"></td><td class="text-end">' + fmt(tv) + '</td><td class="text-end"></td><td class="text-end">' + fmt(tc) + '</td><td class="text-end group-end">' + pct2(tc / tv * 100) + '</td><td class="text-end">' + fmt(tw) + '</td><td class="text-end">' + fmt(ti) + '</td></tr></tfoot>';
+        document.getElementById('oeTable').innerHTML = h;
+        if (chart) {
+          chart.data.labels = sorted.map(r => r.label);
+          chart.data.datasets[0].data = sorted.map(r => r.visits);
+          chart.data.datasets[0].backgroundColor = sorted.map(r => r.color);
+          chart.options.plugins.tooltip.external = doughnutTooltip('oeTooltipEl', 'Web Visits', fmt);
+          chart.update();
+        }
+      }
+      document.querySelectorAll('#oeTabs .nav-link').forEach(b => b.addEventListener('click', () => { activeOe = b.dataset.oe; document.querySelectorAll('#oeTabs .nav-link').forEach(x => x.classList.toggle('active', x === b)); render(); }));
+      document.getElementById('oeTable').addEventListener('click', e => { const th = e.target.closest('th.sortable'); if (!th) return; const k = th.dataset.key; if (state.key === k) state.asc = !state.asc; else { state.key = k; state.asc = false; } render(); });
+      chart = new Chart(document.getElementById('oeChart'), { type: 'doughnut', data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false, external: () => {} } } } });
+      render();
+      document.getElementById('oePngBtn').addEventListener('click', () => downloadChartPng('oeChart', 'oeTooltipEl', 'owned-earned-breakdown.png'));
+      document.getElementById('oeCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('oeTable'), 'owned-earned-breakdown.csv'));
+    })();
+
+    // ═══ REFERRER BREAKDOWN ═══
+    (function() {
+      const R = [
+        { source: 'mailchimp',     medium: 'email',   visits: 920, conv: 38, inst: 14 },
+        { source: 'gamesbeat.com', medium: 'website', visits: 640, conv: 24, inst: 9 },
+        { source: 'discord',       medium: 'social',  visits: 480, conv: 30, inst: 12 },
+        { source: 'reddit.com',    medium: 'social',  visits: 240, conv: 12, inst: 5 },
+        { source: 'fan wiki',      medium: 'website', visits: 140, conv: 6,  inst: 2 },
+      ];
+      let h = '<thead><tr><th>Source</th><th>Medium</th><th class="text-end">Web Visits</th><th class="text-end">Web Conversions</th><th class="text-end">Installs</th></tr></thead><tbody>';
+      R.forEach(r => { h += '<tr><td>' + r.source + '</td><td><span class="badge bg-secondary-lt">' + r.medium + '</span></td><td class="text-end">' + fmt(r.visits) + '</td><td class="text-end">' + fmt(r.conv) + '</td><td class="text-end">' + fmt(r.inst) + '</td></tr>'; });
+      const tv = R.reduce((a, r) => a + r.visits, 0), tc = R.reduce((a, r) => a + r.conv, 0), ti = R.reduce((a, r) => a + r.inst, 0);
+      h += '</tbody><tfoot><tr><td>Total</td><td></td><td class="text-end">' + fmt(tv) + '</td><td class="text-end">' + fmt(tc) + '</td><td class="text-end">' + fmt(ti) + '</td></tr></tfoot>';
+      document.getElementById('oeRefTable').innerHTML = h;
+      document.getElementById('oeRefCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('oeRefTable'), 'referrer-breakdown.csv'));
     })();
 
     // ═══ WEEKLY CREATOR-DRIVEN MENTIONS (value-beyond-clicks card) ═══
@@ -1389,7 +1480,7 @@
         '<div class="flex-fill" style="height:8px; background:rgba(4,32,69,0.05); border-radius:4px; overflow:hidden;"><div style="width:' + (r.share / maxShare * 100).toFixed(1) + '%; height:100%; background:' + r.color + '; opacity:0.75; border-radius:4px;"></div></div>' +
         '<span class="flex-shrink-0 text-end" style="width:108px; color: var(--tblr-secondary);"><strong style="color: var(--tblr-body-color);">' + fmt(r.wl) + '</strong> &middot; ' + pct1(r.share) + '</span>' +
         '</div>').join('');
-      // placement table — grouped header: Deal | Landing Page | Wishlists | Demo Installs
+      // placement table — grouped header: Deal | Landing Page | Wishlists | Paid Installs
       const cols = [
         { key: 'house',  head: 'Media House', text: true },
         { key: 'format', head: 'Format',      text: true },
@@ -1417,7 +1508,7 @@
         h += '<th colspan="3" class="text-center th-group-label group-end">Deal</th>';
         h += '<th colspan="4" class="text-center th-group-label group-end">Landing Page</th>';
         h += '<th colspan="3" class="text-center th-group-label group-end">Wishlists</th>';
-        h += '<th colspan="2" class="text-center th-group-label">Demo Installs</th>';
+        h += '<th colspan="2" class="text-center th-group-label">Paid Installs</th>';
         h += '</tr><tr>';
         cols.forEach(c => {
           const active = key === c.key;
@@ -1454,102 +1545,6 @@
       }
       render();
       document.getElementById('idPlacementCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('idPlacementTable'), 'placement-breakdown.csv'));
-    })();
-
-    // ═══ MARKETS — volumes only (no cost by design) ═══
-    (function() {
-      const rows = [
-        { label: 'US', flag: 'us', visits: 48800, conv: 690, wl: 3220, inst: 1290 },
-        { label: 'DE', flag: 'de', visits: 22300, conv: 320, wl: 1500, inst: 590 },
-        { label: 'UK', flag: 'gb', visits: 15300, conv: 215, wl: 1010, inst: 400 },
-        { label: 'FR', flag: 'fr', visits: 12500, conv: 175, wl: 820, inst: 330 },
-        { label: 'BR', flag: 'br', visits: 11900, conv: 168, wl: 790, inst: 320 },
-        { label: 'CA', flag: 'ca', visits: 9400,  conv: 132, wl: 620, inst: 245 },
-        { label: 'JP', flag: 'jp', visits: 8300,  conv: 118, wl: 550, inst: 215 },
-        { label: 'Others',         visits: 10800, conv: 142, wl: 690, inst: 266 },
-      ];
-      const totWl = rows.reduce((a, r) => a + r.wl, 0);
-      let h = '<thead><tr class="th-group">' +
-        '<th rowspan="2">Market</th>' +
-        '<th colspan="3" class="text-center th-group-label group-end">Landing Page</th>' +
-        '<th colspan="3" class="text-center th-group-label">Outcomes</th>' +
-        '</tr><tr>' +
-        '<th class="text-end">Web Visits</th><th class="text-end">Web Conversions</th><th class="text-end group-end">Web CR%</th>' +
-        '<th class="text-end">Wishlists</th><th class="text-end">WL Share%</th><th class="text-end">Installs</th>' +
-        '</tr></thead><tbody>';
-      rows.forEach(r => {
-        const flag = r.flag ? '<span class="flag flag-' + r.flag + ' me-1"></span>' : '';
-        h += '<tr><td style="white-space:nowrap;">' + flag + r.label + '</td><td class="text-end">' + fmt(r.visits) + '</td><td class="text-end">' + fmt(r.conv) + '</td><td class="text-end group-end">' + pct2(r.conv / r.visits * 100) + '</td><td class="text-end">' + fmt(r.wl) + '</td><td class="text-end">' + pct1(r.wl / totWl * 100) + '</td><td class="text-end">' + fmt(r.inst) + '</td></tr>';
-      });
-      const t = rows.reduce((a, r) => ({ visits: a.visits + r.visits, conv: a.conv + r.conv, wl: a.wl + r.wl, inst: a.inst + r.inst }), { visits: 0, conv: 0, wl: 0, inst: 0 });
-      h += '</tbody><tfoot><tr><td>Total</td><td class="text-end">' + fmt(t.visits) + '</td><td class="text-end">' + fmt(t.conv) + '</td><td class="text-end group-end">' + pct2(t.conv / t.visits * 100) + '</td><td class="text-end">' + fmt(t.wl) + '</td><td class="text-end">100,0%</td><td class="text-end">' + fmt(t.inst) + '</td></tr></tfoot>';
-      document.getElementById('idGeoTable').innerHTML = h;
-      document.getElementById('idGeoCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('idGeoTable'), 'markets-volumes.csv'));
-    })();
-
-    // ═══ DAILY DETAIL (last 14 active days) ═══
-    (function() {
-      const rows = [];
-      for (let i = days - 1; i >= 0 && rows.length < 14; i--) {
-        const v = infVisits[i] + mhVisits[i];
-        if (v < 50) continue;
-        rows.push({
-          date: allLabels[i], inf: infVisits[i], mh: mhVisits[i], visits: v,
-          conv: infConv[i] + mhConv[i], wl: infWl[i] + mhWl[i], inst: infInst[i] + mhInst[i],
-        });
-      }
-      rows.reverse();
-      const cols = [
-        { key: 'inf',    head: 'Creator',     fmtFn: fmt },
-        { key: 'mh',     head: 'Direct Buy',  fmtFn: fmt, end: true },
-        { key: 'conv',   head: 'Web Conversions', fmtFn: fmt },
-        { key: 'wl',     head: 'Wishlists',   fmtFn: fmt },
-        { key: 'inst',   head: 'Installs',    fmtFn: fmt },
-      ];
-      const state = { key: 'date', asc: true };
-      function render() {
-        const { key, asc } = state;
-        const sorted = [...rows].sort((a, b) => {
-          if (key === 'date') return asc ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date);
-          return asc ? a[key] - b[key] : b[key] - a[key];
-        });
-        const isMetric = key !== 'date';
-        const vals = isMetric ? sorted.map(r => r[key]) : [];
-        const minV = Math.min(...vals), maxV = Math.max(...vals), range = maxV - minV || 1;
-        let h = '<thead><tr class="th-group">';
-        h += '<th rowspan="2" class="col-geo-label sortable' + (key === 'date' ? ' sort-active' : '') + '" data-key="date">Date<span class="sort-icon">' + (key === 'date' && !asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
-        h += '<th colspan="2" class="text-center th-group-label group-end">Web Visits</th>';
-        h += '<th colspan="3" class="text-center th-group-label">Outcomes</th>';
-        h += '</tr><tr>';
-        cols.forEach(c => {
-          const active = key === c.key;
-          h += '<th class="text-end sortable' + (active ? ' sort-active' : '') + (c.end ? ' group-end' : '') + '" data-key="' + c.key + '">' + c.head + '<span class="sort-icon">' + (active && !asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
-        });
-        h += '</tr></thead><tbody>';
-        sorted.forEach(r => {
-          const norm = isMetric ? (asc ? 1 - (r[key] - minV) / range : (r[key] - minV) / range) : 0;
-          const opacity = (0.04 + norm * 0.18).toFixed(2);
-          h += '<tr><td class="col-geo-label" style="white-space:nowrap;">' + r.date + '</td>';
-          cols.forEach(c => {
-            const hl = (c.key === key && isMetric) ? ' style="background:rgba(116,182,231,' + opacity + ');"' : '';
-            h += '<td class="text-end' + (c.end ? ' group-end' : '') + '"' + hl + '>' + c.fmtFn(r[c.key]) + '</td>';
-          });
-          h += '</tr>';
-        });
-        h += '</tbody>';
-        const table = document.getElementById('idDailyTable');
-        table.innerHTML = h;
-        table.querySelectorAll('th.sortable').forEach(thEl => {
-          thEl.addEventListener('click', () => {
-            const k = thEl.dataset.key;
-            if (state.key === k) state.asc = !state.asc;
-            else { state.key = k; state.asc = k === 'date'; }
-            render();
-          });
-        });
-      }
-      render();
-      document.getElementById('idDailyCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('idDailyTable'), 'daily-detail.csv'));
     })();
 
     /* ═══ SIDEBAR TOGGLE ═══ */

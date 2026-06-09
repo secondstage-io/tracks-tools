@@ -33,14 +33,17 @@
     .chart-legend { padding: 4px 0; } /* layout via d-flex flex-wrap gap-2 utilities */
     .chart-legend .legend-item {
       display: inline-flex; align-items: center; gap: 6px;
-      padding: 5px 12px; border-radius: 6px; font-size: 13px; font-weight: 500;
-      cursor: pointer; user-select: none; transition: opacity 0.2s, box-shadow 0.2s;
-      border: 1px solid transparent;
+      padding: 3px 11px 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+      cursor: pointer; user-select: none; transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+      background: var(--tblr-bg-surface-secondary, #f8f9fa) !important;
+      border: 1px solid rgba(4,32,69,0.15) !important;
+      color: var(--tblr-body-color, #1e293b);
     }
-    .chart-legend .legend-item:hover { box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-    .chart-legend .legend-item.inactive { opacity: 0.35; text-decoration: line-through; }
-    .chart-legend .legend-swatch { width: 14px; height: 4px; border-radius: 2px; flex-shrink: 0; }
-    .chart-legend .legend-item[data-type="bar"] .legend-swatch { height: 12px; width: 10px; border-radius: 2px; }
+    .chart-legend .legend-item:hover { border-color: rgba(4,32,69,0.3) !important; box-shadow: none; }
+    .chart-legend .legend-item.inactive { background: transparent !important; border-color: rgba(4,32,69,0.12) !important; color: var(--tblr-secondary, #626976); opacity: 0.6; text-decoration: none; }
+    .chart-legend .legend-swatch { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .chart-legend .legend-item[data-type="bar"] .legend-swatch { height: 9px; width: 9px; border-radius: 50%; }
+    .chart-legend .legend-item.inactive .legend-swatch { background: #ccc !important; }
     .kpi { border-radius: 8px; padding: 14px 16px; height: 100%; }
     .info-tip { position: relative; cursor: help; display: inline-flex; padding: 4px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
     .info-tip:hover { background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.06); }
@@ -290,6 +293,12 @@
     .lens-chip { font-size: 11px; font-weight: 600; letter-spacing: 0.3px; padding: 3px 12px; border-radius: 999px; border: 1px solid rgba(4,32,69,0.15); background: transparent; color: var(--tblr-secondary, #626976); cursor: pointer; transition: color 0.15s, background 0.15s, border-color 0.15s; line-height: 1.5; }
     .lens-chip:hover { border-color: var(--tblr-primary, #FF0249); color: var(--tblr-primary, #FF0249); }
     .lens-chip.active { background: var(--tblr-primary, #FF0249); border-color: var(--tblr-primary, #FF0249); color: #fff; }
+    .trend-pill { font-size: 11px; font-weight: 600; letter-spacing: 0.3px; padding: 3px 11px 3px 8px; border-radius: 999px; border: 1px solid rgba(4,32,69,0.15); background: var(--tblr-bg-surface-secondary, #f8f9fa); color: var(--tblr-body-color, #1e293b); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; line-height: 1.5; transition: opacity 0.15s, background 0.15s, border-color 0.15s; }
+    .trend-pill:hover { border-color: rgba(4,32,69,0.3); }
+    .trend-pill .trend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; transition: background 0.15s; }
+    .trend-pill.inactive { background: transparent; color: var(--tblr-secondary, #626976); opacity: 0.6; }
+    .trend-ctrl-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--tblr-secondary, #626976); white-space: nowrap; }
+    .trend-ctrl-sep { width: 1px; align-self: stretch; min-height: 20px; background: rgba(4,32,69,0.12); margin: 0 4px; }
     /* Command Center wrapper */
     /* AI Insight placeholder */
     .ai-insight { border: 1px solid rgba(132,94,247,0.2); background: rgba(132,94,247,0.03); border-radius: 8px; padding: 12px 16px; font-size: 13px; line-height: 1.6; color: var(--tblr-body-color, #1e293b); }
@@ -469,21 +478,20 @@
             </div>
             <nav class="nav nav-pills nav-vertical" style="font-size:13px;">
               <li class="nav-item"><a class="nav-link" href="nativedash-poc-v3-prelaunch.html" data-title="Overview"><i class="ti ti-layout-dashboard me-2"></i><span>Overview</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="steaminsights-v1.html" data-title="Steam Insights"><i class="ti ti-brand-steam me-2"></i><span>Steam Insights</span></a></li>
               <li class="nav-item"><a class="nav-link" href="periodcomparison-v1.html" data-title="Period Comparison"><i class="ti ti-arrows-diff me-2"></i><span>Period Comparison</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Growth</span></li>
               <li class="nav-item"><a class="nav-link active" href="installsua-v1.html" data-title="Installs & UA"><i class="ti ti-device-gamepad-2 me-2"></i><span>Installs &amp; UA</span></a></li>
               <li class="nav-item"><a class="nav-link" href="wishlistinsights-v1.html" data-title="Wishlist Insights"><i class="ti ti-heart me-2"></i><span>Wishlist Insights</span></a></li>
               <li class="nav-item"><a class="nav-link" href="preorderinsights-v1.html" data-title="Preorder Insights"><i class="ti ti-shopping-cart me-2"></i><span>Preorder Insights</span></a></li>
-              <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Game</span></li>
               <li class="nav-item"><a class="nav-link" href="playerlifecycle-v1.html" data-title="Player Lifecycle"><i class="ti ti-refresh me-2"></i><span>Player Lifecycle</span></a></li>
-              <li class="nav-item"><a class="nav-link" href="monetizationltv-v1.html" data-title="Monetization & LTV"><i class="ti ti-coin me-2"></i><span>Monetization & LTV</span></a></li>
-              <li class="nav-item"><a class="nav-link" href="steaminsights-v1.html" data-title="Steam Insights"><i class="ti ti-brand-steam me-2"></i><span>Steam Insights</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="monetizationltv-v1.html" data-title="Revenue & LTV"><i class="ti ti-coin me-2"></i><span>Revenue &amp; LTV</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Media & Web</span></li>
               <li class="nav-item"><a class="nav-link" href="performancemedia-v1.html" data-title="Performance Overview"><i class="ti ti-chart-bar me-2"></i><span>Performance Overview</span></a></li>
               <li class="nav-item"><a class="nav-link" href="awarenesstracker-v1.html" data-title="Awareness Tracker"><i class="ti ti-eye me-2"></i><span>Awareness Tracker</span></a></li>
               <li class="nav-item"><a class="nav-link" href="creativeinsights-v1.html" data-title="Creative Performance"><i class="ti ti-palette me-2"></i><span>Creative Performance</span></a></li>
               <li class="nav-item"><a class="nav-link" href="audienceinsights-v1.html" data-title="Audience Insights"><i class="ti ti-users me-2"></i><span>Audience Insights</span></a></li>
-              <li class="nav-item"><a class="nav-link" href="influencerdirectbuy-v1.html" data-title="Influencer & Direct Buy"><i class="ti ti-speakerphone me-2"></i><span>Influencer & Direct Buy</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="influencerdirectbuy-v1.html" data-title="Influencer & Direct Buy"><i class="ti ti-speakerphone me-2"></i><span>Influencer &amp; Direct Buy</span></a></li>
               <li class="nav-item"><a class="nav-link" href="websiteanalytics-v1.html" data-title="Website Analytics"><i class="ti ti-world-www me-2"></i><span>Website Analytics</span></a></li>
               <li class="nav-item mt-3"><span class="nav-link text-muted py-1 group-label" style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding-left:12px;">Brand</span></li>
               <li class="nav-item"><a class="nav-link" href="brandhealth-v1.html" data-title="Brand Health"><i class="ti ti-star me-2"></i><span>Brand Health</span></a></li>
@@ -650,75 +658,50 @@
         <!-- ═══ INSTALLS & UA — quiet hero: status tiles + install trend ═══ -->
         <div class="card mt-5 mb-3" id="iuIntelCard">
           <div class="card-status-top bg-primary"></div>
-          <div class="card-body">
-            <div class="d-flex flex-wrap" style="row-gap: 14px;">
-              <div style="flex: 3 1 0; min-width: 315px;">
-                <div class="hero-group-label">Volume</div>
-                <div class="row g-2">
-                  <div class="col-4">
-                <div class="kpi kpi-neutral score-tile">
-                  <div class="kpi-label">Total Demo Installs <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Paid (attributed) + organic installs across all storefronts, by install date.</span></span></div>
-                  <div class="kpi-value">142.350</div>
-                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +9.840</span><span>last 7 days</span></div>
+          <div class="card-body pb-3">
+            <div class="d-flex flex-wrap align-items-center" style="row-gap:16px; column-gap:40px;">
+              <div style="flex: 1 1 280px; min-width:260px;">
+                <div class="hero-group-label">Total Demo Installs</div>
+                <div class="d-flex align-items-baseline gap-2" style="margin-top:8px;">
+                  <div style="font-size:2.5rem; font-weight:800; line-height:1; color:var(--tblr-body-color,#1e293b); font-variant-numeric:tabular-nums;">142.350</div>
+                  <span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:3px 9px; border-radius:6px; font-size:13px; font-weight:700;">&uarr; +9.840 last 7 days</span>
                 </div>
+                <div style="font-size:12px; color:var(--tblr-secondary,#626976); margin-top:10px; line-height:1.55;">44.780 paid + 97.570 organic across four demo storefronts. <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Paid (attributed) + organic installs across all storefronts, by install date.</span></span></div>
               </div>
-                  <div class="col-4">
-                <div class="kpi kpi-neutral score-tile">
-                  <div class="kpi-label">Paid Demo Installs <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Installs attributed to paid media within the 30-day attribution window,<br>assigned to the campaign date (when the cost ran).</span></span></div>
-                  <div class="kpi-value">44.780</div>
-                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +2.870</span><span>last 7 days</span></div>
+              <div style="flex: 1.4 1 360px; min-width:340px;">
+                <div class="hero-group-label">Demo installs by platform</div>
+                <div style="display:flex; height:18px; border-radius:9px; overflow:hidden; margin-top:8px; background:#eef2f7;">
+                  <div style="width:58%; background:#15aabf;" title="Steam 82.563"></div>
+                  <div style="width:21%; background:#4263eb;" title="PlayStation 29.894"></div>
+                  <div style="width:16%; background:#2fb344;" title="Xbox 22.776"></div>
+                  <div style="width:5%; background:#66757f;" title="Epic 7.117"></div>
                 </div>
+                <div class="d-flex flex-wrap" style="gap:8px 18px; margin-top:10px;"><span class="d-inline-flex align-items-center gap-2" style="" title="Steam 82.563"><span style="width:26px;height:26px;border-radius:7px;background:rgba(27,40,56,0.1);color:#1b2838;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-label="Steam"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></svg></span><span style="font-size:12px;"><strong style="color:var(--tblr-body-color,#1e293b);">Steam</strong> <span style="color:var(--tblr-secondary,#626976);">58%</span></span></span><span class="d-inline-flex align-items-center gap-2" style="" title="PlayStation 29.894"><span style="width:26px;height:26px;border-radius:7px;background:rgba(46,109,180,0.1);color:#2e6db4;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-label="PlayStation"><path d="M8.984 2.596v17.547l3.915 1.261V6.688c0-.69.304-1.151.794-.991.636.18.76.814.76 1.505v5.875c2.441 1.193 4.362-.002 4.362-3.152 0-3.237-1.126-4.675-4.438-5.827-1.307-.448-3.728-1.186-5.39-1.502zm4.656 16.241l6.296-2.275c.715-.258.826-.625.246-.818-.586-.192-1.637-.139-2.357.123l-4.205 1.5V14.98l.24-.085s1.201-.42 2.913-.615c1.696-.18 3.785.03 5.437.661 1.848.601 2.04 1.472 1.576 2.072-.465.6-1.622 1.036-1.622 1.036l-8.544 3.107V18.86zM1.807 18.6c-1.9-.545-2.214-1.668-1.352-2.32.801-.586 2.16-1.052 2.16-1.052l5.615-2.013v2.313L4.205 17c-.705.271-.825.632-.239.826.586.195 1.637.15 2.343-.12L8.247 17v2.074c-.12.03-.256.044-.39.073-1.939.331-3.996.196-6.038-.479z"/></svg></span><span style="font-size:12px;"><strong style="color:var(--tblr-body-color,#1e293b);">PlayStation</strong> <span style="color:var(--tblr-secondary,#626976);">21%</span></span></span><span class="d-inline-flex align-items-center gap-2" style="" title="Xbox 22.776"><span style="width:26px;height:26px;border-radius:7px;background:rgba(16,124,16,0.1);color:#107c10;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 88 88" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-label="Xbox"><path d="M39.73 86.91c-6.628-.635-13.338-3.015-19.102-6.776-4.83-3.15-5.92-4.447-5.92-7.032 0-5.193 5.71-14.29 15.48-24.658 5.547-5.89 13.275-12.79 14.11-12.604 1.626.363 14.616 13.034 19.48 19 7.69 9.43 11.224 17.154 9.428 20.597-1.365 2.617-9.837 7.733-16.06 9.698-5.13 1.62-11.867 2.306-17.416 1.775zM8.184 67.703c-4.014-6.158-6.042-12.22-7.02-20.988-.324-2.895-.21-4.55.733-10.494 1.173-7.4 5.39-15.97 10.46-21.24 2.158-2.24 2.35-2.3 4.982-1.41 3.19 1.08 6.6 3.436 11.89 8.22l3.09 2.794-1.69 2.07c-7.828 9.61-16.09 23.24-19.2 31.67-1.69 4.58-2.37 9.18-1.64 11.095.49 1.294.04.812-1.61-1.714zm70.453 1.047c.397-1.936-.105-5.49-1.28-9.076-2.545-7.765-11.054-22.21-18.867-32.032l-2.46-3.092 2.662-2.443c3.474-3.19 5.886-5.1 8.49-6.723 2.053-1.28 4.988-2.413 6.25-2.413.777 0 3.516 2.85 5.726 5.95 3.424 4.8 5.942 10.63 7.218 16.69.825 3.92.894 12.3.133 16.21-.63 3.208-1.95 7.366-3.23 10.187-.97 2.113-3.36 6.218-4.41 7.554-.54.687-.54.686-.24-.796zM40.44 11.505C36.834 9.675 31.272 7.71 28.2 7.18c-1.076-.185-2.913-.29-4.08-.23-2.536.128-2.423-.004 1.643-1.925 3.38-1.597 6.2-2.536 10.03-3.34C40.098.78 48.193.77 52.43 1.663c4.575.965 9.964 2.97 13 4.84l.904.554-2.07-.104C60.148 6.745 54.15 8.408 47.71 11.54c-1.942.946-3.63 1.7-3.754 1.68-.123-.024-1.706-.795-3.52-1.715z"/></svg></span><span style="font-size:12px;"><strong style="color:var(--tblr-body-color,#1e293b);">Xbox</strong> <span style="color:var(--tblr-secondary,#626976);">16%</span></span></span><span class="d-inline-flex align-items-center gap-2" style="" title="Epic 7.117"><span style="width:26px;height:26px;border-radius:7px;background:rgba(42,42,42,0.1);color:#2a2a2a;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-label="Epic Games Store"><path d="M3.537 0C2.165 0 1.66.506 1.66 1.879V18.44a4.262 4.262 0 00.02.433c.031.3.037.59.316.92.027.033.311.245.311.245.153.075.258.13.43.2l8.335 3.491c.433.199.614.276.928.27h.002c.314.006.495-.071.928-.27l8.335-3.492c.172-.07.277-.124.43-.2 0 0 .284-.211.311-.243.28-.33.285-.621.316-.92a4.261 4.261 0 00.02-.434V1.879c0-1.373-.506-1.88-1.878-1.88zm13.366 3.11h.68c1.138 0 1.688.553 1.688 1.696v1.88h-1.374v-1.8c0-.369-.17-.54-.523-.54h-.235c-.367 0-.537.17-.537.539v5.81c0 .369.17.54.537.54h.262c.353 0 .523-.171.523-.54V8.619h1.373v2.143c0 1.144-.562 1.71-1.7 1.71h-.694c-1.138 0-1.7-.566-1.7-1.71V4.82c0-1.144.562-1.709 1.7-1.709zm-12.186.08h3.114v1.274H6.117v2.603h1.648v1.275H6.117v2.774h1.74v1.275h-3.14zm3.816 0h2.198c1.138 0 1.7.564 1.7 1.708v2.445c0 1.144-.562 1.71-1.7 1.71h-.799v3.338h-1.4zm4.53 0h1.4v9.201h-1.4zm-3.13 1.235v3.392h.575c.354 0 .523-.171.523-.54V4.965c0-.368-.17-.54-.523-.54zm-3.74 10.147a1.708 1.708 0 01.591.108 1.745 1.745 0 01.49.299l-.452.546a1.247 1.247 0 00-.308-.195.91.91 0 00-.363-.068.658.658 0 00-.28.06.703.703 0 00-.224.163.783.783 0 00-.151.243.799.799 0 00-.056.299v.008a.852.852 0 00.056.31.7.7 0 00.157.245.736.736 0 00.238.16.774.774 0 00.303.058.79.79 0 00.445-.116v-.339h-.548v-.565H7.37v1.255a2.019 2.019 0 01-.524.307 1.789 1.789 0 01-.683.123 1.642 1.642 0 01-.602-.107 1.46 1.46 0 01-.478-.3 1.371 1.371 0 01-.318-.455 1.438 1.438 0 01-.115-.58v-.008a1.426 1.426 0 01.113-.57 1.449 1.449 0 01.312-.46 1.418 1.418 0 01.474-.309 1.58 1.58 0 01.598-.111 1.708 1.708 0 01.045 0zm11.963.008a2.006 2.006 0 01.612.094 1.61 1.61 0 01.507.277l-.386.546a1.562 1.562 0 00-.39-.205 1.178 1.178 0 00-.388-.07.347.347 0 00-.208.052.154.154 0 00-.07.127v.008a.158.158 0 00.022.084.198.198 0 00.076.066.831.831 0 00.147.06c.062.02.14.04.236.061a3.389 3.389 0 01.43.122 1.292 1.292 0 01.328.17.678.678 0 01.207.24.739.739 0 01.071.337v.008a.865.865 0 01-.081.382.82.82 0 01-.229.285 1.032 1.032 0 01-.353.18 1.606 1.606 0 01-.46.061 2.16 2.16 0 01-.71-.116 1.718 1.718 0 01-.593-.346l.43-.514c.277.223.578.335.9.335a.457.457 0 00.236-.05.157.157 0 00.082-.142v-.008a.15.15 0 00-.02-.077.204.204 0 00-.073-.066.753.753 0 00-.143-.062 2.45 2.45 0 00-.233-.062 5.036 5.036 0 01-.413-.113 1.26 1.26 0 01-.331-.16.72.72 0 01-.222-.243.73.73 0 01-.082-.36v-.008a.863.863 0 01.074-.359.794.794 0 01.214-.283 1.007 1.007 0 01.34-.185 1.423 1.423 0 01.448-.066 2.006 2.006 0 01.025 0zm-9.358.025h.742l1.183 2.81h-.825l-.203-.499H8.623l-.198.498h-.81zm2.197.02h.814l.663 1.08.663-1.08h.814v2.79h-.766v-1.602l-.711 1.091h-.016l-.707-1.083v1.593h-.754zm3.469 0h2.235v.658h-1.473v.422h1.334v.61h-1.334v.442h1.493v.658h-2.255zm-5.3.897l-.315.793h.624zm-1.145 5.19h8.014l-4.09 1.348z"/></svg></span><span style="font-size:12px;"><strong style="color:var(--tblr-body-color,#1e293b);">Epic</strong> <span style="color:var(--tblr-secondary,#626976);">5%</span></span></span><span class="d-inline-flex align-items-center gap-2" style=" opacity:0.5;" title="Nintendo not released"><span style="width:26px;height:26px;border-radius:7px;background:rgba(4,32,69,0.05);color:var(--tblr-secondary,#626976);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 550 550" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-label="Nintendo Switch"><g transform="translate(0,550) scale(0.1,-0.1)"><path d="M1365 5154 c-481 -86 -868 -442 -990 -910 -44 -169 -47 -268 -42 -1579 3 -1204 4 -1232 24 -1325 111 -501 467 -858 973 -976 66 -15 150 -18 691 -21 560 -4 618 -3 633 12 15 15 16 208 16 2396 0 1622 -3 2386 -10 2400 -10 18 -27 19 -613 18 -476 -1 -619 -4 -682 -15z m905 -2400 l0 -2026 -407 5 c-375 4 -415 6 -490 25 -322 83 -561 331 -628 654 -22 101 -22 2589 -1 2688 60 281 255 514 518 619 132 53 193 59 621 60 l387 1 0 -2026z"/><path d="M1451 4169 c-63 -12 -159 -60 -210 -105 -105 -91 -157 -220 -149 -372 4 -79 9 -100 41 -164 47 -97 118 -168 215 -216 67 -33 84 -37 171 -40 79 -3 107 0 160 18 217 73 348 284 311 500 -43 257 -287 429 -539 379z"/><path d="M3157 5163 c-4 -3 -7 -1087 -7 -2409 0 -2181 1 -2402 16 -2408 27 -10 803 -6 899 4 406 46 764 293 959 660 25 47 58 126 75 175 63 188 61 138 61 1575 0 1147 -2 1318 -16 1391 -99 521 -496 914 -1018 1004 -70 12 -178 15 -526 15 -240 0 -440 -3 -443 -7z m1068 -2178 c156 -41 284 -160 336 -312 33 -94 32 -232 -1 -318 -61 -158 -181 -269 -335 -310 -250 -65 -516 86 -589 334 -22 76 -21 204 4 282 75 245 335 389 585 324z"/></g></svg></span><span style="font-size:12px;"><strong style="color:var(--tblr-secondary,#626976);">Nintendo</strong> <span style="color:var(--tblr-secondary,#626976);">&mdash;</span></span></span></div>
               </div>
-                  <div class="col-4">
-                <div class="kpi kpi-neutral score-tile">
-                  <div class="kpi-label">Demo Install CR <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Paid installs per ad click.</span></span></div>
-                  <div class="kpi-value">3,6%</div>
-                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +0,2pp</span><span>last 7 days</span></div>
-                </div>
-              </div>
-                </div>
-              </div>
-              <div style="flex: 3 1 0; min-width: 315px; border-left: 1px solid rgba(4,32,69,0.1); padding-left: 12px; margin-left: 12px;">
-                <div class="hero-group-label">Efficiency & Return</div>
-                <div class="row g-2">
-                  <div class="col-4">
-                <div class="kpi kpi-beat-soft score-tile">
-                  <div class="kpi-label">Demo CPI <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Cost &divide; attributed paid installs, on campaign date.<br>Matures over the attribution window &mdash; see Demo CPI Progression below.</span></span></div>
-                  <div class="kpi-value">4,12&thinsp;&euro;</div>
-                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 17,6%</span><span>vs goal 5,00&thinsp;&euro;</span></div>
-                </div>
-              </div>
-                  <div class="col-4">
-                <div class="kpi kpi-neutral score-tile">
-                  <div class="kpi-label"><span style="text-transform:none;">eCPI</span> <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Cost &divide; ALL installs (paid + organic), on install date &mdash;<br>the blended price including the organic halo.</span></span></div>
-                  <div class="kpi-value">1,30&thinsp;&euro;</div>
-                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&darr; 4,8%</span><span>last 7 days</span></div>
-                </div>
-              </div>
-                  <div class="col-4">
-                <div class="kpi kpi-beat-soft score-tile">
-                  <div class="kpi-label">ROAS <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Modelled attributed net revenue &divide; media cost (estimated).</span></span></div>
-                  <div class="kpi-value">8,0&times;</div>
-                  <div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 100%</span><span>vs goal 4,0&times;</span></div>
-                </div>
-              </div>
-                </div>
+            </div>
+            <div class="border-top mt-3 pt-3">
+              <div class="row g-2">
+                <div class="col-6 col-lg"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Paid Demo Installs <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Installs attributed to paid media within the 30-day attribution window,<br>assigned to the campaign date (when the cost ran).</span></span></div><div class="kpi-value">44.780</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(4,32,69,0.06); color:var(--tblr-secondary, #626976); padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +2.870</span><span>last 7 days</span></div></div></div>
+                <div class="col-6 col-lg"><div class="kpi kpi-neutral score-tile"><div class="kpi-label">Demo Install CR <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Paid installs per ad click.</span></span></div><div class="kpi-value">3,6%</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(4,32,69,0.06); color:var(--tblr-secondary, #626976); padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; +0,2pp</span><span>last 7 days</span></div></div></div>
+                <div class="col-6 col-lg"><div class="kpi kpi-beat-soft score-tile"><div class="kpi-label">Demo CPI <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Cost &divide; attributed paid installs, on campaign date.<br>Matures over the attribution window.</span></span></div><div class="kpi-value">4,12&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 17,6%</span><span>vs goal 5,00&thinsp;&euro;</span></div></div></div>
+                <div class="col-6 col-lg"><div class="kpi kpi-neutral score-tile"><div class="kpi-label"><span style="text-transform:none;">eCPI</span> <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Cost &divide; ALL installs (paid + organic), on install date &mdash;<br>the blended price including the organic halo.</span></span></div><div class="kpi-value">1,30&thinsp;&euro;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&darr; 4,8%</span><span>last 7 days</span></div></div></div>
+                <div class="col-6 col-lg"><div class="kpi kpi-beat-soft score-tile"><div class="kpi-label">ROAS <span class="info-tip" style="color: var(--tblr-secondary); vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Modelled attributed net revenue &divide; media cost (estimated).</span></span></div><div class="kpi-value">8,0&times;</div><div class="kpi-goal d-flex align-items-center gap-2" style="margin-top:6px;"><span class="kpi-delta" style="background:rgba(47,179,68,0.16); color:#2fb344; padding:2px 7px; border-radius:5px; font-size:12px; font-weight:700;">&uarr; 100%</span><span>vs goal 4,0&times;</span></div></div></div>
               </div>
             </div>
           </div>
           <div class="card-body border-top pt-3">
             <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
-              <span style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--tblr-secondary, #626976);">Overlay</span>
+              <span class="trend-ctrl-label">Installs</span>
+              <div class="lens-chips" id="iuTrendLegend"></div>
+              <div class="trend-ctrl-sep d-none d-lg-block"></div>
+              <span class="trend-ctrl-label">Efficiency overlay</span>
               <div class="lens-chips" id="iuLensChips">
                 <button type="button" class="lens-chip active" data-lens="cpi">CPI</button>
                 <button type="button" class="lens-chip" data-lens="ecpi">eCPI</button>
                 <button type="button" class="lens-chip" data-lens="cr">Demo Install CR</button>
                 <button type="button" class="lens-chip" data-lens="roas">ROAS</button>
               </div>
-            </div>
-            <div class="d-flex align-items-center gap-2 flex-wrap">
-              <div id="iuTrendLegend" class="chart-legend d-flex flex-wrap gap-2 flex-fill"></div>
-              <div class="dropdown flex-shrink-0">
+              <div class="dropdown flex-shrink-0 ms-auto">
                 <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
                 <div class="dropdown-menu dropdown-menu-end">
                   <button class="dropdown-item" id="iuTrendPngBtn">PNG Image</button>
@@ -740,79 +723,12 @@
           </div>
         </div>
 
-        <!-- ═══ PLATFORM SPLIT ═══ -->
-        <div class="card mb-3">
-          <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
-            <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Demo Installs by Platform</span>
-            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Total and paid-attributed installs per storefront, by install date.<br>Console attribution relies on platform-reported installs; PC on the full tracking chain.</span></span>
-            <div class="dropdown ms-1">
-              <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
-              <div class="dropdown-menu dropdown-menu-end">
-                <button class="dropdown-item" id="iuPlatformCsvBtn">CSV Spreadsheet</button>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="row g-4">
-              <div class="col-6 col-lg">
-                <div class="d-flex align-items-start gap-3">
-                  <span class="flex-shrink-0" style="width:56px; height:56px; border-radius:12px; background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.08); color: var(--tblr-primary, #FF0249); display:inline-flex; align-items:center; justify-content:center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-label="Steam"><path d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></svg></span>
-                  <div>
-                    <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Steam</div>
-                    <div style="font-size:1.15rem; font-weight:700; font-variant-numeric: tabular-nums;">82.563</div>
-                    <div style="font-size:11px; color: var(--tblr-secondary);">Paid: <strong style="color: var(--tblr-body-color, #1e293b);">25.972</strong> &middot; 58% of installs</div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-6 col-lg">
-                <div class="d-flex align-items-start gap-3">
-                  <span class="flex-shrink-0" style="width:56px; height:56px; border-radius:12px; background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.08); color: var(--tblr-primary, #FF0249); display:inline-flex; align-items:center; justify-content:center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-label="Epic Games Store"><path d="M3.537 0C2.165 0 1.66.506 1.66 1.879V18.44a4.262 4.262 0 00.02.433c.031.3.037.59.316.92.027.033.311.245.311.245.153.075.258.13.43.2l8.335 3.491c.433.199.614.276.928.27h.002c.314.006.495-.071.928-.27l8.335-3.492c.172-.07.277-.124.43-.2 0 0 .284-.211.311-.243.28-.33.285-.621.316-.92a4.261 4.261 0 00.02-.434V1.879c0-1.373-.506-1.88-1.878-1.88zm13.366 3.11h.68c1.138 0 1.688.553 1.688 1.696v1.88h-1.374v-1.8c0-.369-.17-.54-.523-.54h-.235c-.367 0-.537.17-.537.539v5.81c0 .369.17.54.537.54h.262c.353 0 .523-.171.523-.54V8.619h1.373v2.143c0 1.144-.562 1.71-1.7 1.71h-.694c-1.138 0-1.7-.566-1.7-1.71V4.82c0-1.144.562-1.709 1.7-1.709zm-12.186.08h3.114v1.274H6.117v2.603h1.648v1.275H6.117v2.774h1.74v1.275h-3.14zm3.816 0h2.198c1.138 0 1.7.564 1.7 1.708v2.445c0 1.144-.562 1.71-1.7 1.71h-.799v3.338h-1.4zm4.53 0h1.4v9.201h-1.4zm-3.13 1.235v3.392h.575c.354 0 .523-.171.523-.54V4.965c0-.368-.17-.54-.523-.54zm-3.74 10.147a1.708 1.708 0 01.591.108 1.745 1.745 0 01.49.299l-.452.546a1.247 1.247 0 00-.308-.195.91.91 0 00-.363-.068.658.658 0 00-.28.06.703.703 0 00-.224.163.783.783 0 00-.151.243.799.799 0 00-.056.299v.008a.852.852 0 00.056.31.7.7 0 00.157.245.736.736 0 00.238.16.774.774 0 00.303.058.79.79 0 00.445-.116v-.339h-.548v-.565H7.37v1.255a2.019 2.019 0 01-.524.307 1.789 1.789 0 01-.683.123 1.642 1.642 0 01-.602-.107 1.46 1.46 0 01-.478-.3 1.371 1.371 0 01-.318-.455 1.438 1.438 0 01-.115-.58v-.008a1.426 1.426 0 01.113-.57 1.449 1.449 0 01.312-.46 1.418 1.418 0 01.474-.309 1.58 1.58 0 01.598-.111 1.708 1.708 0 01.045 0zm11.963.008a2.006 2.006 0 01.612.094 1.61 1.61 0 01.507.277l-.386.546a1.562 1.562 0 00-.39-.205 1.178 1.178 0 00-.388-.07.347.347 0 00-.208.052.154.154 0 00-.07.127v.008a.158.158 0 00.022.084.198.198 0 00.076.066.831.831 0 00.147.06c.062.02.14.04.236.061a3.389 3.389 0 01.43.122 1.292 1.292 0 01.328.17.678.678 0 01.207.24.739.739 0 01.071.337v.008a.865.865 0 01-.081.382.82.82 0 01-.229.285 1.032 1.032 0 01-.353.18 1.606 1.606 0 01-.46.061 2.16 2.16 0 01-.71-.116 1.718 1.718 0 01-.593-.346l.43-.514c.277.223.578.335.9.335a.457.457 0 00.236-.05.157.157 0 00.082-.142v-.008a.15.15 0 00-.02-.077.204.204 0 00-.073-.066.753.753 0 00-.143-.062 2.45 2.45 0 00-.233-.062 5.036 5.036 0 01-.413-.113 1.26 1.26 0 01-.331-.16.72.72 0 01-.222-.243.73.73 0 01-.082-.36v-.008a.863.863 0 01.074-.359.794.794 0 01.214-.283 1.007 1.007 0 01.34-.185 1.423 1.423 0 01.448-.066 2.006 2.006 0 01.025 0zm-9.358.025h.742l1.183 2.81h-.825l-.203-.499H8.623l-.198.498h-.81zm2.197.02h.814l.663 1.08.663-1.08h.814v2.79h-.766v-1.602l-.711 1.091h-.016l-.707-1.083v1.593h-.754zm3.469 0h2.235v.658h-1.473v.422h1.334v.61h-1.334v.442h1.493v.658h-2.255zm-5.3.897l-.315.793h.624zm-1.145 5.19h8.014l-4.09 1.348z"/></svg></span>
-                  <div>
-                    <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Epic Games Store</div>
-                    <div style="font-size:1.15rem; font-weight:700; font-variant-numeric: tabular-nums;">7.117</div>
-                    <div style="font-size:11px; color: var(--tblr-secondary);">Paid: <strong style="color: var(--tblr-body-color, #1e293b);">2.239</strong> &middot; 5% of installs</div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-6 col-lg">
-                <div class="d-flex align-items-start gap-3">
-                  <span class="flex-shrink-0" style="width:56px; height:56px; border-radius:12px; background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.08); color: var(--tblr-primary, #FF0249); display:inline-flex; align-items:center; justify-content:center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-label="PlayStation"><path d="M8.984 2.596v17.547l3.915 1.261V6.688c0-.69.304-1.151.794-.991.636.18.76.814.76 1.505v5.875c2.441 1.193 4.362-.002 4.362-3.152 0-3.237-1.126-4.675-4.438-5.827-1.307-.448-3.728-1.186-5.39-1.502zm4.656 16.241l6.296-2.275c.715-.258.826-.625.246-.818-.586-.192-1.637-.139-2.357.123l-4.205 1.5V14.98l.24-.085s1.201-.42 2.913-.615c1.696-.18 3.785.03 5.437.661 1.848.601 2.04 1.472 1.576 2.072-.465.6-1.622 1.036-1.622 1.036l-8.544 3.107V18.86zM1.807 18.6c-1.9-.545-2.214-1.668-1.352-2.32.801-.586 2.16-1.052 2.16-1.052l5.615-2.013v2.313L4.205 17c-.705.271-.825.632-.239.826.586.195 1.637.15 2.343-.12L8.247 17v2.074c-.12.03-.256.044-.39.073-1.939.331-3.996.196-6.038-.479z"/></svg></span>
-                  <div>
-                    <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">PlayStation</div>
-                    <div style="font-size:1.15rem; font-weight:700; font-variant-numeric: tabular-nums;">29.894</div>
-                    <div style="font-size:11px; color: var(--tblr-secondary);">Paid: <strong style="color: var(--tblr-body-color, #1e293b);">9.404</strong> &middot; 21% of installs</div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-6 col-lg">
-                <div class="d-flex align-items-start gap-3">
-                  <span class="flex-shrink-0" style="width:56px; height:56px; border-radius:12px; background: rgba(var(--tblr-primary-rgb, 255, 2, 73), 0.08); color: var(--tblr-primary, #FF0249); display:inline-flex; align-items:center; justify-content:center;"><svg width="28" height="28" viewBox="0 0 88 88" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-label="Xbox"><path d="M39.73 86.91c-6.628-.635-13.338-3.015-19.102-6.776-4.83-3.15-5.92-4.447-5.92-7.032 0-5.193 5.71-14.29 15.48-24.658 5.547-5.89 13.275-12.79 14.11-12.604 1.626.363 14.616 13.034 19.48 19 7.69 9.43 11.224 17.154 9.428 20.597-1.365 2.617-9.837 7.733-16.06 9.698-5.13 1.62-11.867 2.306-17.416 1.775zM8.184 67.703c-4.014-6.158-6.042-12.22-7.02-20.988-.324-2.895-.21-4.55.733-10.494 1.173-7.4 5.39-15.97 10.46-21.24 2.158-2.24 2.35-2.3 4.982-1.41 3.19 1.08 6.6 3.436 11.89 8.22l3.09 2.794-1.69 2.07c-7.828 9.61-16.09 23.24-19.2 31.67-1.69 4.58-2.37 9.18-1.64 11.095.49 1.294.04.812-1.61-1.714zm70.453 1.047c.397-1.936-.105-5.49-1.28-9.076-2.545-7.765-11.054-22.21-18.867-32.032l-2.46-3.092 2.662-2.443c3.474-3.19 5.886-5.1 8.49-6.723 2.053-1.28 4.988-2.413 6.25-2.413.777 0 3.516 2.85 5.726 5.95 3.424 4.8 5.942 10.63 7.218 16.69.825 3.92.894 12.3.133 16.21-.63 3.208-1.95 7.366-3.23 10.187-.97 2.113-3.36 6.218-4.41 7.554-.54.687-.54.686-.24-.796zM40.44 11.505C36.834 9.675 31.272 7.71 28.2 7.18c-1.076-.185-2.913-.29-4.08-.23-2.536.128-2.423-.004 1.643-1.925 3.38-1.597 6.2-2.536 10.03-3.34C40.098.78 48.193.77 52.43 1.663c4.575.965 9.964 2.97 13 4.84l.904.554-2.07-.104C60.148 6.745 54.15 8.408 47.71 11.54c-1.942.946-3.63 1.7-3.754 1.68-.123-.024-1.706-.795-3.52-1.715z"/></svg></span>
-                  <div>
-                    <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Xbox</div>
-                    <div style="font-size:1.15rem; font-weight:700; font-variant-numeric: tabular-nums;">22.776</div>
-                    <div style="font-size:11px; color: var(--tblr-secondary);">Paid: <strong style="color: var(--tblr-body-color, #1e293b);">7.165</strong> &middot; 16% of installs</div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-6 col-lg">
-                <div class="d-flex align-items-start gap-3" style="opacity: 0.5;">
-                  <span class="flex-shrink-0" style="width:56px; height:56px; border-radius:12px; background: rgba(4,32,69,0.05); color: var(--tblr-secondary); display:inline-flex; align-items:center; justify-content:center;"><svg width="28" height="28" viewBox="0 0 550 550" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-label="Nintendo Switch"><g transform="translate(0,550) scale(0.1,-0.1)"><path d="M1365 5154 c-481 -86 -868 -442 -990 -910 -44 -169 -47 -268 -42 -1579 3 -1204 4 -1232 24 -1325 111 -501 467 -858 973 -976 66 -15 150 -18 691 -21 560 -4 618 -3 633 12 15 15 16 208 16 2396 0 1622 -3 2386 -10 2400 -10 18 -27 19 -613 18 -476 -1 -619 -4 -682 -15z m905 -2400 l0 -2026 -407 5 c-375 4 -415 6 -490 25 -322 83 -561 331 -628 654 -22 101 -22 2589 -1 2688 60 281 255 514 518 619 132 53 193 59 621 60 l387 1 0 -2026z"/><path d="M1451 4169 c-63 -12 -159 -60 -210 -105 -105 -91 -157 -220 -149 -372 4 -79 9 -100 41 -164 47 -97 118 -168 215 -216 67 -33 84 -37 171 -40 79 -3 107 0 160 18 217 73 348 284 311 500 -43 257 -287 429 -539 379z"/><path d="M3157 5163 c-4 -3 -7 -1087 -7 -2409 0 -2181 1 -2402 16 -2408 27 -10 803 -6 899 4 406 46 764 293 959 660 25 47 58 126 75 175 63 188 61 138 61 1575 0 1147 -2 1318 -16 1391 -99 521 -496 914 -1018 1004 -70 12 -178 15 -526 15 -240 0 -440 -3 -443 -7z m1068 -2178 c156 -41 284 -160 336 -312 33 -94 32 -232 -1 -318 -61 -158 -181 -269 -335 -310 -250 -65 -516 86 -589 334 -22 76 -21 204 4 282 75 245 335 389 585 324z"/></g></svg></span>
-                  <div>
-                    <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Nintendo</div>
-                    <div style="font-size:1.15rem; font-weight:700; color: var(--tblr-secondary);">&mdash;</div>
-                    <div style="font-size:11px; color: var(--tblr-secondary);">not released on this platform</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- ═══ DAILY INSTALLS ═══ -->
         <div class="card mb-3">
           <div class="card-header py-2 px-3 d-flex align-items-center" style="min-height:auto;">
             <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--tblr-secondary);">Daily Demo Installs</span>
-            <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Day-by-day install chain for the last 14 flight days. All paid installs and CPIs are <strong>cohorted</strong><br>(attributed to the campaign date of the spend that earned them) and mature over the attribution window;<br><strong>eCPI</strong> blends in organic installs. Click any header to sort.</span></span>
+            <span class="info-tip ms-2" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Day-by-day install chain for the last 14 flight days. All paid installs and CPIs are <strong>cohorted</strong><br>(attributed to the campaign date of the spend that earned them) and mature over the attribution window;<br><strong>eCPI</strong> blends in organic installs. Click any header to sort.</span></span>
+            <div class="dropdown ms-auto"><button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" aria-label="Columns" title="Show / hide columns"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></button><div class="dropdown-menu dropdown-menu-end" id="iuDailyColMenu" style="max-height:320px;overflow:auto;"></div></div>
             <div class="dropdown ms-1">
               <button class="btn btn-sm btn-sm-icon dropdown-toggle no-caret" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 11 12 16 17 11"/><line x1="12" y1="4" x2="12" y2="16"/></svg></button>
               <div class="dropdown-menu dropdown-menu-end">
@@ -868,6 +784,7 @@
             <ul class="nav nav-tabs breakdown-tabs mb-0 flex-shrink-0" id="iuBreakdownTabs" role="tablist" style="border-bottom:0;">
               <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#iuTabChannel" role="tab" data-dim="channel">by channel</a></li>
               <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#iuTabMarket" role="tab" data-dim="market">by market</a></li>
+              <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#iuTabPlatform" role="tab" data-dim="platform">by platform</a></li>
             </ul>
             <span class="ms-auto info-tip" style="color: var(--tblr-secondary);"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="tip-text">Cost &rarr; web path &rarr; installs per dimension. Organic sources show dashes for paid metrics.<br>Small-volume rows keep their CPI but the blended eCPI is the honest comparison there.</span></span>
             <div class="dropdown ms-1">
@@ -1202,22 +1119,53 @@
       const canvas = document.getElementById('iuTrendChart');
       const ctx = canvas.getContext('2d');
       const lenses = {
-        cpi:  { idx: 2, axisTitle: 'CPI (€)', fmt: euro2 },
-        ecpi: { idx: 3, axisTitle: 'eCPI (€)', fmt: euro2 },
-        cr:   { idx: 4, axisTitle: 'Demo Install CR (%)', fmt: pct2 },
-        roas: { idx: 5, axisTitle: 'ROAS (×)', fmt: ratio1 },
+        cpi:  { idx: 5, axisTitle: 'CPI (€)', fmt: euro2 },
+        ecpi: { idx: 6, axisTitle: 'eCPI (€)', fmt: euro2 },
+        cr:   { idx: 7, axisTitle: 'Demo Install CR (%)', fmt: pct2 },
+        roas: { idx: 8, axisTitle: 'ROAS (×)', fmt: ratio1 },
       };
       let activeLens = 'cpi';
       const COLORS = [
-        { solid: '#4263eb', light: 'rgba(66,99,235,0.65)' },
-        { solid: '#748ffc', light: 'rgba(116,143,252,0.40)' },
+        { solid: '#15aabf', light: 'rgba(21,170,191,0.78)' },
+        { solid: '#4263eb', light: 'rgba(66,99,235,0.78)' },
+        { solid: '#2fb344', light: 'rgba(47,179,68,0.78)' },
+        { solid: '#66757f', light: 'rgba(102,117,127,0.78)' },
+        { solid: '#adb5bd', light: 'rgba(173,181,189,0.45)' },
         { solid: '#FF0249', light: 'rgba(255,2,73,0.08)' },
         { solid: '#0ca678', light: 'rgba(12,166,120,0.08)' },
         { solid: '#f76707', light: 'rgba(247,103,7,0.08)' },
         { solid: '#845ef7', light: 'rgba(132,94,247,0.08)' },
       ];
-      const seriesData = [dailyPaid, dailyOrg, dCPI, dECPI, dCR, dROAS];
-      const seriesLabels = ['Paid Demo Installs', 'Organic Demo Installs', 'CPI', 'eCPI', 'Demo Install CR', 'ROAS'];
+      const iuTrendFmt = { 'CPI': euro2, 'eCPI': euro2, 'Demo Install CR': pct2, 'ROAS': ratio1 };
+      function iuTrendTip(context){
+        const { chart, tooltip } = context;
+        const el = document.getElementById('iuTrendTooltipEl');
+        if (tooltip.opacity === 0) { el.classList.add('opacity-0'); return; }
+        el.classList.remove('opacity-0');
+        if (tooltip.body) {
+          const d = new Date(tooltip.title[0]);
+          const dateStr = isNaN(d) ? tooltip.title[0] : d.toLocaleDateString('en-US', { day:'numeric', month:'long', year:'numeric' });
+          let html = '<div class="card"><div class="card-body p-2"><div class="fw-bold mb-1">' + dateStr + '</div><hr class="my-1">';
+          let total = 0;
+          tooltip.dataPoints.forEach(dp => {
+            const isLine = dp.dataset.type === 'line';
+            if (!isLine) total += dp.parsed.y;
+            const f = iuTrendFmt[dp.dataset.label] || (v => fmt(v));
+            html += '<div class="tooltip-row"><span class="tooltip-dot" style="background:' + (isLine ? dp.dataset.borderColor : dp.dataset.backgroundColor) + '"></span><span class="tooltip-label text-secondary">' + dp.dataset.label + '</span><span class="tooltip-value">' + f(dp.parsed.y) + '</span></div>';
+          });
+          html += '<hr class="my-1"><div class="tooltip-row"><span class="tooltip-dot" style="background:transparent"></span><span class="tooltip-label fw-bold">Total Demo Installs</span><span class="tooltip-value fw-bold">' + fmt(total) + '</span></div></div></div>';
+          el.innerHTML = html;
+        }
+        const { offsetLeft, offsetTop } = chart.canvas;
+        const tipW = el.offsetWidth;
+        let left = offsetLeft + tooltip.caretX + 14;
+        if (left + tipW > chart.canvas.offsetLeft + chart.width) left = offsetLeft + tooltip.caretX - tipW - 14;
+        el.style.left = left + 'px';
+        el.style.top = (offsetTop + tooltip.caretY - el.offsetHeight / 2) + 'px';
+      }
+      const tSteam = dailyPaid.map(v => Math.round(v*0.58)), tPs = dailyPaid.map(v => Math.round(v*0.21)), tXbox = dailyPaid.map(v => Math.round(v*0.16)), tEpic = dailyPaid.map(v => Math.round(v*0.05));
+      const seriesData = [tSteam, tPs, tXbox, tEpic, dailyOrg, dCPI, dECPI, dCR, dROAS];
+      const seriesLabels = ['Paid Steam Demo Installs', 'Paid PlayStation Demo Installs', 'Paid Xbox Demo Installs', 'Paid Epic Demo Installs', 'Organic Demo Installs', 'CPI', 'eCPI', 'Demo Install CR', 'ROAS'];
       const chart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -1225,18 +1173,18 @@
           datasets: seriesData.map((data, i) => ({
             label: seriesLabels[i],
             data,
-            type: i < 2 ? 'bar' : 'line',
-            stack: i < 2 ? 'inst' : undefined,
+            type: i < 5 ? 'bar' : 'line',
+            stack: i < 5 ? 'inst' : undefined,
             borderColor: COLORS[i].solid,
-            backgroundColor: i < 2 ? COLORS[i].light : 'transparent',
-            borderWidth: i < 2 ? 0 : 2.5,
-            borderDash: i >= 2 ? [4, 3] : undefined,
-            tension: 0.35, pointRadius: 0, pointHoverRadius: i < 2 ? 0 : 5,
+            backgroundColor: i < 5 ? COLORS[i].light : 'transparent',
+            borderWidth: i < 5 ? 0 : 2.5,
+            borderDash: i >= 5 ? [4, 3] : undefined,
+            tension: 0.35, pointRadius: 0, pointHoverRadius: i < 5 ? 0 : 5,
             pointHoverBorderWidth: 2, pointHoverBackgroundColor: '#fff',
-            yAxisID: i < 2 ? 'y' : 'yEff',
-            hidden: i >= 2 && i !== 2,
+            yAxisID: i < 5 ? 'y' : 'yEff',
+            hidden: i >= 5 && i !== 5,
             spanGaps: true,
-            order: i < 2 ? 6 : 1,
+            order: i < 5 ? 6 : 1,
           }))
         },
         plugins: [makeTrendCrosshair('y')],
@@ -1246,10 +1194,7 @@
           interaction: { mode: 'index', intersect: false },
           plugins: {
             legend: { display: false },
-            tooltip: { enabled: false, external: makeTrendTooltip('iuTrendTooltipEl', {
-              'Paid Demo Installs': v => fmt(v), 'Organic Demo Installs': v => fmt(v),
-              'CPI': euro2, 'eCPI': euro2, 'Demo Install CR': pct2, 'ROAS': ratio1,
-            }) }
+            tooltip: { enabled: false, external: iuTrendTip }
           },
           scales: {
             x: { stacked: true, grid: { display: false }, ticks: trendXTicks },
@@ -1259,17 +1204,17 @@
         }
       });
       const legendEl = document.getElementById('iuTrendLegend');
+      const PILL_SHORT = ['Steam', 'PlayStation', 'Xbox', 'Epic', 'Organic'];
       function renderLegend() {
-        const items = [0, 1, lenses[activeLens].idx];
-        legendEl.innerHTML = items.map(i => {
+        legendEl.innerHTML = [0, 1, 2, 3, 4].map(i => {
           const ds = chart.data.datasets[i];
           const hidden = !chart.isDatasetVisible(i);
           const c = COLORS[i];
-          return '<span class="legend-item ' + (hidden ? 'inactive' : '') + '" data-index="' + i + '" data-type="' + (i < 2 ? 'bar' : 'line') + '" title="' + (hidden ? 'Click to show ' : 'Click to hide ') + ds.label + '" style="background:' + (hidden ? 'transparent' : c.light) + '; border-color:' + (hidden ? '#ccc' : c.solid) + '"><span class="legend-swatch" style="background:' + c.solid + '"></span>' + ds.label + '</span>';
+          return '<button type="button" class="trend-pill ' + (hidden ? 'inactive' : '') + '" data-index="' + i + '" title="' + (hidden ? 'Click to show ' : 'Click to hide ') + ds.label + '"><span class="trend-dot" style="background:' + (hidden ? '#ccc' : c.solid) + '"></span>' + PILL_SHORT[i] + '</button>';
         }).join('');
       }
       legendEl.addEventListener('click', e => {
-        const item = e.target.closest('.legend-item');
+        const item = e.target.closest('.trend-pill');
         if (!item) return;
         const idx = parseInt(item.dataset.index);
         chart.setDatasetVisibility(idx, !chart.isDatasetVisible(idx));
@@ -1279,7 +1224,7 @@
         const l = lenses[lens];
         if (!l) return;
         activeLens = lens;
-        [2, 3, 4, 5].forEach(i => chart.setDatasetVisibility(i, i === l.idx));
+        [5, 6, 7, 8].forEach(i => chart.setDatasetVisibility(i, i === l.idx));
         chart.options.scales.yEff.title.text = l.axisTitle;
         chart.update();
         renderLegend();
@@ -1300,7 +1245,7 @@
     })();
 
     // Platform CSV
-    document.getElementById('iuPlatformCsvBtn').addEventListener('click', () => {
+    document.getElementById('iuPlatformCsvBtn')?.addEventListener('click', () => {
       const csv = 'Platform,Paid Demo Installs,Total Demo Installs,Share\nSteam,25972,82563,58%\nEpic Games Store,2239,7117,5%\nPlayStation,9404,29894,21%\nXbox,7165,22776,16%\nNintendo,,,'
       const blob = new Blob([csv], { type: 'text/csv' });
       const link = document.createElement('a');
@@ -1320,6 +1265,7 @@
         const paid = dailyPaid[i], org = dailyOrg[i], tot = dailyTotal[i];
         rows.push({
           date: allLabels[i], cost: dailySpend[i], paid, org, tot,
+          paidSteam: Math.round(paid*0.58), paidEpic: Math.round(paid*0.05), paidPs: Math.round(paid*0.21), paidXbox: Math.round(paid*0.16),
           share: org / tot * 100, cpi: dCPI[i], ecpi: dECPI[i], cr: dCR[i], roas: dROAS[i],
         });
       }
@@ -1327,6 +1273,10 @@
       const cols = [
         { key: 'cost',  head: 'Cost',           fmtFn: euroT, end: true },
         { key: 'paid',  head: 'Paid Demo Installs',  fmtFn: fmt },
+        { key: 'paidSteam', head: 'Paid Steam Demo Installs', fmtFn: fmt },
+        { key: 'paidEpic',  head: 'Paid Epic Demo Installs',  fmtFn: fmt },
+        { key: 'paidPs',    head: 'Paid PlayStation Demo Installs', fmtFn: fmt },
+        { key: 'paidXbox',  head: 'Paid Xbox Demo Installs', fmtFn: fmt },
         { key: 'org',   head: 'Organic Demo Installs', fmtFn: fmt },
         { key: 'share', head: 'Organic Share%', fmtFn: pct1 },
         { key: 'tot',   head: 'Total Demo Installs', fmtFn: fmt, end: true },
@@ -1335,6 +1285,7 @@
         { key: 'cr',    head: 'Demo Install CR%',    fmtFn: pct2 },
         { key: 'roas',  head: 'ROAS',           fmtFn: ratio1 },
       ];
+      const colVisible = {}; for (const c of cols) colVisible[c.key] = true;
       const ascDefault = ['cpi', 'ecpi', 'date'];
       const state = { key: 'date', asc: true };
       const lensColMap = { cpi: 'cpi', ecpi: 'ecpi', cr: 'cr', roas: 'roas' };
@@ -1347,6 +1298,7 @@
           if (key === 'date') return asc ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date);
           return asc ? a[key] - b[key] : b[key] - a[key];
         });
+        const vcols = cols.filter(c => colVisible[c.key] !== false);
         const isMetric = key !== 'date';
         const vals = isMetric ? sorted.map(r => r[key]) : [];
         const minV = Math.min(...vals), maxV = Math.max(...vals), range = maxV - minV || 1;
@@ -1357,13 +1309,13 @@
           return '<th class="' + (k === 'date' ? 'col-geo-label' : 'text-end') + ' sortable' + (active ? ' sort-active' : '') + (extra || '') + '" data-key="' + k + '">' + head + '<span class="sort-icon">' + arrow + '</span></th>';
         };
         let h = '<thead><tr>' + sortTh('date', 'Date');
-        cols.forEach(c => { h += sortTh(c.key, c.head, c.end ? ' group-end' : ''); });
+        vcols.forEach(c => { h += sortTh(c.key, c.head, c.end ? ' group-end' : ''); });
         h += '</tr></thead><tbody>';
         sorted.forEach(r => {
           const norm = isMetric ? (asc ? 1 - (r[key] - minV) / range : (r[key] - minV) / range) : 0;
           const opacity = (0.04 + norm * 0.18).toFixed(2);
           h += '<tr><td class="col-geo-label" style="white-space:nowrap;">' + r.date + '</td>';
-          cols.forEach(c => {
+          vcols.forEach(c => {
             let style = '';
             if (c.key === key && isMetric) style = ' style="background:rgba(116,182,231,' + opacity + ');"';
             else if (c.key === hlKey && key !== hlKey) style = ' style="background:rgba(116,182,231,0.08);"';
@@ -1373,10 +1325,11 @@
         });
         const totRow = {
           cost: t.cost, paid: t.paid, org: t.org, tot: t.tot, share: t.org / t.tot * 100,
+          paidSteam: Math.round(t.paid*0.58), paidEpic: Math.round(t.paid*0.05), paidPs: Math.round(t.paid*0.21), paidXbox: Math.round(t.paid*0.16),
           cpi: t.cost / t.paid, ecpi: t.cost / t.tot, cr: 3.6, roas: 8.0,
         };
         h += '</tbody><tfoot style="position: sticky; bottom: 0; z-index: 1; background: var(--tblr-bg-surface, #fff);"><tr><td class="col-geo-label">Grand Total</td>';
-        cols.forEach(c => { h += '<td class="text-end' + (c.end ? ' group-end' : '') + '">' + c.fmtFn(totRow[c.key]) + '</td>'; });
+        vcols.forEach(c => { h += '<td class="text-end' + (c.end ? ' group-end' : '') + '">' + c.fmtFn(totRow[c.key]) + '</td>'; });
         h += '</tr></tfoot>';
         const table = document.getElementById('iuDailyTable');
         table.innerHTML = h;
@@ -1390,6 +1343,11 @@
         });
       }
       render();
+      (function(){
+        const menu = document.getElementById('iuDailyColMenu'); if (!menu) return;
+        menu.innerHTML = '<div class="dropdown-header" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--tblr-secondary,#626976);">Columns</div>' + cols.map(c => '<label class="dropdown-item d-flex align-items-center gap-2" style="cursor:pointer;"><input type="checkbox" class="form-check-input m-0" data-col="'+c.key+'" '+(colVisible[c.key]?'checked':'')+'> '+c.head+'</label>').join('');
+        menu.querySelectorAll('input[data-col]').forEach(cb => cb.addEventListener('change', () => { colVisible[cb.dataset.col] = cb.checked; render(); }));
+      })();
       document.getElementById('iuDailyCsvBtn').addEventListener('click', () => downloadTableCsv(document.getElementById('iuDailyTable'), 'daily-installs.csv'));
     })();
 
@@ -1407,17 +1365,48 @@
       const actualTotal = actualPaid.map((p, i) => p + dailyOrg[i]);
       const canvas = document.getElementById('iuActualChart');
       const ctx = canvas.getContext('2d');
+      const aSteam = actualPaid.map(v => Math.round(v*0.58)), aPs = actualPaid.map(v => Math.round(v*0.21)), aXbox = actualPaid.map(v => Math.round(v*0.16)), aEpic = actualPaid.map(v => Math.round(v*0.05));
       const C = [
-        { solid: '#4263eb', light: 'rgba(66,99,235,0.65)' },
-        { solid: '#748ffc', light: 'rgba(116,143,252,0.40)' },
+        { solid: '#15aabf', light: 'rgba(21,170,191,0.78)' },
+        { solid: '#4263eb', light: 'rgba(66,99,235,0.78)' },
+        { solid: '#2fb344', light: 'rgba(47,179,68,0.78)' },
+        { solid: '#66757f', light: 'rgba(102,117,127,0.78)' },
+        { solid: '#adb5bd', light: 'rgba(173,181,189,0.45)' },
       ];
+      function iuActualTip(context){
+        const { chart, tooltip } = context;
+        const el = document.getElementById('iuActualTooltipEl');
+        if (tooltip.opacity === 0) { el.classList.add('opacity-0'); return; }
+        el.classList.remove('opacity-0');
+        if (tooltip.body) {
+          const d = new Date(tooltip.title[0]);
+          const dateStr = isNaN(d) ? tooltip.title[0] : d.toLocaleDateString('en-US', { day:'numeric', month:'long', year:'numeric' });
+          let html = '<div class="card"><div class="card-body p-2"><div class="fw-bold mb-1">' + dateStr + '</div><hr class="my-1">';
+          let total = 0;
+          tooltip.dataPoints.forEach(dp => {
+            total += dp.parsed.y;
+            html += '<div class="tooltip-row"><span class="tooltip-dot" style="background:' + dp.dataset.backgroundColor + '"></span><span class="tooltip-label text-secondary">' + dp.dataset.label + '</span><span class="tooltip-value">' + fmt(dp.parsed.y) + '</span></div>';
+          });
+          html += '<hr class="my-1"><div class="tooltip-row"><span class="tooltip-dot" style="background:transparent"></span><span class="tooltip-label fw-bold">Total Demo Installs</span><span class="tooltip-value fw-bold">' + fmt(total) + '</span></div></div></div>';
+          el.innerHTML = html;
+        }
+        const { offsetLeft, offsetTop } = chart.canvas;
+        const tipW = el.offsetWidth;
+        let left = offsetLeft + tooltip.caretX + 14;
+        if (left + tipW > chart.canvas.offsetLeft + chart.width) left = offsetLeft + tooltip.caretX - tipW - 14;
+        el.style.left = left + 'px';
+        el.style.top = (offsetTop + tooltip.caretY - el.offsetHeight / 2) + 'px';
+      }
       const chart = new Chart(ctx, {
         type: 'bar',
         data: {
           labels: allLabels,
           datasets: [
-            { label: 'Paid Demo Installs (arrived)', data: actualPaid, backgroundColor: C[0].light, stack: 'a' },
-            { label: 'Organic Demo Installs', data: dailyOrg, backgroundColor: C[1].light, stack: 'a' },
+            { label: 'Paid Steam Demo Installs', data: aSteam, backgroundColor: C[0].light, stack: 'a' },
+            { label: 'Paid PlayStation Demo Installs', data: aPs, backgroundColor: C[1].light, stack: 'a' },
+            { label: 'Paid Xbox Demo Installs', data: aXbox, backgroundColor: C[2].light, stack: 'a' },
+            { label: 'Paid Epic Demo Installs', data: aEpic, backgroundColor: C[3].light, stack: 'a' },
+            { label: 'Organic Demo Installs', data: dailyOrg, backgroundColor: C[4].light, stack: 'a' },
           ]
         },
         plugins: [makeTrendCrosshair('y')],
@@ -1427,13 +1416,11 @@
           interaction: { mode: 'index', intersect: false },
           plugins: {
             legend: { display: false },
-            tooltip: { enabled: false, external: makeTrendTooltip('iuActualTooltipEl', {
-              'Paid Demo Installs (arrived)': v => fmt(v), 'Organic Demo Installs': v => fmt(v),
-            }) }
+            tooltip: { enabled: false, external: iuActualTip }
           },
           scales: {
             x: { stacked: true, grid: { display: false }, ticks: trendXTicks },
-            y: { stacked: true, position: 'left', min: 0, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 }, color: '#999', callback: v => compact(v) }, title: { display: true, text: 'Demo installs on this date', font: { size: 12 } } },
+            y: { stacked: true, position: 'left', min: 0, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 }, color: '#999', callback: v => compact(v) }, title: { display: true, text: 'Installs on this date', font: { size: 12 } } },
           }
         }
       });
@@ -1488,6 +1475,24 @@
           { label: 'JP', flag: 'jp', color: '#ae3ec9', cost: 9200,  webv: 64000,  webc: 14100,  paid: 1790,  org: 4570 },
           { label: 'KR', flag: 'kr', color: '#e8590c', cost: 8100,  webv: 58000,  webc: 12800,  paid: 2240,  org: 3800 },
         ]
+      },
+      platform: {
+        labelHead: 'Platform',
+        noCost: true,
+        groups: { inst: 'Installs' },
+        cols: [
+          { key: 'paid',  head: 'Paid Demo Installs',    group: 'inst', fmtFn: fmt },
+          { key: 'org',   head: 'Organic Demo Installs', group: 'inst', fmtFn: fmt },
+          { key: 'tot',   head: 'Total Demo Installs',   group: 'inst', fmtFn: fmt },
+          { key: 'share', head: 'Organic Share%',   group: 'inst', fmtFn: pct1 },
+        ],
+        rows: [
+          { label: 'Steam',            color: '#1b2838', cost: 93499, webv: null, webc: null, paid: 25972, org: 56591 },
+          { label: 'PlayStation',      color: '#2e6db4', cost: 46080, webv: null, webc: null, paid: 9404,  org: 20490 },
+          { label: 'Xbox',             color: '#107c10', cost: 37258, webv: null, webc: null, paid: 7165,  org: 15611 },
+          { label: 'Epic Games Store', color: '#2a2a2a', cost: 8732,  webv: null, webc: null, paid: 2239,  org: 4878 },
+          { label: 'Nintendo',         color: '#9aa4b0', cost: null,  webv: null, webc: null, paid: null,  org: null },
+        ]
       }
     };
     const IU_ARPI = 33; // modelled avg net revenue per paid install (€) — keeps ROAS = ARPI / CPI coherent
@@ -1499,6 +1504,7 @@
         r.cpi   = (r.cost && r.paid) ? r.cost / r.paid : null;
         r.ecpi  = (r.cost && r.tot) ? r.cost / r.tot : null;
         r.roas  = r.cpi ? IU_ARPI / r.cpi : null;
+        r.share = (r.org != null && r.tot) ? r.org / r.tot * 100 : null;
       });
     });
     const iuCols = [
@@ -1515,7 +1521,7 @@
     ];
     const iuGroups = { web: 'Web Path', inst: 'Installs' };
     const iuAscDefault = ['cpa', 'cpi', 'ecpi'];
-    const iuSortState = { channel: { key: 'cpi', asc: true }, market: { key: 'cpi', asc: true } };
+    const iuSortState = { channel: { key: 'cpi', asc: true }, market: { key: 'cpi', asc: true }, platform: { key: 'tot', asc: false } };
     const iuCharts = {};
 
     function iuDoughnutTooltip(tooltipElId, metric, fmtFn) {
@@ -1544,7 +1550,7 @@
 
     (function() {
       const panes = document.getElementById('iuBreakdownPanes');
-      const paneIds = { channel: 'iuTabChannel', market: 'iuTabMarket' };
+      const paneIds = { channel: 'iuTabChannel', market: 'iuTabMarket', platform: 'iuTabPlatform' };
       Object.keys(iuDims).forEach((dim, i) => {
         const pane = document.createElement('div');
         pane.className = 'tab-pane' + (i === 0 ? ' active' : '');
@@ -1554,22 +1560,25 @@
           '<div class="row align-items-center">' +
           '  <div class="col-lg-3"><div style="position: relative; height: 220px;"><canvas id="iuChart-' + dim + '"></canvas><div id="iuTooltip-' + dim + '" class="chart-tooltip opacity-0"></div></div></div>' +
           '  <div class="col-lg-9"><div class="table-responsive geo-scroll-5 geo-hscroll"><table class="table wt mb-0 wt-sticky-head wt-freeze-first" id="iuTable-' + dim + '"></table></div></div>' +
-          '</div>';
+          '</div>' + (dim === 'platform'
+            ? '<div class="d-flex align-items-start gap-2 mt-2" style="font-size:11px; color: var(--tblr-secondary,#626976); line-height:1.5;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0" style="margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><div>Installs are native per storefront (paid + organic). Cost-per-install and web-path metrics aren&rsquo;t shown by platform &mdash; media spend isn&rsquo;t bought per platform, so a per-platform CPI would be <strong>modelled, not measured</strong>. Use the by-channel / by-market tabs for efficiency.</div></div>'
+            : '');
         panes.appendChild(pane);
       });
     })();
 
-    function iuGroupEnds() {
-      const ends = new Set(['cost']);
-      ['web', 'inst'].forEach(g => {
-        const cols = iuCols.filter(c => c.group === g);
-        ends.add(cols[cols.length - 1].key);
-      });
+    function iuGroupEnds(COLS, GROUPS) {
+      const ends = new Set();
+      if (COLS.some(c => c.key === 'cost')) ends.add('cost');
+      Object.keys(GROUPS).forEach(g => { const cs = COLS.filter(c => c.group === g); if (cs.length) ends.add(cs[cs.length - 1].key); });
       return ends;
     }
 
     function iuRenderTable(dim) {
       const { key, asc } = iuSortState[dim];
+      const COLS = iuDims[dim].cols || iuCols;
+      const GROUPS = iuDims[dim].groups || iuGroups;
+      const noCost = !!iuDims[dim].noCost;
       const isText = key === 'label';
       const rows = [...iuDims[dim].rows].sort((a, b) => {
         const av = a[key], bv = b[key];
@@ -1581,18 +1590,18 @@
       });
       const vals = isText ? [] : rows.map(r => r[key]).filter(v => v != null);
       const minV = Math.min(...vals), maxV = Math.max(...vals), range = maxV - minV || 1;
-      const ends = iuGroupEnds();
+      const ends = iuGroupEnds(COLS, GROUPS);
       const st = iuSortState[dim];
       const groupCounts = {};
-      iuCols.forEach(c => { if (c.group) groupCounts[c.group] = (groupCounts[c.group] || 0) + 1; });
+      COLS.forEach(c => { if (c.group) groupCounts[c.group] = (groupCounts[c.group] || 0) + 1; });
       let h = '<thead><tr class="th-group">';
       h += '<th rowspan="2" class="col-geo-label sortable' + (st.key === 'label' ? ' sort-active' : '') + '" data-key="label">' + iuDims[dim].labelHead + '<span class="sort-icon">' + (st.key === 'label' && !st.asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
-      h += '<th rowspan="2" class="text-end sortable group-end' + (st.key === 'cost' ? ' sort-active' : '') + '" data-key="cost">Cost<span class="sort-icon">' + (st.key === 'cost' && !st.asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
-      Object.keys(iuGroups).forEach((g, gi, arr) => {
-        h += '<th colspan="' + groupCounts[g] + '" class="text-center th-group-label' + (gi < arr.length - 1 ? ' group-end' : '') + '">' + iuGroups[g] + '</th>';
+      if (!noCost) h += '<th rowspan="2" class="text-end sortable group-end' + (st.key === 'cost' ? ' sort-active' : '') + '" data-key="cost">Cost<span class="sort-icon">' + (st.key === 'cost' && !st.asc ? '&#x25BC;' : '&#x25B2;') + '</span></th>';
+      Object.keys(GROUPS).forEach((g, gi, arr) => {
+        h += '<th colspan="' + groupCounts[g] + '" class="text-center th-group-label' + (gi < arr.length - 1 ? ' group-end' : '') + '">' + GROUPS[g] + '</th>';
       });
       h += '</tr><tr>';
-      iuCols.forEach(c => {
+      COLS.forEach(c => {
         if (!c.group) return;
         const active = st.key === c.key;
         const arrow = active && !st.asc ? '&#x25BC;' : '&#x25B2;';
@@ -1607,7 +1616,7 @@
         const dot = '<span class="d-inline-block rounded-circle me-2" style="width:10px; height:10px; background:' + r.color + '; vertical-align:middle;"></span>';
         const flag = r.flag ? '<span class="flag flag-' + r.flag + ' me-1"></span>' : '';
         h += '<tr><td class="col-geo-label" style="white-space:nowrap;">' + dot + flag + r.label + '</td>';
-        iuCols.forEach(c => {
+        COLS.forEach(c => {
           const v = r[c.key];
           const hl = (c.key === key && !isText) ? ' style="background:rgba(116,182,231,' + opacity + ');' + bold + '"' : '';
           h += '<td class="text-end' + (ends.has(c.key) ? ' group-end' : '') + '"' + hl + '>' + (v == null ? '<span class="text-secondary">&mdash;</span>' : c.fmtFn(v)) + '</td>';
@@ -1628,7 +1637,7 @@
       });
       const additive = ['cost', 'webv', 'webc', 'paid', 'org', 'tot'];
       const pieKey = additive.includes(key) ? key : 'tot';
-      const cm = iuCols.find(c => c.key === pieKey);
+      const cm = COLS.find(c => c.key === pieKey) || iuCols.find(c => c.key === pieKey);
       const chart = iuCharts[dim];
       if (chart) {
         const chartRows = rows.filter(r => r[pieKey] != null && r[pieKey] > 0);
@@ -1813,10 +1822,10 @@
         { label: 'AU', iso: 'AU', paid: 1800,  org: 3700,  w: { steam: 0.52, epic: 0.05, ps: 0.25, xbox: 0.18 } },
       ];
       const PLATFORMS = [
-        { key: 'steam', label: 'Steam Paid', color: '#15aabf' },
-        { key: 'epic',  label: 'Epic Paid',  color: '#66757f' },
-        { key: 'ps',    label: 'PS Paid',    color: '#4263eb' },
-        { key: 'xbox',  label: 'Xbox Paid',  color: '#2fb344' },
+        { key: 'steam', label: 'Paid Steam Demo Installs', color: '#15aabf' },
+        { key: 'epic',  label: 'Paid Epic Demo Installs',  color: '#66757f' },
+        { key: 'ps',    label: 'Paid PlayStation Demo Installs',    color: '#4263eb' },
+        { key: 'xbox',  label: 'Paid Xbox Demo Installs',  color: '#2fb344' },
       ];
       const series = PLATFORMS.map(p => GEO.map(g => Math.round(g.paid * g.w[p.key])));
       const orgSeries = GEO.map(g => g.org);
