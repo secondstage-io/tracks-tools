@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRACKS Integration</title>
+<!-- Real Tabler Core 1.4.0 (matches the app: @tabler/core) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/css/tabler.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+  /* Mirrors app/javascript/entrypoints/application.sass overrides only */
+  :root{
+    --tblr-font-sans-serif:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --tblr-primary:#FF0249;--tblr-primary-rgb:255,2,73;
+  }
+  header.main-navbar{background:var(--tblr-primary);box-shadow:none}
+  .card.constrained{max-width:1000px;margin:0 auto}
+  /* prototype-only helpers (not visual styling — interaction affordances) */
+  .ip-mod-head{cursor:pointer}
+  .ip-chev{transition:transform .15s}
+  .ip-mod.open .ip-chev{transform:rotate(90deg)}
+  .ip-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .ip-goal{cursor:pointer;transition:border-color .15s,background .15s}
+  .ip-goal:hover{border-color:#cbd5e1}
+  .ip-goal.ip-on{border-color:var(--tblr-primary);background:rgba(var(--tblr-primary-rgb),.04)}
+  .ip-cb{width:1.35rem;height:1.35rem;flex:0 0 auto}
+  .ip-info,.ip-info:hover,.ip-info:focus{color:#94a3b8;text-decoration:none!important;transition:color .15s}
+  .ip-info:hover{color:var(--tblr-primary)}
+</style>
+</head>
+<body class="layout-fluid">
+<div class="page">
+
+  <!-- ░░ Primary navbar (app/views/layouts/application.html.erb) ░░ -->
+  <header class="navbar navbar-expand-md d-print-none main-navbar" data-bs-theme="dark">
+    <div class="container-xl">
+      <div class="navbar-brand pe-0 pe-md-3">
+        <a href="#" class="text-white fw-bolder fs-3 text-decoration-none" style="letter-spacing:1px">&#9670; TRACKS</a>
+      </div>
+      <div class="navbar-nav flex-row order-md-last">
+        <div class="nav-item dropdown">
+          <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
+            <span class="avatar avatar-sm" style="background:rgba(255,255,255,.2);color:#fff">DU</span>
+            <div class="d-none d-xl-block ps-2"><div>Demo User</div><div class="mt-1 small text-white-50">demo@enshrouded.com</div></div>
+          </a>
+          <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow" data-bs-theme="light">
+            <a class="dropdown-item" href="#">Profile</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Sign Out</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ░░ Secondary navigation ░░ -->
+  <header class="navbar-expand-md">
+    <div class="collapse navbar-collapse" id="navbar-menu">
+      <div class="navbar">
+        <div class="container-xl">
+          <div class="row flex-fill align-items-center"><div class="col">
+            <ul class="navbar-nav main-navigation">
+              <li class="nav-item active"><a class="nav-link" href="#"><span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-device-gamepad-2"></i></span><span class="nav-link-title">Dashboard</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="#"><span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-chart-funnel"></i></span><span class="nav-link-title">Attribution Tracking</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="#"><span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-article"></i></span><span class="nav-link-title">FAQ</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="#"><span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-book-2"></i></span><span class="nav-link-title">Glossary</span></a></li>
+              <li class="nav-item"><a class="nav-link" href="#"><span class="nav-link-icon d-md-none d-lg-inline-block"><i class="ti ti-file-code-2"></i></span><span class="nav-link-title">Documentation</span></a></li>
+            </ul>
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-wrapper">
+    <!-- ░░ Page header ░░ -->
+    <div class="page-header d-print-none">
+      <div class="container-xl">
+        <div class="row g-2 align-items-center"><div class="col">
+          <div class="page-pretitle"><a href="#" class="text-secondary text-decoration-none">Enshrouded</a></div>
+          <h2 class="page-title">TRACKS Integration</h2>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- ░░ Page body ░░ -->
+    <div class="page-body">
+      <div class="container-xl">
+
+        <!-- subpage_wrapper: .row > .card.constrained > .card-img-top hero > .card-body -->
+        <div class="row">
+          <div class="card constrained">
+            <div class="card-img-top" style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 45%,#0f3460 100%);height:240px">
+              <div class="d-flex flex-column justify-content-end h-100 p-4" style="background:linear-gradient(transparent,rgba(0,0,0,.7))">
+                <h1 class="text-white mb-1">TRACKS Integration: Enshrouded</h1>
+                <p class="text-white opacity-75 mb-0">Set up TRACKS around the outcomes that matter to your game. We map the work, track every step, and show only the setup you actually need.</p>
+              </div>
+            </div>
+
+            <div class="card-body game-subpage-content">
+
+              <!-- ═══ INTRO ═══ -->
+              <p class="text-secondary mb-4">Get TRACKS live for your game, step by step. This plan shows what to set up for the outcomes you care about, who does what, and how far along you are. For deeper detail on any step, see the <a href="https://documentation.secondstage.io" target="_blank" rel="noopener">TRACKS documentation <i class="ti ti-external-link"></i></a>.</p>
+
+              <!-- ═══ START HERE / GOALS ═══ -->
+              <div id="foundationSlot"></div>
+              <div class="mb-2"><span class="h3">What do you want to measure?</span></div>
+              <p class="text-secondary">Pick the outcomes that matter to your game and we'll build your plan &mdash; TRACKS shows only the setup your selection needs (shared steps are done once).</p>
+              <div class="row g-2 mb-2" id="goals"></div>
+              <div class="d-flex align-items-center gap-3 mb-4 small text-secondary">
+                <span><span class="fw-bold text-dark" id="goalCount">0</span> goals selected</span>
+                <span>&middot;</span>
+                <a href="#" class="link-secondary" id="selectAll">Select all</a>
+                <a href="#" class="link-secondary" id="clearAll">Clear</a>
+              </div>
+
+              <!-- ═══ 02 · SETUP ═══ -->
+              <div class="mb-2"><span class="h3">Let's get you set up</span></div>
+              <p class="text-secondary" id="setupSub">Your modules and their live status. Expand any module to see its steps.</p>
+
+              <div class="card card-sm mb-3">
+                <div class="card-body">
+                  <div class="row align-items-center">
+                    <div class="col-auto"><span class="h1 m-0" id="ovPct">0%</span><div class="small text-secondary">your part done</div></div>
+                    <div class="col">
+                      <div class="fw-bold" id="ovT1">Pick your goals to scope the plan</div>
+                      <div class="text-secondary small mb-2" id="ovT2">Until then, all modules are shown.</div>
+                      <div class="progress progress-sm"><div class="progress-bar" id="ovBar" style="width:0%"></div></div>
+                    </div>
+                    <div class="col-auto text-end ps-3" id="ovDeadlines"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="modules"></div>
+
+              <!-- legend -->
+              <div class="d-flex flex-wrap gap-3 mt-3 pt-3 border-top small text-secondary">
+                <span><span class="ip-dot bg-green me-1"></span>Completed</span>
+                <span><span class="ip-dot bg-yellow me-1"></span>In progress</span>
+                <span><span class="ip-dot bg-red me-1"></span>Blocked</span>
+                <span><span class="ip-dot bg-secondary me-1"></span>Not started</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ░░ Footer ░░ -->
+    <footer class="footer footer-transparent d-print-none">
+      <div class="container-xl"><div class="row text-secondary small"><div class="col-12 text-center py-3">
+        &copy; 2026 Second Stage GmbH. All rights reserved. &middot; TRACKS Integration prototype
+      </div></div></div>
+    </footer>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.4.0/dist/js/tabler.min.js"></script>
+<script>
+// ════════ DATA ════════
+const MODULES = [
+  {id:'cloud', name:'Google Cloud Project', foundation:true, note:'Required foundation for your entire TRACKS dashboard — set this up first', steps:[
+    {t:'Create Google Cloud project & enable billing', who:'you', s:'completed', dur:'20 min'},
+    {t:'Grant analytics@secondstage.io Owner access (IAM)', who:'you', s:'completed', dur:'5 min'},
+    {t:'Add branded-domain DNS records (TXT + CNAME)', who:'you', s:'completed', dur:'15 min', doc:'https://documentation.secondstage.io/platform/domains/'},
+    {t:'Deploy measurement microservices & verify domain', who:'ss', s:'completed', dur:'1–2 d'},
+  ]},
+  {id:'landing', name:'Landing Page', note:'Web visits & organic traffic', steps:[
+    {t:'Add Google Tag Manager + grant Publish access', who:'you', s:'blocked', dur:'30 min', doc:'https://documentation.secondstage.io/platform/landingpages/#google-tag-manager-integration-access'},
+    {t:'Add Google Analytics 4 + grant Editor access', who:'you', s:'blocked', dur:'30 min', doc:'https://documentation.secondstage.io/platform/landingpages/#google-analytics-integration-access'},
+    {t:'Deploy TRACKS snippet & configure GA4 key events', who:'ss', s:'notstarted', dur:'1 d'},
+  ]},
+  {id:'steam', name:'Steamworks', note:'Steam wishlist & traffic attribution', steps:[
+    {t:'Invite analytics@secondstage.io in Steamworks', who:'you', s:'completed', dur:'5 min'},
+    {t:'Connect Steam marketing data & storefront UTMs', who:'ss', s:'completed', dur:'1 d'},
+  ]},
+  {id:'media', name:'Media Channels', note:'Campaign performance across ad platforms', steps:[
+    {t:'Grant ad-account access & complete project overview', who:'you', s:'inprogress', dur:'30 min'},
+    {t:'Set up campaign naming conventions', who:'you', s:'inprogress', dur:'½ d', doc:'https://documentation.secondstage.io/support/adopshelper/'},
+    {t:'Build tracking links (Influencer / Organic / Media Houses)', who:'you', s:'inprogress', dur:'2–3 d', doc:'https://documentation.secondstage.io/support/trackinglinks/'},
+    {t:'Connect platform data & prepare link templates', who:'ss', s:'notstarted', dur:'1 d'},
+  ]},
+  {id:'inflinks', name:'Influencer & Direct Buy', note:'Tracking links for influencer & direct-buy deals', steps:[
+    {t:'Build tracking links (Influencer / Media Houses)', who:'you', s:'notstarted', dur:'2–3 d', doc:'https://documentation.secondstage.io/support/trackinglinks/'},
+    {t:'Prepare your link-builder templates', who:'ss', s:'notstarted', dur:'1 d'},
+  ]},
+  {id:'attribution', name:'Attribution', note:'Installs & in-game events', dependsOn:'cloud', steps:[
+    {t:'Integrate the /measure endpoint', who:'you', s:'blocked', dur:'1–3 h', doc:'https://documentation.secondstage.io/attribution/measurementapi/'},
+    {t:'Send game_open / session_start events', who:'you', s:'blocked', dur:'1–3 d', doc:'https://documentation.secondstage.io/attribution/overview/'},
+    {t:'Run end-to-end attribution testing', who:'ss', s:'notstarted', dur:'1 d'},
+  ]},
+  {id:'postbacks', name:'Postbacks', note:'Send conversions back to your ad platforms', dependsOn:'landing', steps:[
+    {t:'Grant editor access to each Events / Dataset manager', who:'you', s:'blocked', dur:'15 min'},
+    {t:'Configure Conversion API postbacks', who:'ss', s:'notstarted', dur:'1–2 d'},
+  ]},
+  {id:'brand', name:'Brand Health', note:'Share of voice vs. one competitor', steps:[
+    {t:'Add one competitor title (game + optional Steam ID)', who:'you', s:'notstarted', dur:'5 min', auto:true},
+    {t:'Set up share-of-voice tracking', who:'ss', s:'notstarted', dur:'1 d'},
+  ]},
+];
+
+const GOALS = [
+  {id:'campaign',   label:'Performance Media',       desc:'Spend → results across all ad channels',        icon:'ti-speakerphone', mods:{cloud:'req',media:'req'}},
+  {id:'influencer', label:'Influencer & Direct Buy', desc:'Which influencers & direct buys drive results', icon:'ti-user-star',    mods:{cloud:'req',attribution:'req',inflinks:'req'}},
+  {id:'wishlist',   label:'Wishlist tracking',       desc:'Which campaigns drive Steam wishlists',         icon:'ti-heart',        mods:{cloud:'req',steam:'req',media:'req',landing:'opt'}},
+  {id:'installs',   label:'Install tracking',        desc:'Which campaigns drive demo or game installs',   icon:'ti-download',     mods:{cloud:'req',media:'req',attribution:'req'}},
+  {id:'website',    label:'Website Analytics',       desc:'Visits, organic & landing-page conversions',    icon:'ti-world',        mods:{cloud:'req',landing:'req',media:'opt'}},
+  {id:'brand',      label:'Brand health',            desc:'Share of voice vs. a competitor title',         icon:'ti-radar',        mods:{brand:'req'}},
+  {id:'ingame',     label:'In-game conversions',     desc:'DLC, cosmetics and other in-game events',       icon:'ti-coin',         mods:{cloud:'req',media:'req',attribution:'req'}},
+  {id:'autoopt',    label:'Postback Conversions',    desc:'Feed conversions back to the ad platforms',     icon:'ti-rocket',       mods:{cloud:'req',media:'req',attribution:'req',postbacks:'req'}},
+];
+
+// Tabler class maps
+const MOD_BADGE  = {done:['Done','bg-green-lt'],inprogress:['In progress','bg-yellow-lt'],blocked:['Blocked','bg-red-lt'],notstarted:['Not started','bg-secondary-lt']};
+const MOD_STATUS = {done:'bg-green',inprogress:'bg-yellow',blocked:'bg-red',notstarted:'bg-secondary'};
+const STEP_BADGE = {completed:['Completed','bg-green-lt'],inprogress:['In progress','bg-yellow-lt'],blocked:['Blocked','bg-red-lt'],notstarted:['Not started','bg-secondary-lt']};
+const STEP_DOT   = {completed:'bg-green',inprogress:'bg-yellow',blocked:'bg-red',notstarted:'bg-secondary'};
+// Documentation deep-links per module (documentation.secondstage.io)
+const DOC = {
+  cloud:'https://documentation.secondstage.io/platform/cloud/',
+  landing:'https://documentation.secondstage.io/platform/landingpages/',
+  steam:'https://documentation.secondstage.io/platform/steamworks/',
+  media:'https://documentation.secondstage.io/platform/mediachannels/',
+  inflinks:'https://documentation.secondstage.io/support/trackinglinks/',
+  attribution:'https://documentation.secondstage.io/platform/attribution/',
+  postbacks:'https://documentation.secondstage.io/attribution/postbacks/',
+};
+// per-goal documentation link (points at the most relevant section; refine slugs as needed)
+const GOAL_DOC = {
+  campaign:DOC.media, influencer:DOC.attribution, wishlist:DOC.steam, installs:DOC.attribution,
+  website:DOC.landing, ingame:DOC.attribution, autoopt:DOC.postbacks,
+};
+
+const selected = new Set(), open = new Set();  // start empty — client picks their goals
+let bhVal = '', bhSteam = '', bhKeywords = [];
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+const modStatus = m => {
+  if(m.steps.some(s=>s.s==='blocked')) return 'blocked';
+  const total=m.steps.length, done=m.steps.filter(s=>s.s==='completed').length;
+  if(done===total) return 'done';
+  if(done>0 || m.steps.some(s=>s.s==='inprogress')) return 'inprogress';
+  return 'notstarted';
+};
+const modDone = m => ({done:m.steps.filter(s=>s.s==='completed').length, total:m.steps.length});
+const doneYou = m => { const a=m.steps.filter(s=>s.who==='you'); return {done:a.filter(s=>s.s==='completed').length,total:a.length}; };
+const doneSS  = m => { const a=m.steps.filter(s=>s.who==='ss');  return {done:a.filter(s=>s.s==='completed').length,total:a.length}; };
+// sort key: 0 = needs attention (blocked/overdue), 1 = in progress, 2 = not started, 3 = done
+function modAttention(m){
+  if(m.steps.some(s=>s.s==='blocked') || m.steps.some(s=>dlFlag(s)==='overdue')) return 0;
+  const st=modStatus(m); return st==='inprogress'?1:st==='notstarted'?2:3;
+}
+// name of an unfinished prerequisite module, or '' if none / already done
+function depName(m){ if(!m.dependsOn) return ''; const d=MODULES.find(x=>x.id===m.dependsOn); return (d&&modStatus(d)!=='done')?d.name:''; }
+
+const isoOffset = n => { const d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); };
+// classify a step's deadline: 'overdue' | 'soon' (<=7 days) | '' . Completed / undated steps never flag.
+function dlFlag(s){
+  if(s.s==='completed' || !s.dl) return '';
+  const t=new Date(); t.setHours(0,0,0,0);
+  const days=Math.round((new Date(s.dl+'T00:00:00')-t)/86400000);
+  if(days<0) return 'overdue';
+  if(days<=7) return 'soon';
+  return '';
+}
+function setDeadline(mid,idx,val){ const m=MODULES.find(x=>x.id===mid); if(!m) return; m.steps[idx].dl=val; renderModules(); renderOverall(); }
+
+// one step row. "You" steps get a colour-coded status pill + editable deadline; "Second Stage" steps are read-only.
+function stepRow(s, m, i){
+  const _d = s.doc || DOC[m.id];
+  const guide = (s.who==='ss' || !_d) ? '' : `<a href="${_d}" target="_blank" rel="noopener" class="link-secondary ms-1" title="Open guide"><i class="ti ti-external-link"></i></a>`;
+  const [slab,scls] = STEP_BADGE[s.s];
+  const flag = dlFlag(s);
+  const flagBadge = flag==='overdue'?`<div><span class="badge bg-red-lt mt-1">Overdue</span></div>`
+                  : flag==='soon'?`<div><span class="badge bg-yellow-lt mt-1">Due soon</span></div>`:'';
+  const dlCell = s.who==='you'
+    ? `<input type="date" class="form-control form-control-sm ${flag==='overdue'?'border-danger':flag==='soon'?'border-warning':''}" style="width:150px" value="${s.dl||''}" onchange="setDeadline('${m.id}',${i},this.value)">${flagBadge}`
+    : (s.dl?`<span class="text-secondary small">${s.dl}</span>`:`<span class="text-secondary">&mdash;</span>`);
+  let ctrl;
+  if(s.who==='ss'){
+    ctrl = `<span class="badge ${scls}">${slab}</span>`;
+  } else {
+    const items = ['completed','inprogress','blocked','notstarted']
+      .map(v=>`<button type="button" class="dropdown-item" onclick="setStep('${m.id}',${i},'${v}')"><span class="ip-dot ${STEP_DOT[v]} me-2"></span>${STEP_BADGE[v][0]}</button>`).join('');
+    ctrl = `<span class="dropdown">
+        <button type="button" class="badge ${scls} border-0 dropdown-toggle" data-bs-toggle="dropdown" style="cursor:pointer">${slab}</button>
+        <div class="dropdown-menu dropdown-menu-end">${items}</div>
+      </span>`;
+  }
+  return `<tr>
+    <td class="w-1"><span class="ip-dot ${STEP_DOT[s.s]}"></span></td>
+    <td>${s.t} ${guide}</td>
+    <td class="w-1 text-nowrap text-secondary">${s.dur}</td>
+    <td class="w-1 text-nowrap">${dlCell}</td>
+    <td class="w-1 text-nowrap text-end">${ctrl}</td>
+  </tr>`;
+}
+
+function neededMap(){
+  const map={};
+  selected.forEach(gid=>{const g=GOALS.find(x=>x.id===gid);for(const k in g.mods){if(map[k]!=='req')map[k]=g.mods[k];}});
+  // pull each needed module's prerequisite into scope as required — show the module rather than badging it
+  let changed=true;
+  while(changed){ changed=false;
+    Object.keys(map).forEach(mid=>{ const m=MODULES.find(x=>x.id===mid);
+      if(m&&m.dependsOn&&map[m.dependsOn]!=='req'){ map[m.dependsOn]='req'; changed=true; } });
+  }
+  return map;
+}
+
+function renderGoals(){
+  document.getElementById('goals').innerHTML = GOALS.map(g=>`
+    <div class="col-12 col-md-6">
+      <div class="ip-goal card h-100 mb-0 ${selected.has(g.id)?'ip-on':''}" data-g="${g.id}" role="button" tabindex="0">
+        <div class="card-body d-flex align-items-center p-3">
+          <input class="form-check-input ip-cb me-3" type="checkbox" ${selected.has(g.id)?'checked':''} tabindex="-1" style="pointer-events:none">
+
+          <i class="ti ${g.icon} fs-2 me-3 text-secondary"></i>
+          <div class="flex-fill">
+            <div class="fw-bold">${g.label}</div>
+            <div class="text-secondary small">${g.desc}</div>
+          </div>
+          ${GOAL_DOC[g.id]?`<a href="${GOAL_DOC[g.id]}" target="_blank" rel="noopener" class="ip-info ms-2" title="Learn more about ${g.label} in the docs" onclick="event.stopPropagation()"><i class="ti ti-info-circle fs-3"></i></a>`:''}
+        </div>
+      </div>
+    </div>`).join('');
+  document.querySelectorAll('#goals .ip-goal').forEach(el=>{
+    const toggle=()=>{const id=el.dataset.g; selected.has(id)?selected.delete(id):selected.add(id); sync();};
+    el.onclick=toggle;
+    el.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();} };
+  });
+}
+
+function renderModules(){
+  const need=neededMap(), none=selected.size===0;
+  const cardHtml = m => {
+    const req=need[m.id];
+    const st=modStatus(m), yp=doneYou(m), sp=doneSS(m);
+    const ypct = yp.total?Math.round(yp.done/yp.total*100):0;
+    const [blab,bcls]=MOD_BADGE[st];
+    const tag = m.foundation
+      ? `<span class="badge bg-pink-lt ms-2">Always required &middot; foundation</span>`
+      : (req?`<span class="badge ${req==='req'?'bg-pink-lt':'bg-secondary-lt'} ms-2">${req==='req'?'Required':'Optional'}</span>`:'');
+    const doc = DOC[m.id];
+    const idx = m.steps.map((s,i)=>({s,i}));
+    const youRows = idx.filter(x=>x.s.who==='you').map(x=>stepRow(x.s,m,x.i)).join('');
+    const ssRows  = idx.filter(x=>x.s.who==='ss').map(x=>stepRow(x.s,m,x.i)).join('');
+    const bh = m.id==='brand' ? `
+      <div class="px-3 py-3 border-bottom" style="background:#f5f6f8">
+        <div class="fw-bold text-uppercase small text-secondary mb-3">Competitor configuration</div>
+        <div class="row g-2 align-items-start mb-3" style="max-width:560px">
+          <div class="col-md-7"><label class="form-label">Competitor title</label><input class="form-control" id="bhComp" placeholder="e.g. Valheim" value="${bhVal.replace(/"/g,'&quot;')}" onkeydown="if(event.key==='Enter'){event.preventDefault();bhSaveComp(this.value);}">${bhVal.trim().length>1?`<div class="text-green small mt-1"><i class="ti ti-check me-1"></i>Saved</div>`:`<div class="text-secondary small mt-1">Press Enter to save</div>`}</div>
+          <div class="col-md-5"><label class="form-label">Steam App ID <span class="text-secondary fw-normal">(optional)</span></label><input class="form-control" id="bhSteam" placeholder="e.g. 892970" value="${bhSteam.replace(/"/g,'&quot;')}" onkeydown="if(event.key==='Enter'){event.preventDefault();bhSaveSteam(this.value);}">${bhSteam.trim().length>0?`<div class="text-green small mt-1"><i class="ti ti-check me-1"></i>Saved</div>`:`<div class="text-secondary small mt-1">Press Enter to save</div>`}</div>
+        </div>
+        <label class="form-label">Additional competitor titles <span class="text-secondary fw-normal">&mdash; track more rival games &middot; &euro;250 each</span></label>
+        <div class="d-flex gap-2 mb-2" style="max-width:420px">
+          <input class="form-control" id="bhKw" placeholder="e.g. Palworld" onkeydown="if(event.key==='Enter'){event.preventDefault();bhAddKw();}">
+          <button class="btn btn-outline-primary text-nowrap" type="button" onclick="bhAddKw()">Request title</button>
+        </div>
+        ${bhKeywords.length?`<div class="alert alert-info py-2 mt-2 mb-0"><i class="ti ti-info-circle me-1"></i>Requested: <strong>${bhKeywords.map(esc).join(', ')}</strong> &mdash; ${bhKeywords.length} title${bhKeywords.length>1?'s':''} &times; &euro;250 = <strong>&euro;${(bhKeywords.length*250).toLocaleString('de-DE')}</strong>. Your account manager will be in touch to confirm.</div>`:''}
+      </div>`:'';
+    return `
+      <div class="card mb-2 ip-mod ${open.has(m.id)?'open':''}" data-m="${m.id}">
+        <div class="card-status-start ${MOD_STATUS[st]}"></div>
+        <div class="card-body py-2 ip-mod-head" role="button" tabindex="0" data-toggle="${m.id}">
+          <div class="row align-items-center">
+            <div class="col-auto"><i class="ti ti-chevron-right ip-chev text-secondary"></i></div>
+            <div class="col">
+              <div class="fw-bold d-flex align-items-center flex-wrap">${m.name}${tag}</div>
+              <div class="text-secondary small">${m.note}</div>
+            </div>
+            <div class="col-auto d-none d-md-block" style="width:170px">
+              <div class="progress progress-sm"><div class="progress-bar" style="width:${ypct}%"></div></div>
+              <div class="small text-secondary text-end mt-1">${yp.done}/${yp.total} your tasks</div>
+            </div>
+            <div class="col-auto text-end" style="width:120px"><span class="badge ${bcls}">${blab}</span></div>
+          </div>
+        </div>
+        <div class="ip-steps ${open.has(m.id)?'':'d-none'}">
+          <div class="px-3 pt-3 pb-1 text-uppercase fw-bold small text-secondary">Your tasks <span class="fw-normal text-lowercase">&middot; ${yp.done} of ${yp.total} done</span></div>
+          <table class="table table-vcenter card-table mb-0">
+            <thead><tr><th class="w-1"></th><th>Task</th><th class="w-1">Est.</th><th class="w-1">Deadline</th><th class="w-1 text-end">Status</th></tr></thead>
+            <tbody>${youRows}</tbody>
+          </table>
+          ${bh}
+          ${ssRows?`<div class="border-top border-bottom mt-2" style="background:#f5f6f8">
+            <div class="px-3 pt-2 pb-1 text-uppercase fw-bold small text-secondary">Handled by Second Stage <span class="fw-normal text-lowercase">&middot; ${sp.done} of ${sp.total} done</span></div>
+            <table class="table table-vcenter card-table mb-0 bg-transparent" style="--tblr-table-bg:transparent">${ssRows}</table>
+          </div>`:''}
+          ${DOC[m.id]?`<div class="px-3 py-2"><a href="${DOC[m.id]}" target="_blank" rel="noopener" class="link-secondary small"><i class="ti ti-book-2 me-1"></i>Open the ${m.name} guide</a></div>`:''}
+        </div>
+      </div>`;
+  };
+  const slot = document.getElementById('foundationSlot');
+  const foundationCards = MODULES.filter(m=>m.foundation).map(cardHtml).join('');
+  // "Start here" + Google Cloud Project stay pinned at the top in every state
+  slot.innerHTML = `<div class="mb-2"><span class="h3">Start here</span></div>`
+    + `<p class="text-secondary">Your Google Cloud project hosts TRACKS — it's required no matter what you measure.</p>`
+    + foundationCards + `<hr class="my-4">`;
+  const list = none ? [] : MODULES.filter(m=>!m.foundation && need[m.id]);
+  list.sort((a,b)=> modAttention(a)-modAttention(b) || MODULES.indexOf(a)-MODULES.indexOf(b)); // attention first, done last
+  document.getElementById('modules').innerHTML = list.map(cardHtml).join('');
+
+  document.querySelectorAll('.ip-mod-head').forEach(h=>{
+    const toggle=()=>{const id=h.dataset.toggle,card=h.closest('.ip-mod'); open.has(id)?open.delete(id):open.add(id); card.classList.toggle('open'); card.querySelector('.ip-steps').classList.toggle('d-none');};
+    h.onclick=toggle;
+    h.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();} };
+  });
+}
+
+function renderOverall(){
+  const need=neededMap(), none=selected.size===0;
+  const mods=MODULES.filter(m=>m.foundation||need[m.id]);
+  let yd=0,yt=0,ad=0,at=0;
+  mods.forEach(m=>{const y=doneYou(m),o=modDone(m); yd+=y.done;yt+=y.total; ad+=o.done;at+=o.total;});
+  const yp=yt?Math.round(yd/yt*100):0, op=at?Math.round(ad/at*100):0;
+  document.getElementById('goalCount').textContent=selected.size;
+  const ovPct=document.getElementById('ovPct'), ovBar=document.getElementById('ovBar');
+  const allDone = !none && mods.every(m=>modStatus(m)==='done');
+  if(none){
+    ovPct.textContent='—'; ovBar.style.width='0%';
+    document.getElementById('ovT1').textContent='No goals selected';
+    document.getElementById('ovT2').textContent='Pick at least one outcome above to build your plan.';
+    document.getElementById('setupSub').textContent='Select your goals above to see the modules they need.';
+  }else if(allDone){
+    ovPct.textContent=yp+'%'; ovBar.style.width=yp+'%';
+    document.getElementById('ovT1').innerHTML='&#127881; All set &mdash; your integration is complete';
+    document.getElementById('ovT2').textContent='Every module in your plan is done.';
+    document.getElementById('setupSub').textContent='Only the modules your goals need are shown.';
+  }else{
+    ovPct.textContent=yp+'%'; ovBar.style.width=yp+'%';
+    document.getElementById('ovT1').textContent=yd+' of '+yt+' of your tasks done';
+    document.getElementById('ovT2').textContent='Overall incl. Second Stage: '+op+'% · '+mods.length+' module'+(mods.length>1?'s':'')+' needed.';
+    document.getElementById('setupSub').textContent='Only the modules your goals need are shown.';
+  }
+  let overdue=0, soon=0;
+  mods.forEach(m=>m.steps.forEach(s=>{const f=dlFlag(s); if(f==='overdue')overdue++; else if(f==='soon')soon++;}));
+  document.getElementById('ovDeadlines').innerHTML = (overdue||soon)
+    ? (overdue?`<span class="badge bg-red-lt d-inline-flex align-items-center mb-1"><i class="ti ti-alert-triangle me-1"></i>${overdue} overdue</span> `:'')
+      + (soon?`<span class="badge bg-yellow-lt mb-1">${soon} due soon</span>`:'')
+    : `<span class="badge bg-green-lt">On track</span>`;
+}
+
+function sync(){renderGoals();renderModules();renderOverall();}
+
+function bhSaveComp(v){
+  bhVal=v;
+  MODULES.find(m=>m.id==='brand').steps[0].s = v.trim().length>1?'completed':'notstarted';
+  renderModules();renderOverall();
+  const bi=document.getElementById('bhComp'); if(bi){bi.focus();bi.setSelectionRange(bi.value.length,bi.value.length);}
+}
+function bhSaveSteam(v){
+  bhSteam=v;
+  renderModules();
+  const bi=document.getElementById('bhSteam'); if(bi){bi.focus();bi.setSelectionRange(bi.value.length,bi.value.length);}
+}
+function bhAddKw(){ const el=document.getElementById('bhKw'); if(!el) return; const v=el.value.trim(); if(v) bhKeywords.push(v); el.value=''; renderModules(); const f=document.getElementById('bhKw'); if(f) f.focus(); }
+function bhRemoveKw(i){ bhKeywords.splice(i,1); renderModules(); }
+function setStep(mid,idx,val){
+  const m=MODULES.find(x=>x.id===mid); if(!m) return;
+  m.steps[idx].s=val;
+  renderModules(); renderOverall();
+}
+
+document.getElementById('selectAll').onclick=e=>{e.preventDefault();GOALS.forEach(g=>selected.add(g.id));sync();};
+document.getElementById('clearAll').onclick=e=>{e.preventDefault();selected.clear();sync();};
+
+// demo deadlines (relative to today so the overdue / due-soon states always render)
+const DEMO_DL={media:[-4,2,11], landing:[3,3], attribution:[18,25]};
+MODULES.forEach(m=>{const arr=DEMO_DL[m.id]; if(arr) m.steps.forEach((s,i)=>{ if(s.who==='you'&&arr[i]!==undefined) s.dl=isoOffset(arr[i]); });});
+sync();
+</script>
+</body>
+</html>
